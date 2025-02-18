@@ -12,6 +12,6 @@ COPY ./src .
 
 RUN npx tsc
 
-EXPOSE 9000
+EXPOSE 80
 
 ENTRYPOINT ["node", "main.js"]

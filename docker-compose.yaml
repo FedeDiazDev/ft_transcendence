@@ -1,0 +1,123 @@
+services:
+  nginx:
+    container_name: nginx-lb
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - auth-service
+      - game-service
+    networks:
+      - transcendence-network
+
+  frontend:
+    container_name: frontend-spa
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # depends_on:
+    #   - nginx
+    networks:
+      - transcendence-network
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    volumes:
+      - auth-db:/data   # SQLite DB
+    networks:
+      - transcendence-network
+
+  game-service:
+    container_name: game-service
+    build:
+      context: ./game-service
+      dockerfile: Dockerfile
+    volumes:
+      - game-data-db:/data    # SQLite
+    networks:
+      - transcendence-network
+
+  # Other services here
+
+  # Monitoring Stack
+  elasticsearch:
+    image: elasticsearch:8.17.2
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+    networks:
+      - transcendence-network
+
+  kibana:
+    image: kibana:8.17.2
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - transcendence-network
+
+  prometheus:
+    image: prom/prometheus:v3.2.0
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - prometheus-data:/prometheus   # Persist metrics data
+    ports:
+      - "9090:9090"
+    depends_on:
+      - nginx
+      - auth-service
+      - game-service
+    networks:
+      - transcendence-network
+
+  grafana:
+    image: grafana/grafana:11.3.4
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana   # Persist dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - transcendence-network
+
+volumes:
+  auth-db:
+    driver: local
+    driver_opts:
+      type: none
+      device: /vol-route/auth-db
+  game-data-db:
+    driver: local
+    driver_opts:
+      type: none
+      device: /vol-route/game-data-db
+  elasticsearch-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /vol-route/elasticsearch-data
+  grafana-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /vol-route/grafana-data
+  prometheus-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /vol-route/prometheus-data
+
+networks:
+  transcendence-network:
+    driver: bridge
