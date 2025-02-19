@@ -14,7 +14,9 @@ COPY ./postcss.config.js ./postcss.config.js
 COPY ./tailwind.config.js ./tailwind.config.js
 
 RUN npx tsc
+RUN npx tailwindcss -i ./src/styles.css -o ./dist/styles.css 
+RUN npm install -g http-server
 
 EXPOSE 9000
 
-ENTRYPOINT ["node", "dist/main.js"]
+ENTRYPOINT ["http-server", "src", "-p", "9000"]
