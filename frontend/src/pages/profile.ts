@@ -11,4 +11,4 @@ export const Profile = () => {
     
     div.appendChild(ProfileView());
     return div;
-}
+};

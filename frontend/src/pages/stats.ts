@@ -8,5 +8,4 @@ export const StatsView = () => {
     container.appendChild(matchContainer);
     matchContainer.appendChild(CardGame("Victorias", "text-green"));
     matchContainer.appendChild(CardGame("Derrotas", "text-red"));
-
 };
