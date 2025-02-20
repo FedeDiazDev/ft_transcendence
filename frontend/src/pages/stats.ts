@@ -4,6 +4,7 @@ import { ScoreCard } from "../components/ScoreCard.js";
 export const StatsView = () => {
     const container = document.createElement("div");
     container.className = "flex flex-col gap-4"
+  
     const statsContainer = document.createElement("div");
     const winMatchContainer = document.createElement("div");
     const looseMatchContainer = document.createElement("div");

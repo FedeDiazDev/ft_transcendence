@@ -13,4 +13,4 @@ export const ProfileView = () => {
     container.appendChild(passwordInput);
 
     return container;
-}
+};

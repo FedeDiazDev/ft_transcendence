@@ -1,9 +1,16 @@
 import { Home } from "./pages/home.js";
 import { Game } from "./pages/game.js";
-import { Profile } from "./pages/profile.js"
+import { Profile } from "./pages/profile.js";
+import { LogHome } from "./pages/loghome.js";
+import { Login } from "./pages/login.js";
+import { Signup } from "./pages/signup.js";
 import { StatsView } from "./pages/stats.js";
+
 const routes: Record<string, () => HTMLElement> = {
   "/": Home,
+  "/loghome": LogHome,
+  "/login": Login,
+  "/signup": Signup,
   "/profile": Profile,
   "/stats": StatsView,  
   "/friends": () => {
