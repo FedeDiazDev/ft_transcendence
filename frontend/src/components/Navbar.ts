@@ -24,7 +24,7 @@ export const Navbar = () => {
       const a = document.createElement("a");
       a.textContent = text;
       a.href = path;
-      a.className = "px-3 py-2 rounded hover:bg-gray-700 transition";
+      a.className = "px-3 py-2 rounded-lg hover:bg-gray-700 transition";
       a.addEventListener("click", (e) => {
         e.preventDefault();
         window.history.pushState({}, "", path);

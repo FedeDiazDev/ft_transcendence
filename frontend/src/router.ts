@@ -4,6 +4,7 @@ import { Profile } from "./pages/profile.js";
 import { LogHome } from "./pages/loghome.js";
 import { Login } from "./pages/login.js";
 import { Signup } from "./pages/signup.js";
+import { StatsView } from "./pages/stats.js";
 
 const routes: Record<string, () => HTMLElement> = {
   "/": Home,
@@ -11,16 +12,13 @@ const routes: Record<string, () => HTMLElement> = {
   "/login": Login,
   "/signup": Signup,
   "/profile": Profile,
+  "/stats": StatsView,  
   "/friends": () => {
     const div = document.createElement("div");
     div.innerHTML = "<h2>🫂 Lista de amigos</h2>";
     return div;
   },
-  "/stats": () => {
-    const div = document.createElement("div");
-    div.innerHTML = "<h2>📊 Estadísticas</h2>";
-    return div;
-  },
+  
 };
 
 export const render = () => {
