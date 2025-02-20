@@ -1,20 +1,17 @@
 import { Home } from "./pages/home.js";
 import { Game } from "./pages/game.js";
 import { Profile } from "./pages/profile.js"
-
+import { StatsView } from "./pages/stats.js";
 const routes: Record<string, () => HTMLElement> = {
   "/": Home,
   "/profile": Profile,
+  "/stats": StatsView,  
   "/friends": () => {
     const div = document.createElement("div");
     div.innerHTML = "<h2>🫂 Lista de amigos</h2>";
     return div;
   },
-  "/stats": () => {
-    const div = document.createElement("div");
-    div.innerHTML = "<h2>📊 Estadísticas</h2>";
-    return div;
-  },
+  
 };
 
 export const render = () => {

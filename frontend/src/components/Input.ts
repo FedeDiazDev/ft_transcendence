@@ -8,7 +8,7 @@ export const Input = (type: string = "text", value: string = "", placeholder?: s
     input.placeholder = placeholder;
   }
 
-  input.className = `p-2 border rounded focus:outline-none transition ${
+  input.className = `p-2 border rounded-lg focus:outline-none transition ${
     editable ? "bg-white focus:ring-2 focus:ring-blue-500" : "bg-gray-200 cursor-not-allowed"
   }`;
 
