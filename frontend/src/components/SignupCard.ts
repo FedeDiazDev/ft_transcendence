@@ -18,5 +18,9 @@ export const SignupCard = () => {
         input.className = "text-black p-2 border rounded focus:outline-none transition";
         div.appendChild(input);
     }
+    const button = document.createElement("button");
+    button.textContent = "Sign Up";
+    button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
+    div.appendChild(button);
     return div;
 }
