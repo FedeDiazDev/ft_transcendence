@@ -1,6 +1,8 @@
-# trascendence
+# Trascendence
 
-## Levantar Container SPA
+### Levantar Container SPA
 
+```bash
 docker build -t front .
-docker run -p 9000:9000 front -d
+
+docker run -p 9000:9000 front
