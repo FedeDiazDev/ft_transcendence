@@ -2,7 +2,10 @@ import { Status } from "./Status.js";
 
 export const Friend = (avatarUrl: string, name: string, connected: boolean) => {
     const container = document.createElement("div");
-    container.className = "flex items-center gap-4 p-4 bg-gray-800 text-white rounded-lg shadow-md w-80";
+    container.className = "flex justify-between items-center p-4 bg-gray-800 text-white rounded-lg shadow-md w-80";
+    
+    const leftContainer = document.createElement("div");
+    leftContainer.className = "flex items-center gap-3";
 
     const avatar = document.createElement("img");
     avatar.src = avatarUrl;
@@ -13,18 +16,23 @@ export const Friend = (avatarUrl: string, name: string, connected: boolean) => {
     username.textContent = name;
     username.className = "text-lg font-semibold";
 
+    leftContainer.appendChild(avatar);
+    leftContainer.appendChild(username);
+    
+    const rightContainer = document.createElement("div");
+    rightContainer.className = "flex items-center gap-3";
+
     const scoreboard = document.createElement("span");
     scoreboard.textContent = "📊";
     scoreboard.className = "text-xl";
 
-    // Estado de conexión
     const statusIndicator = Status(connected);
 
-    // Agregar elementos al contenedor
-    container.appendChild(avatar);
-    container.appendChild(username);
-    container.appendChild(scoreboard);
-    container.appendChild(statusIndicator);
+    rightContainer.appendChild(scoreboard);
+    rightContainer.appendChild(statusIndicator);
+    
+    container.appendChild(leftContainer);
+    container.appendChild(rightContainer);
 
     return container;
 };
