@@ -1,6 +1,6 @@
 import { Status } from "./Status.js";
-
-export const Friend = (avatarUrl: string, name: string, connected: boolean) => {
+import { navigateTo } from "../router.js";
+export const Friend = (avatarUrl: string, name: string, connected: boolean, userId: number) => {
     const container = document.createElement("div");
     container.className = "flex justify-between items-center p-4 bg-gray-800 text-white rounded-lg shadow-md w-80";
     
@@ -14,7 +14,11 @@ export const Friend = (avatarUrl: string, name: string, connected: boolean) => {
 
     const username = document.createElement("p");
     username.textContent = name;
-    username.className = "text-lg font-semibold";
+    username.className = "text-lg font-semibold cursor-pointer hover:text-blue-400 transition";
+    username.title = "Ver perfil"; 
+    username.addEventListener("click", () => {
+        navigateTo(`/profile/${userId}`);
+    });
 
     leftContainer.appendChild(avatar);
     leftContainer.appendChild(username);
@@ -24,7 +28,13 @@ export const Friend = (avatarUrl: string, name: string, connected: boolean) => {
 
     const scoreboard = document.createElement("span");
     scoreboard.textContent = "📊";
-    scoreboard.className = "text-xl";
+    scoreboard.className = "text-xl cursor-pointer hover:text-blue-400 transition";
+    scoreboard.title = "Ver estadísticas";
+    
+    scoreboard.addEventListener("click", () => {
+        navigateTo(`/stats/${userId}`);
+    });
+;
 
     const statusIndicator = Status(connected);
 
