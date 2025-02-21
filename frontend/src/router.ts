@@ -1,5 +1,5 @@
 import { Home } from "./pages/home.js";
-import { Game } from "./pages/game.js";
+import { Friend } from "./pages/friends.js";
 import { Profile } from "./pages/profile.js";
 import { LogHome } from "./pages/loghome.js";
 import { Login } from "./pages/login.js";
@@ -12,24 +12,42 @@ const routes: Record<string, () => HTMLElement> = {
   "/login": Login,
   "/signup": Signup,
   "/profile": Profile,
-  "/stats": StatsView,  
-  "/friends": () => {
-    const div = document.createElement("div");
-    div.innerHTML = "<h2>🫂 Lista de amigos</h2>";
-    return div;
-  },
-  
+  "/stats": StatsView,
+  "/friends": Friend,
 };
 
 export const render = () => {
   const app = document.getElementById("app");
   if (app) {
     app.innerHTML = "";
-    const component = routes[window.location.pathname] || (() => {
+
+    const path = window.location.pathname;
+    const pathParts = path.split("/");
+    //TODO: en un futuro hacer que StatsView reciba el id del usuario que queremos ver
+    if (pathParts[1] === "stats" && pathParts.length === 3) {
+      const id = pathParts[2];
+      const div = document.createElement("div");
+      div.innerHTML = `<h2>📊 Estadísticas del usuario ${id}</h2>`;
+      div.appendChild(StatsView());
+      app.appendChild(div);
+      return;
+    }
+    //TODO: en un futuro hacer que Profile reciba el id del usuario que queremos ver
+    if (pathParts[1] === "profile" && pathParts.length === 3) {
+      app.innerHTML = "";
+      const id = pathParts[2];
+      const div = document.createElement("div");
+      div.innerHTML = `<h2>📊 Perfil del usuario ${id}</h2>`;      
+      div.appendChild(Profile());
+      app.appendChild(div);
+      return;
+    }
+    const component = routes[path] || (() => {
       const div = document.createElement("div");
       div.innerHTML = "<h2>404 - Página no encontrada</h2>";
       return div;
     });
+
     app.appendChild(component());
   }
 };
