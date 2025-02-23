@@ -5,7 +5,7 @@ import { LogHome } from "./pages/loghome.js";
 import { Login } from "./pages/login.js";
 import { Signup } from "./pages/signup.js";
 import { StatsView } from "./pages/stats.js";
-
+import { Game } from "./pages/Game.js"
 const routes: Record<string, () => HTMLElement> = {
   "/": Home,
   "/loghome": LogHome,
@@ -14,6 +14,7 @@ const routes: Record<string, () => HTMLElement> = {
   "/profile": Profile,
   "/stats": StatsView,
   "/friends": Friend,
+  "/local_game": Game
 };
 
 export const render = () => {
