@@ -5,9 +5,9 @@ import { LogHome } from "./pages/loghome.js";
 import { Login } from "./pages/login.js";
 import { Signup } from "./pages/signup.js";
 import { StatsView } from "./pages/stats.js";
+import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from  "./pages/online.js"
-
 const routes: Record<string, () => HTMLElement> = {
   "/": Home,
   "/loghome": LogHome,
@@ -17,7 +17,9 @@ const routes: Record<string, () => HTMLElement> = {
   "/stats": StatsView,
   "/friends": Friend,
   "/local_game": Game,
-  "/online_game": Online
+  "/online_game": Online,
+  "/create_tournament": CreateTournament,
+  "/tournament/waiting_room": Online
 };
 
 export const render = () => {
