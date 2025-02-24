@@ -1,4 +1,4 @@
-import { MatchCard } from "./stats/MatchCard.js";
+import { MatchCard } from "./MatchCard.js";
 
 export const ScoreCard = () => {
 	const container = document.createElement("div");

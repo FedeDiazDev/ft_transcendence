@@ -1,4 +1,4 @@
-import { navigateTo } from "../router.js";
+import { navigateTo } from "../../router.js";
 
 export const LogHomeCard = () => {
     const div = document.createElement("div");
