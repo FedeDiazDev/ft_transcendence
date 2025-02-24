@@ -1,4 +1,4 @@
-import { SignupCard } from "../components/SignupCard.js"
+import { SignupCard } from "../components/auth/SignupCard.js"
 
 export const Signup = () => {
     const div = document.createElement("div");

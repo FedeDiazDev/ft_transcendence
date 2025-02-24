@@ -1,5 +1,5 @@
-import { FriendList } from "../components/FiendsList.js";
-import { SearchBar } from "../components/SearchBar.js"
+import { FriendList } from "../components/friends/FiendsList.js";
+import { SearchBar } from "../components/common/SearchBar.js"
 
 export const Friend = () => {
     const div = document.createElement("div");

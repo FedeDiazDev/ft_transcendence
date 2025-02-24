@@ -1,4 +1,4 @@
-import { Navbar } from "./components/Navbar.js";
+import { Navbar } from "./components/common/Navbar.js";
 import { LogHome } from "./pages/loghome.js";
 
 document.addEventListener("DOMContentLoaded", () => {

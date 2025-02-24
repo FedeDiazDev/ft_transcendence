@@ -1,4 +1,4 @@
-import { render } from "../router.js";
+import { render } from "../../router.js";
 
 export const Card = (icon: string, text: string, path: string) => {
     const card = document.createElement("button");
