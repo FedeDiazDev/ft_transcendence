@@ -1,6 +1,6 @@
 const fastify = require('fastify')({ logger:true })
 
-fastify.get('/signup', function handler (request, reply){
+fastify.post('/signup', function handler (request, reply){
 	const {username, email, pass} = request.body;
 	if (username && email && pass)
 		reply.send({is: 'working'});

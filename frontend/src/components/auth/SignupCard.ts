@@ -21,6 +21,24 @@ export const SignupCard = () => {
     const button = document.createElement("button");
     button.textContent = "Sign Up";
     button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
+
+    const user = {
+        nickname: "fmoran-m",
+        password: "1234",
+        email: "fmoran-m"
+    }
+
+    button.addEventListener("click", async () => {
+        const response = await fetch("http://localhost:3000/signup", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(user),
+        });
+        const responseText = await response.text();
+        console.log(responseText);
+    });
     div.appendChild(button);
     return div;
 }
