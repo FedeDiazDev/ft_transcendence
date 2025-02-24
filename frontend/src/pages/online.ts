@@ -1,4 +1,4 @@
-import { WaitingRoom } from "../components/WaitingRoom.js";
+import { WaitingRoom } from "../components/common/WaitingRoom.js";
 
 export const Online = () => {
     const container = document.createElement("div");

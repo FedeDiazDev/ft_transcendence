@@ -1,4 +1,4 @@
-import { GameCanvas } from "../components/Canvas.js"; 
+import { GameCanvas } from "../components/game/Canvas.js"; 
 
 export const Game = () => {
     const container = document.createElement("div");

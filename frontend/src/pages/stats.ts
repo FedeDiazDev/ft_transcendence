@@ -1,5 +1,5 @@
-import { CardGame } from "../components/CardGame.js";
-import { ScoreCard } from "../components/ScoreCard.js";
+import { CardGame } from "../components/stats/CardGame.js";
+import { ScoreCard } from "../components/stats/ScoreCard.js";
 
 export const StatsView = () => {
     const container = document.createElement("div");
