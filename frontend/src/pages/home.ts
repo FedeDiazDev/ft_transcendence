@@ -1,4 +1,4 @@
-import { Card } from "../components/Card.js";
+import { Card } from "../components/common/Card.js";
 
 export const Home = () => {
   const div = document.createElement("div");
@@ -7,7 +7,7 @@ export const Home = () => {
   const cards = [
     { title: "🔥", description: "Local", path: '/local_game' },
     { title: "🚀", description: "Online", path: '/online_game' },
-    { title: "🎮", description: "Torneo", path: '/tournament' },
+    { title: "🎮", description: "Torneo", path: '/create_tournament' },
   ];
 
   cards.forEach(({ title, description, path }) => {

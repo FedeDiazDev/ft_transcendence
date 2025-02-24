@@ -1,6 +1,9 @@
+import { GameCanvas } from "../components/game/Canvas.js"; 
+
 export const Game = () => {
-    const div = document.createElement("div");
-    div.innerHTML = "<h2 class='text-2xl'>🎮 ¡Vamos a jugar Pong!</h2>";
-    return div;
-  };
-  
+    const container = document.createElement("div");
+    container.className = "flex justify-center items-center h-screen bg-black mt-10";
+    const canvas = GameCanvas();
+    container.appendChild(canvas);
+    return container;
+};
