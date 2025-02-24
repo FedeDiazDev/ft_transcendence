@@ -1,0 +1,61 @@
+services:
+  nginx:
+    container_name: nginx-lb
+    build:
+      context: ./reverse-proxy
+      dockerfile: Dockerfile
+    ports:
+    # Port 8080:443 mapping means: 1. host machine exposes port 8080, 2. nginx listens on port 443
+    # Useful when you can't expose a priviledged port but want to run the service as priviledged
+      - "8080:443"
+    volumes:
+      - front-spa:/var/www/html
+    depends_on:
+      - frontend
+      # - auth-service
+      # - game-service
+    networks:
+      - transcendence-network
+
+  frontend:
+    container_name: frontend-spa
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - front-spa:/usr/src/app/
+    networks:
+      - transcendence-network
+
+  # auth-service:
+  #   container_name: auth-service
+  #   build:
+  #     context: ./auth-service
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - auth-db:/data   # SQLite DB
+  #   networks:
+  #     - transcendence-network
+
+  # game-service:
+  #   container_name: game-service
+  #   build:
+  #     context: ./game-service
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - game-data-db:/data    # SQLite
+  #   networks:
+  #     - transcendence-network
+
+  # Other services here
+
+
+volumes:
+  front-spa:
+  # auth-db:
+  # game-data-db:
+  
+
+networks:
+  transcendence-network:
+    driver: bridge
