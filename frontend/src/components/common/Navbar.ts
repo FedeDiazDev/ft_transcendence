@@ -1,4 +1,4 @@
-import { render } from "../router.js";
+import { render } from "../../router.js";
 
 export const Navbar = () => {
     const nav = document.createElement("nav");

@@ -1,4 +1,4 @@
-import { ProfileView } from "../components/ProfileCard.js"
+import { ProfileView } from "../components/common/ProfileCard.js"
 
 export const Profile = () => {
     const div = document.createElement("div");

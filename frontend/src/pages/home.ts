@@ -1,4 +1,4 @@
-import { Card } from "../components/Card.js";
+import { Card } from "../components/common/Card.js";
 
 export const Home = () => {
   const div = document.createElement("div");

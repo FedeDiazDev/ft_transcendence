@@ -1,4 +1,4 @@
-import { LogHomeCard } from "../components/LogHomeCard.js"
+import { LogHomeCard } from "../components/auth/LogHomeCard.js"
 
 export const LogHome = () => {
     const div = document.createElement("div");

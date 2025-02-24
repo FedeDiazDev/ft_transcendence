@@ -1,5 +1,5 @@
-import { Status } from "./Status.js";
-import { navigateTo } from "../router.js";
+import { Status } from "../common/Status.js";
+import { navigateTo } from "../../router.js";
 export const Friend = (avatarUrl: string, name: string, connected: boolean, userId: number) => {
     const container = document.createElement("div");
     container.className = "flex justify-between items-center p-4 bg-gray-800 text-white rounded-lg shadow-md w-80";
