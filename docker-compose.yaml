@@ -5,8 +5,9 @@ services:
       context: ./reverse-proxy
       dockerfile: Dockerfile
     ports:
-      - "80:80"
-      - "443:443"
+    # Port 8080:443 mapping means: 1. host machine exposes port 8080, 2. nginx listens on port 443
+    # Useful when you can't expose a priviledged port but want to run the service as priviledged
+      - "8080:443"
     volumes:
       - front-spa:/var/www/html
     depends_on:
@@ -51,21 +52,8 @@ services:
 
 volumes:
   front-spa:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/nerea/Documents/transcendence-pvc/front-spa
-      o: bind
   # auth-db:
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     device: /home/nerea/Documents/transcendence-pvc/auth-db
   # game-data-db:
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     device: /home/nerea/Documents/transcendence-pvc/game-data-db
   
 
 networks:
