@@ -1,11 +1,48 @@
-const fastify = require('fastify')({ logger:true })
+import Fastify from 'fastify'
+const fastify = Fastify({
+	logger: true
+  })
 
-fastify.post('/signup', function handler (request, reply){
-	const {username, email, pass} = request.body;
-	if (username && email && pass)
-		reply.send({is: 'working'});
-	else
-		reply.send({not: 'going'});
+const connectOptions = {
+    host: '0.0.0.0',
+    port: 3000
+}
+
+const opts = {
+  schema: { 
+    body: {
+      type: "object",
+      properties: {
+        nickname: { type: "string" },
+        email: { type: "string" },
+        password: { type: "string" }
+      },
+      required: ["nickname", "email", "password"]
+    },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          hello: { type: "string" }
+        }
+      }
+    }
+  }
+};
+
+function serverError(err) {
+    if (err) {
+        fastify.log.error(err);
+        process.exit(1);
+    }
+}
+
+fastify.get('/', async function handler (request, reply) {
+	return { root: 'works' }
 })
 
-fastify.listen({ port: 3000, host: '0.0.0.0',});
+fastify.post("/signup", opts, async function handler (request, reply) {
+	reply.send({"post" : "complete"});
+});
+
+fastify.listen(connectOptions, serverError);

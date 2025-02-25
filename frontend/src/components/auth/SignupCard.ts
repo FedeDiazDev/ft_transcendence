@@ -3,7 +3,7 @@ export const SignupCard = () => {
     div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-64 min-h-80 mx-auto text-white justify-evenly";
 
     const names = ["Nickname", "Email", "Password", "Confirm password"];
-    for (let i:number = 0; i < 4; i++){
+    for (let i:number = 0; i < names.length; i++){
         const text = document.createElement("h3");
         text.textContent = names[i];
         div.appendChild(text);
@@ -22,23 +22,6 @@ export const SignupCard = () => {
     button.textContent = "Sign Up";
     button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
 
-    const user = {
-        nickname: "fmoran-m",
-        password: "1234",
-        email: "fmoran-m"
-    }
-
-    button.addEventListener("click", async () => {
-        const response = await fetch("http://localhost:3000/signup", {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(user),
-        });
-        const responseText = await response.text();
-        console.log(responseText);
-    });
     div.appendChild(button);
     return div;
 }
