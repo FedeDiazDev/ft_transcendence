@@ -12,6 +12,9 @@ export async function movePaddle(request, reply) {
   if (!player || !direction) {
     return reply.status(400).send({ error: "Faltan datos" });
   }
+  if (!["left", "right"].includes(player) || !["up", "down"].includes(direction)) {
+    return reply.status(400).send({ error: "Valores no validos" });
+  }
 
   game.movePaddle(player, direction);
 
@@ -23,7 +26,6 @@ export async function startGame(request, reply) {
   reply.send({ message: "Juego iniciado", status: game.status });
 }
 
-export async function createGame(request, reply)
-{
-	reply.send({ message: "Juego creado"})
+export async function createGame(request, reply) {
+  reply.send({ message: "Juego creado" })
 }
