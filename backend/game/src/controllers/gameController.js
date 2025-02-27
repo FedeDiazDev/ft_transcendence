@@ -18,12 +18,12 @@ export async function movePaddle(request, reply) {
 
   game.movePaddle(player, direction);
 
-  reply.send({ message: `${game.paddles[player]}` });
+  reply.send({ message: game.paddles[player] });
 }
 
 export async function startGame(request, reply) {
   game.start();
-  reply.send({ message: "Juego iniciado", status: game.status });
+  reply.send({ message: "Juego iniciado", game: game });
 }
 
 export async function createGame(request, reply) {
