@@ -1,4 +1,6 @@
-import Fastify from 'fastify'
+import Fastify from 'fastify';
+import dbConnector from './database.js';
+import routes from './routes.js';
 
 const fastify = Fastify({
 	logger: true
@@ -31,16 +33,7 @@ const opts = {
 	}
   };
   
-
-fastify.get('/', async function handler (request, reply) {
-	return { root: 'works' }
-})
-
-fastify.post("/signup", opts, async function handler (request, reply) {
-	if (request.body.password != request.body.confirmPassword)
-		reply.status(400).send({message : "Password does not match"},);
-	else
-		reply.send({message : "Successful request"});
-});
+fastify.register(routes);
+fastify.register(dbConnector);
 
 fastify.listen(connectOptions, serverError);

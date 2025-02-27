@@ -34,8 +34,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-  #   volumes:
-  #     - auth-db:/data   # SQLite DB
+    volumes:
+      - auth-db:/data/
   #   networks:
   #     - transcendence-network
 
@@ -54,7 +54,7 @@ services:
 
 volumes:
   front-spa:
-  # auth-db:
+  auth-db:
   # game-data-db:
   
 

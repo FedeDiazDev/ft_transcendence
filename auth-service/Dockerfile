@@ -1,5 +1,7 @@
 FROM node:22
 
+RUN mkdir data
+
 WORKDIR /usr/src/app/
 
 COPY package.json package.json
@@ -11,4 +13,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "server"]
+CMD ["node", "src/server"]
