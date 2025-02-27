@@ -1,3 +1,3 @@
-export default function getRoot(reply){
-	reply.status(200).send("everything fine");
+export default function getRoot(request, reply){
+	reply.status(200).send({message : "hola como estamos"});
 }
