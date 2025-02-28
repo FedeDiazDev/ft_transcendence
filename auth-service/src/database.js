@@ -6,6 +6,9 @@ function dbConnector(fastify) {
     const dbFile = "/data/auth.db";
     const db = new Database(dbFile, { verbose: console.log });
 
+	//Improve performance writting in the database
+	db.pragma('journal_mode = WAL');
+
     //Creates table
   
     db.exec(`
@@ -13,10 +16,12 @@ function dbConnector(fastify) {
         id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        salt TEXT NOT NULL
       );
     `);
 
+ 
 //  Can access an instance of the DB from fastify
   
     fastify.decorate("db", db);

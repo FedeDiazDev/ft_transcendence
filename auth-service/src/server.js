@@ -18,21 +18,7 @@ function serverError(err) {
     }
 }
 
-const opts = {
-	schema: { 
-	  body: {
-		type: "object",
-		properties: {
-		  nickname: { type: "string" },
-		  email: { type: "string" },
-		  password: { type: "string" },
-		  confirmPassword: { type: "string" }
-		},
-		required: ["nickname", "email", "password", "confirmPassword"]
-	  }
-	}
-  };
-  
+ 
 fastify.register(routes);
 fastify.register(dbConnector);
 

@@ -2,7 +2,7 @@ export const SignupCard = () => {
     const div = document.createElement("div");
     div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-64 min-h-80 mx-auto text-white justify-evenly";
 
-    const names = ["Nickname", "Email", "Password", "Confirm password"];
+    const names = ["Username", "Email", "Password", "Confirm password"];
     for (let i:number = 0; i < names.length; i++){
         const text = document.createElement("h3");
         text.textContent = names[i];
