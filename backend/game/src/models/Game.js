@@ -1,6 +1,8 @@
 import { GameStatus } from "./GameStatus.js";
 import { Paddle } from "./Paddle.js";
 import { Ball } from "./Ball.js";
+import { canvasH } from "../controllers/gameController.js";
+import { canvasW } from "../controllers/gameController.js";
 
 export class Game {
 	constructor() {
@@ -24,6 +26,24 @@ export class Game {
 	update() {
 		if (this.status === GameStatus.PLAYING) {
 			this.ball.move();
+		}
+		//Sumar puntos a derecha
+		if (this.ball.x <= 0) {
+			this.ball.x = 50;
+			this.ball.y = 50;
+			this.ball.vx *= -1;
+			this.ball.vy = Math.random() > 0.5 ? 10 : -10;
+		}
+		//Sumar puntos a izquierda
+		else if (this.ball.x + this.ball.width >= canvasW) {
+			this.ball.x = 50;
+			this.ball.y = 50;
+			this.ball.vx *= -1;
+			this.ball.vy = Math.random() > 0.5 ? 10 : -10;
+		}
+
+		if (this.ball.y <= 0 || this.ball.y + this.ball.height >= canvasH) {
+			this.ball.vy *= -1;
 		}
 	}
 }

@@ -1,10 +1,12 @@
 import { Game } from "../models/Game.js";
 
 let game = null;
+export const canvasH = 400;
+export const canvasW = 800;
 
 export async function getGameInfo(request, reply) {
   if (game === null)
-      reply.send({message: "No hay ningun juego creado"})
+    reply.send({ message: "No hay ningun juego creado" })
   reply.send({ status: game.status, ball: game.ball, paddles: game.paddles });
 }
 
@@ -31,4 +33,9 @@ export async function startGame(request, reply) {
 export async function createGame(request, reply) {
   game = new Game();
   reply.send({ message: "Juego creado" })
+}
+
+export async function moveBall(reques, reply) {
+
+  game.update();
 }
