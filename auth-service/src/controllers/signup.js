@@ -22,6 +22,11 @@ export default function postSignup(request, reply){
 		const query = db.prepare("INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)");
 		query.run(request.body.username, request.body.email, passStruct.hash, passStruct.salt);
 
-		reply.status(200).send({message : "Registration complete"});
+		reply.status(200).headers({
+			'Access-Control-Allow-Origin': '*', // Replace with your frontend origin
+			'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+			'Access-Control-Allow-Credentials': 'true',
+		}).send({message : "Registration complete"});
 	}
 }

@@ -12,7 +12,7 @@ services:
       - front-spa:/var/www/html
     depends_on:
       - frontend
-      # - auth-service
+      - auth-service
       # - game-service
     networks:
       - transcendence-network
@@ -36,8 +36,8 @@ services:
       - "3000:3000"
     volumes:
       - auth-db:/data/
-  #   networks:
-  #     - transcendence-network
+    networks:
+      - transcendence-network
 
   # game-service:
   #   container_name: game-service

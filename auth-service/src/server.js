@@ -6,8 +6,8 @@ import routes from './routes.js';
 
 const opts = {
 	logger: true,
-	key : fs.readFileSync(path.resolve("/etc/ssl/server.key")) ,
-	cert : fs.readFileSync(path.resolve("/etc/ssl/server.crt")) ,
+	// key : fs.readFileSync(path.resolve("/etc/ssl/server.key")) ,
+	// cert : fs.readFileSync(path.resolve("/etc/ssl/server.crt")) ,
 }
 
 const fastify = Fastify(opts);
@@ -28,3 +28,5 @@ fastify.register(routes);
 fastify.register(dbConnector);
 
 fastify.listen(connectOptions, serverError);
+
+
