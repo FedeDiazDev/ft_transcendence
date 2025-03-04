@@ -1,8 +1,10 @@
 import { Game } from "../models/Game.js";
 
-const game = new Game();
+let game = null;
 
 export async function getGameInfo(request, reply) {
+  if (game === null)
+      reply.send({message: "No hay ningun juego creado"})
   reply.send({ status: game.status, ball: game.ball, paddles: game.paddles });
 }
 
@@ -27,5 +29,6 @@ export async function startGame(request, reply) {
 }
 
 export async function createGame(request, reply) {
+  game = new Game();
   reply.send({ message: "Juego creado" })
 }
