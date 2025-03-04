@@ -1,10 +1,16 @@
 import Fastify from 'fastify';
+import fs from 'fs';
+import path from 'path';
 import dbConnector from './database.js';
 import routes from './routes.js';
 
-const fastify = Fastify({
-	logger: true
-  })
+const opts = {
+	logger: true,
+	key : fs.readFileSync(path.resolve("/etc/ssl/server.key")) ,
+	cert : fs.readFileSync(path.resolve("/etc/ssl/server.crt")) ,
+}
+
+const fastify = Fastify(opts);
 
 const connectOptions = {
     host: '0.0.0.0',
@@ -18,7 +24,6 @@ function serverError(err) {
     }
 }
 
- 
 fastify.register(routes);
 fastify.register(dbConnector);
 
