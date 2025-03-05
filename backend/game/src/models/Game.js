@@ -12,6 +12,9 @@ export class Game {
 			left: new Paddle("left", 10, 50),
 			right: new Paddle("right", 480, 50),
 		};
+		this.points = 10;
+		this.leftPoints = 0;
+		this.rightPoints = 0;
 	}
 	start() {
 		this.status = GameStatus.PLAYING;
@@ -26,24 +29,40 @@ export class Game {
 	update() {
 		if (this.status === GameStatus.PLAYING) {
 			this.ball.move();
-		}
-		//Sumar puntos a derecha
+		}		
 		if (this.ball.x <= 0) {
-			this.ball.x = 50;
-			this.ball.y = 50;
-			this.ball.vx *= -1;
-			this.ball.vy = Math.random() > 0.5 ? 10 : -10;
-		}
-		//Sumar puntos a izquierda
+			this.resetBall();
+			this.checkScore("left");
+		}		
 		else if (this.ball.x + this.ball.width >= canvasW) {
-			this.ball.x = 50;
-			this.ball.y = 50;
-			this.ball.vx *= -1;
-			this.ball.vy = Math.random() > 0.5 ? 10 : -10;
+			this.resetBall();
+			this.checkScore("right");
 		}
-
 		if (this.ball.y <= 0 || this.ball.y + this.ball.height >= canvasH) {
 			this.ball.vy *= -1;
 		}
+	}
+
+	resetBall() {
+		this.ball.x = 50;
+		this.ball.y = 50;
+		if (this.status === GameStatus.PLAYING) {
+			this.ball.vx *= -1;
+			this.ball.vy = Math.random() > 0.5 ? 10 : -10;
+		}
+	}
+
+	checkScore(player) {
+		if (player === "left")
+			this.leftPoints++;
+		else if (player === "right")
+			this.rightPoints++;
+		if (this.leftPoints >= 10 || this.rightPoints >= 10)
+			this.status = GameStatus.GAME_OVER;
+	}
+
+	paddleColision()
+	{
+		if ()
 	}
 }
