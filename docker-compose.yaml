@@ -12,7 +12,7 @@ services:
       - front-spa:/var/www/html
     depends_on:
       - frontend
-      # - auth-service
+      - auth-service
       # - game-service
     networks:
       - transcendence-network
@@ -27,15 +27,17 @@ services:
     networks:
       - transcendence-network
 
-  # auth-service:
-  #   container_name: auth-service
-  #   build:
-  #     context: ./auth-service
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - auth-db:/data   # SQLite DB
-  #   networks:
-  #     - transcendence-network
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - auth-db:/data/
+    networks:
+      - transcendence-network
 
   # game-service:
   #   container_name: game-service
@@ -52,7 +54,7 @@ services:
 
 volumes:
   front-spa:
-  # auth-db:
+  auth-db:
   # game-data-db:
   
 
