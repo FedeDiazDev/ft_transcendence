@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@punkish/fastify-better-sqlite3": "^2.0.0",
+    "better-sqlite3": "^11.8.1",
+    "fastify": "^5.2.1",
+    "fastify-plugin": "^5.0.1"
+  }
+}

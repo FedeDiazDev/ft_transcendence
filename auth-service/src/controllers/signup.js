@@ -1,0 +1,32 @@
+import crypto from "crypto";
+
+function hashPassword(password){
+	const salt = crypto.randomBytes(32).toString('hex');
+	const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+
+	console.log("Hashed Password");
+
+	return{
+		salt: salt,
+		hash: hash
+	}
+}
+
+export default function postSignup(request, reply){
+	if (request.body.password != request.body.confirmPassword)
+		reply.status(400).send({message : "Password does not match"});
+	else{
+		const passStruct = hashPassword(request.body.password);
+		const db = request.server.db;
+
+		const query = db.prepare("INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)");
+		query.run(request.body.username, request.body.email, passStruct.hash, passStruct.salt);
+
+		reply.status(200).headers({
+			'Access-Control-Allow-Origin': '*', // Replace with your frontend origin
+			'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+			'Access-Control-Allow-Credentials': 'true',
+		}).send({message : "Registration complete"});
+	}
+}
