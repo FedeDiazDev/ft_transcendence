@@ -3,14 +3,18 @@ import fs from 'fs';
 import path from 'path';
 import dbConnector from './database.js';
 import routes from './routes.js';
+import cors from '@fastify/cors'
 
 const opts = {
 	logger: true,
-	// key : fs.readFileSync(path.resolve("/etc/ssl/server.key")) ,
-	// cert : fs.readFileSync(path.resolve("/etc/ssl/server.crt")) ,
 }
 
 const fastify = Fastify(opts);
+
+fastify.setErrorHandler((error, request, reply) => {
+	fastify.log.error(error);
+	reply.status(350).send(error);
+});
 
 const connectOptions = {
     host: '0.0.0.0',
@@ -24,9 +28,17 @@ function serverError(err) {
     }
 }
 
-fastify.register(routes);
-fastify.register(dbConnector);
+async function startServer(){
+	try{
+		await fastify.register(cors);
+		await fastify.register(routes);
+		await fastify.register(dbConnector);
 
-fastify.listen(connectOptions, serverError);
+		await fastify.listen(connectOptions, serverError);
+	}catch(error){
+		fastify.log.error(error);
+		process.exit(1);
+	}
+}
 
-
+startServer();
