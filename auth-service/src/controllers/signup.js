@@ -16,16 +16,11 @@ function hashPassword(password){
 }
 
 export default function postSignup(request, reply){
-	//Password does not match
-	if (request.body.password != request.body.confirmPassword)
-		throw new Error("Password does not match");
-	//Register into the database
-	else{
 		const passStruct = hashPassword(request.body.password);
 		const db = request.server.db;
 
 		const query = db.prepare("INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)");
 		query.run(request.body.username, request.body.email, passStruct.hash, passStruct.salt);
 		reply.status(200).send({message : "Registration complete"});
-	}
+//	}
 }

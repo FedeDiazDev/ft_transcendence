@@ -6,15 +6,15 @@ const signupOpts = {
 	  body: {
 		type: "object",
 		properties: {
-		  username: { type: "string" },
-		  email: { type: "string" },
-		  password: { type: "string" },
-		  confirmPassword: { type: "string" }
+			username: { type: "string"},
+			email: { type: "string" , format : "email"},
+			password: { type: "string" , minLength : 8, pattern : "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$" },
+			confirmPassword: { type: "string" , maxLength : 20, pattern : "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$" }
 		},
-		required: ["username", "email", "password", "confirmPassword"]
+		required: ["username", "email", "password", "confirmPassword"],
 	  }
 	}
-  }; //How can we check what is failing
+  };
  
 export default function routes(fastify) {
   fastify.post("/signup", signupOpts, postSignup);

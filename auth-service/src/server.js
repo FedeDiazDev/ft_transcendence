@@ -1,6 +1,4 @@
 import Fastify from 'fastify';
-import fs from 'fs';
-import path from 'path';
 import dbConnector from './database.js';
 import routes from './routes.js';
 import errorMap from './errorMap.js'
@@ -14,16 +12,10 @@ const opts = {
 //Create instance of fastify with opts
 const fastify = Fastify(opts);
 
-//Manages errors when the fastify server is running
+//Manages errors from errorMap
 fastify.setErrorHandler((error, request, reply) => {
 	fastify.log.error(error);    
-	const mappedError = errorMap[error.code];
-
-    if (mappedError) {
-        reply.status(mappedError.statusCode).send({ code : error.code, error: mappedError.message });
-    } else {
-        reply.status(500).send({ error: "Internal Server Error." });
-    }
+	reply.send(error);
 });
 
 //Defines where it listens
