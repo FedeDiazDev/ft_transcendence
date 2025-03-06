@@ -2,7 +2,7 @@ import getRoot from './controllers/getRoot.js'
 import postSignup from './controllers/signup.js'
 
 const signupOpts = {
-	schema: { 
+	schema: {
 	  body: {
 		type: "object",
 		properties: {

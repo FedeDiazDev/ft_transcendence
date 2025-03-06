@@ -3,24 +3,36 @@ import fs from 'fs';
 import path from 'path';
 import dbConnector from './database.js';
 import routes from './routes.js';
+import errorMap from './errorMap.js'
 import cors from '@fastify/cors'
 
+//Activate logger inside fastify
 const opts = {
 	logger: true,
 }
 
+//Create instance of fastify with opts
 const fastify = Fastify(opts);
 
+//Manages errors when the fastify server is running
 fastify.setErrorHandler((error, request, reply) => {
-	fastify.log.error(error);
-	reply.status(350).send(error);
+	fastify.log.error(error);    
+	const mappedError = errorMap[error.code];
+
+    if (mappedError) {
+        reply.status(mappedError.statusCode).send({ code : error.code, error: mappedError.message });
+    } else {
+        reply.status(500).send({ error: "Internal Server Error." });
+    }
 });
 
+//Defines where it listens
 const connectOptions = {
     host: '0.0.0.0',
     port: 3000
 }
 
+//Exit process if the init fails
 function serverError(err) {
     if (err) {
         fastify.log.error(err);
@@ -28,6 +40,9 @@ function serverError(err) {
     }
 }
 
+//Async function. Register adds plugins to the db, but it is asynchronous. For that, it is important 
+//to wait when one is completed. Also, the try catch is necessary because the server is not initialized
+//and the setErrorHandler is no running yet
 async function startServer(){
 	try{
 		await fastify.register(cors);

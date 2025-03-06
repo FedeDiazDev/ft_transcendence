@@ -1,5 +1,8 @@
 import crypto from "crypto";
 
+//SALT: Random values than interacts with the hasing aside of regular string that comes
+//HASH: Math iterations to transform the password
+
 function hashPassword(password){
 	const salt = crypto.randomBytes(32).toString('hex');
 	const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
@@ -13,8 +16,10 @@ function hashPassword(password){
 }
 
 export default function postSignup(request, reply){
+	//Password does not match
 	if (request.body.password != request.body.confirmPassword)
 		throw new Error("Password does not match");
+	//Register into the database
 	else{
 		const passStruct = hashPassword(request.body.password);
 		const db = request.server.db;

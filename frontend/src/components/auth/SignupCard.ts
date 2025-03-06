@@ -45,11 +45,10 @@ export const SignupCard = () => {
 			})
 			const data = await response.json(); 
 			console.log("Fetch response:", " ", data.message);
-		} catch(error){}
-			//console.error("Fetch error:", error);
-		//} //Esto sería un error al hacer fetch, pero no que la respuesta sea un error o no
+		} catch(error){
+			console.error("Fetch error:", error);
+		}
 	});
- 
     div.appendChild(button);
     return div;
 }

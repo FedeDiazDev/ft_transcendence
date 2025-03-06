@@ -20,7 +20,6 @@ function dbConnector(fastify) {
         salt TEXT NOT NULL
       );
     `);
-
  
 //  Can access an instance of the DB from fastify
   
@@ -32,8 +31,6 @@ function dbConnector(fastify) {
       db.close();
       done();
     });
-  
- //   console.log("Database and posts table created successfully");
   }
   
   export default fp(dbConnector);
