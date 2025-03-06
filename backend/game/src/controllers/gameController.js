@@ -35,7 +35,8 @@ export async function createGame(request, reply) {
   reply.send({ message: "Juego creado" })
 }
 
-export async function moveBall(reques, reply) {
+export async function moveBall(request, reply) {
 
   game.update();
+  return reply.send({ status: 'success', gameState: game });
 }
