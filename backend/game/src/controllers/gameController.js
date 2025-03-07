@@ -31,12 +31,17 @@ export async function startGame(request, reply) {
 }
 
 export async function createGame(request, reply) {
-  game = new Game();
-  reply.send({ message: "Juego creado" })
+  const { leftPlayerId, rightPlayerId } = request.body;
+
+  if (!leftPlayerId || !rightPlayerId) {
+    return reply.status(400).send({ error: "Faltan datos" });
+  
+  }
+  game = new Game(leftPlayerId, rightPlayerId);
+  reply.status(200).send({ message: "Juego creado", gameState: game })
 }
 
 export async function moveBall(request, reply) {
-
   game.update();
   return reply.send({ status: 'success', gameState: game });
 }

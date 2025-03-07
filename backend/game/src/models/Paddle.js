@@ -1,6 +1,7 @@
 export class Paddle {
-	constructor(player, x, y) {
+	constructor(player, x, y, playerId) {
 		this.player = player;
+		this.playerId = playerId;
 		this.x = x;
 		this.y = y;
 		this.width = 10;

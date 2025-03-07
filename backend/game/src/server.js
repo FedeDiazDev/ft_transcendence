@@ -1,19 +1,40 @@
-import Fastify from 'fastify'
-import routes from "./routes/router.js"
-const fastify = Fastify({
-	logger: true
-})
-const opt = {
-	port: 4444,
-	host: "0.0.0.0"
+import Fastify from 'fastify';
+import routes from './routes/router.js';
+import cors from '@fastify/cors'
+
+const opts = {
+	logger: true,
 }
 
-fastify.register(routes);
+const fastify = Fastify(opts);
 
-fastify.listen(opt, (err, address) => {
-	if (err) {
-		console.error(err);
+fastify.setErrorHandler((error, request, reply) => {
+	fastify.log.error(error);    
+	reply.send(error);
+});
+
+const connectOptions = {
+    host: '0.0.0.0',
+    port: 4444
+}
+
+function serverError(err) {
+    if (err) {
+        fastify.log.error(err);
+        process.exit(1);
+    }
+}
+
+async function startServer(){
+	try{
+		await fastify.register(cors);
+		await fastify.register(routes);		
+
+		await fastify.listen(connectOptions, serverError);
+	}catch(error){
+		fastify.log.error(error);
 		process.exit(1);
 	}
-	console.log(`Servidor corriendo en ${address}`);
-});
+}
+
+startServer();

@@ -5,12 +5,12 @@ import { canvasH } from "../controllers/gameController.js";
 import { canvasW } from "../controllers/gameController.js";
 
 export class Game {
-	constructor() {
+	constructor(player1Id, player2Id) {
 		this.status = GameStatus.WAITING;
 		this.ball = new Ball(50, 50);
 		this.paddles = {
-			left: new Paddle("left", 10, 50),
-			right: new Paddle("right", 480, 50),
+			left: new Paddle("left", 10, 50, player1Id),
+			right: new Paddle("right", 480, 50, player2Id),
 		};
 		this.points = 10;
 		this.leftPoints = 0;
