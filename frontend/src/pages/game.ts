@@ -6,12 +6,18 @@ import { createGame } from "../api/game/gameAPI.js"
 export const Game = () => {
     const container = document.createElement("div");
     container.className = "flex justify-center items-center h-screen bg-black mt-10";
-    const canvas = GameCanvas();
-    container.appendChild(canvas);
 
-    createGame(1, 2)        
-        .then(response => console.log(response))
-        .catch(err => console.error(err));
+    createGame(1, 2)
+        .then(gameData => {
+            if (!gameData) {
+                console.error("Error: No se pudo crear el juego.");
+                return;
+            }
+            console.log("Juego creado:", gameData);
+            const newCanvas = GameCanvas(gameData.gameState);
+            container.appendChild(newCanvas);
+        })
+        .catch(err => console.error("Error al crear el juego:", err));
 
     const cleanup = useKeyPress({
         "ArrowUp": () => movePaddle("right", "up"),

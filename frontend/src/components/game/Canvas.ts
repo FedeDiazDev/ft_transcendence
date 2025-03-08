@@ -1,4 +1,4 @@
-export const GameCanvas = () => {
+export const GameCanvas = (state : any) => {
     const canvas = document.createElement("canvas");
     canvas.width = 800;
     canvas.height = 400;
@@ -6,10 +6,10 @@ export const GameCanvas = () => {
 
     const ctx = canvas.getContext("2d");    
     let gameState = {
-        ball: { x: 400, y: 200 },
+        ball: { x: state.ball.x, y: state.ball.y },
         paddles: [
-            { x: 20, y: 150 },
-            { x: 760, y: 150 }
+            { x: state.paddles.left.x, y: state.paddles.left.y },
+            { x: state.paddles.right.x, y: state.paddles.right.y }
         ]
     };  
     const draw = () => {
@@ -21,7 +21,7 @@ export const GameCanvas = () => {
         ctx.arc(gameState.ball.x, gameState.ball.y, 10, 0, Math.PI * 2);
         ctx.fill();       
         gameState.paddles.forEach(paddle => {
-            ctx.fillRect(paddle.x, paddle.y, 10, 80);
+            ctx.fillRect(paddle.x, paddle.y, 10, 100);
         });
     };   
     const loop = () => {

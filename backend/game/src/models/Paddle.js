@@ -5,7 +5,7 @@ export class Paddle {
 		this.x = x;
 		this.y = y;
 		this.width = 10;
-		this.height = 40;
+		this.height = 100;
 		this.speed = 10;
 	}
 

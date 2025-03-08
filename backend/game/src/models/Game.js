@@ -7,10 +7,10 @@ import { canvasW } from "../controllers/gameController.js";
 export class Game {
 	constructor(player1Id, player2Id) {
 		this.status = GameStatus.WAITING;
-		this.ball = new Ball(50, 50);
+		this.ball = new Ball(400, 200);
 		this.paddles = {
-			left: new Paddle("left", 10, 50, player1Id),
-			right: new Paddle("right", 480, 50, player2Id),
+			left: new Paddle("left", 20, 150, player1Id),
+			right: new Paddle("right", 770, 150, player2Id),
 		};
 		this.points = 10;
 		this.leftPoints = 0;
@@ -45,8 +45,8 @@ export class Game {
 	}
 
 	resetBall() {
-		this.ball.x = 50;
-		this.ball.y = 50;
+		this.ball.x = 400;
+		this.ball.y = 200;
 		if (this.status === GameStatus.PLAYING) {
 			this.ball.vx *= -1;
 			this.ball.vy = Math.random() > 0.5 ? 10 : -10;
