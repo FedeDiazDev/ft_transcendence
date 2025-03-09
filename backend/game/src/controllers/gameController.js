@@ -7,7 +7,7 @@ export const canvasW = 800;
 export async function getGameInfo(request, reply) {
   if (game === null)
     reply.send({ message: "No hay ningun juego creado" })
-  reply.send({ status: game.status, ball: game.ball, paddles: game.paddles });
+  reply.send({ gameState: game.gameState });
 }
 
 export async function movePaddle(request, reply) {
@@ -22,7 +22,7 @@ export async function movePaddle(request, reply) {
 
   game.movePaddle(player, direction);
 
-  reply.send({ message: game.paddles[player] });
+  reply.send({ message: game });
 }
 
 export async function startGame(request, reply) {
@@ -35,7 +35,7 @@ export async function createGame(request, reply) {
 
   if (!leftPlayerId || !rightPlayerId) {
     return reply.status(400).send({ error: "Faltan datos" });
-  
+
   }
   game = new Game(leftPlayerId, rightPlayerId);
   reply.status(200).send({ message: "Juego creado", gameState: game })

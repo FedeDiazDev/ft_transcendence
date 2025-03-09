@@ -20,3 +20,16 @@ export const createGame = async (leftPlayerId: number, rightPlayerId: number): P
 		throw error;
 	}
 }
+
+export const getGameState = async (): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.game}/game/state`);
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error obteniendo el estado del juego:", error);
+        return null;
+    }
+};

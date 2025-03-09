@@ -1,4 +1,4 @@
-import { API_URLS } from "../apiConfig.js"; 
+import { API_URLS } from "../apiConfig.js";
 
 
 type Player = "left" | "right";
@@ -15,7 +15,13 @@ export const movePaddle = async (player: Player, direction: Direction): Promise<
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
+        const data = await response.json();
+        console.log(data)
+        if (!data) {
+            throw new Error("Respuesta inválida del servidor");
+        }
+        return data;
     } catch (error) {
-        console.error("Error moviendo la pala:", error);
+        console.error("Error en /movePaddle:", error);
     }
 };

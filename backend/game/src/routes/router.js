@@ -3,7 +3,7 @@ import { createGame, movePaddle, startGame, getGameInfo, moveBall } from "../con
 async function routes (fastify, opts)
 {
 	//*GET
-	fastify.get("/game/info", getGameInfo);
+	fastify.get("/game/state", getGameInfo);
 	
 	//*POST
 	fastify.post("/game/create", createGame);

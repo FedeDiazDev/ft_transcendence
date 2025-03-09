@@ -4,7 +4,8 @@
     "rootDir": "./src",
     "target": "ES6",
     "module": "ESNext",
-    "strict": true
+    "strict": true,
+    "lib": ["ES2017", "DOM"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
