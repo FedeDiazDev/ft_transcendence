@@ -6,10 +6,10 @@ const signupOpts = {
 	  body: {
 		type: "object",
 		properties: {
-			username: { type: "string"},
+			username: { type: "string", minLength : 1, pattern : "^[a-zA-Z0-9]+$"},
 			email: { type: "string" , format : "email"},
-			password: { type: "string" , minLength : 8, pattern : "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$" },
-			confirmPassword: { type: "string" , maxLength : 20, pattern : "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$" }
+			password: { type: "string" , minLength : 8, pattern : "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d ]{8,}$"},
+			confirmPassword: { type: "string" , minLength : 8, pattern : "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d ]{8,}$"}
 		},
 		required: ["username", "email", "password", "confirmPassword"],
 	  }
