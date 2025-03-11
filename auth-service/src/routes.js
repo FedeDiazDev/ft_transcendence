@@ -1,34 +1,36 @@
-import getRoot from './controllers/getRoot.js'
 import postSignup from './controllers/signup.js'
+import postLogin from './controllers/login.js'
 
 const signupOpts = {
-	schema: { 
+	schema: {
 	  body: {
 		type: "object",
 		properties: {
-		  username: { type: "string" },
-		  email: { type: "string" },
-		  password: { type: "string" },
-		  confirmPassword: { type: "string" }
+			username: { type: "string", minLength : 1, pattern : "^[a-zA-Z0-9]+$"},
+			email: { type: "string" , format : "email"},
+			password: { type: "string" , minLength : 8, pattern : "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d ]{8,}$"},
+			confirmPassword: { type: "string" , minLength : 8, pattern : "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d ]{8,}$"}
 		},
-		required: ["username", "email", "password", "confirmPassword"]
+		required: ["username", "email", "password", "confirmPassword"],
 	  }
 	}
   };
- 
-export default function routes(fastify) {
-  fastify.get("/", getRoot);
 
-  fastify.options('/signup', (req, reply) => {
-	reply
-		.headers({
-		'Access-Control-Allow-Origin': '*', // Replace with your frontend origin
-		'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-		'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-		'Access-Control-Allow-Credentials': 'true',
-		})
-		.send(); // No body needed for OPTIONS request, just set the headers
-  });
-  fastify.post("/signup", signupOpts, postSignup);
+ const loginOpts = {
+	schema: {
+	  body: {
+		type: "object",
+		properties: {
+			user: { type: "string", minLength : 1},
+			password: { type: "string", minLength : 1},
+		},
+		required: ["user", "password"],
+	  }
+	}
+  };
+
+export default function routes(fastify) {
+	fastify.post("/signup", signupOpts, postSignup);
+	fastify.post("/login", loginOpts, postLogin);
 }
 
