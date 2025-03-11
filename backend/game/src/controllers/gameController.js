@@ -1,4 +1,5 @@
 import { Game } from "../models/Game.js";
+import { GameStatus } from "../models/GameStatus.js";
 
 let game = null;
 export const canvasH = 400;
@@ -22,11 +23,12 @@ export async function movePaddle(request, reply) {
 
   game.movePaddle(player, direction);
 
-  reply.send({ message: game });
+  reply.send({ gameState: game });
 }
 
 export async function startGame(request, reply) {
   game.start();
+  game.gameStatus = GameStatus.PLAYING;
   reply.send({ message: "Juego iniciado", game: game });
 }
 

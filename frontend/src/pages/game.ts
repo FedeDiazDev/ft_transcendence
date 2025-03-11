@@ -1,13 +1,10 @@
 import { GameCanvas } from "../components/game/Canvas.js";
-import { useKeyPress } from "../hooks/useKeyPress.js";
-import { movePaddle } from "../api/game/paddleAPI.js";
-import { createGame, getGameState } from "../api/game/gameAPI.js";
+import { createGame } from "../api/game/gameAPI.js";
 import { GameState } from "../types/types.js";
+
 export const Game = () => {
     const container = document.createElement("div");
     container.className = "flex justify-center items-center h-screen bg-black mt-10";
-
-    let canvas: any;
 
     createGame(1, 2)
         .then(gameData => {
@@ -30,30 +27,10 @@ export const Game = () => {
                 rightPoints: gameState.rightPoints ?? 0,
             };
 
-            canvas = GameCanvas(validatedState);
+            const canvas = GameCanvas(validatedState);
             container.appendChild(canvas);
         })
         .catch(err => console.error("Error al crear el juego:", err));
-
-    const moveAndUpdate = async (player: "left" | "right", direction: "up" | "down") => {
-        await movePaddle(player, direction);
-
-        const newState = await getGameState();
-        if (newState && typeof newState === "object") {
-            canvas?.updateGameState(newState);
-        } else {
-            console.error("Error: Estado del juego inválido", newState);
-        }
-    };
-
-    const cleanup = useKeyPress({
-        "ArrowUp": () => moveAndUpdate("right", "up"),
-        "ArrowDown": () => moveAndUpdate("right", "down"),
-        "w": () => moveAndUpdate("left", "up"),
-        "s": () => moveAndUpdate("left", "down"),
-    });
-
-    window.addEventListener("beforeunload", cleanup);
 
     return container;
 };

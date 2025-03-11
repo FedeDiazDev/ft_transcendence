@@ -16,7 +16,7 @@ export const movePaddle = async (player: Player, direction: Direction): Promise<
             throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log(data)
+        // console.log(data)
         if (!data) {
             throw new Error("Respuesta inválida del servidor");
         }
