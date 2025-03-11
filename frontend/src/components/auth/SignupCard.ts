@@ -39,7 +39,7 @@ function showErrors(frontErrors : string[], errorDiv : HTMLDivElement){
 	}
 }
 
-function clickOnButton(button : HTMLButtonElement, names : string[], errorDiv : HTMLDivElement){
+function clickOnButtonSignup(button : HTMLButtonElement, names : string[], errorDiv : HTMLDivElement){
 	button.addEventListener("click", async () => {
 	errorDiv.innerHTML = '';
 	const inputs: string[] = [];
@@ -65,7 +65,7 @@ function clickOnButton(button : HTMLButtonElement, names : string[], errorDiv : 
 	});
 }
 
-async function fetchSignup(sendData : { username? : string, email? : string, password? : string, confirmPassword? : string}, errorDiv : HTMLDivElement){
+async function fetchSignup(sendData : { username : string, email : string, password : string, confirmPassword : string}, errorDiv : HTMLDivElement){
 	try{
 		const response = await fetch ("http://localhost:3000/signup", {
 			method: "POST",
@@ -78,7 +78,6 @@ async function fetchSignup(sendData : { username? : string, email? : string, pas
 		console.error("Fetch error:", error);
 	}
 }
-
 
 export const SignupCard = () => {
 	const div = document.createElement("div");
@@ -106,7 +105,7 @@ export const SignupCard = () => {
     button.textContent = "Sign Up";
     button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
 
-	const sendData = clickOnButton(button, names, errorDiv);
+	clickOnButtonSignup(button, names, errorDiv);
 
     div.appendChild(button);
 
