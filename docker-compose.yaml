@@ -32,8 +32,6 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
     volumes:
       - auth-db:/data/
     networks:
