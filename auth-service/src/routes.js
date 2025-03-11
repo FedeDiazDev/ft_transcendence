@@ -1,5 +1,5 @@
-import getRoot from './controllers/getRoot.js'
 import postSignup from './controllers/signup.js'
+import postLogin from './controllers/login.js'
 
 const signupOpts = {
 	schema: {
@@ -15,8 +15,22 @@ const signupOpts = {
 	  }
 	}
   };
- 
+
+ const loginOpts = {
+	schema: {
+	  body: {
+		type: "object",
+		properties: {
+			user: { type: "string", minLength : 1},
+			password: { type: "string", minLength : 1},
+		},
+		required: ["user", "password"],
+	  }
+	}
+  };
+
 export default function routes(fastify) {
-  fastify.post("/signup", signupOpts, postSignup);
+	fastify.post("/signup", signupOpts, postSignup);
+	fastify.post("/login", loginOpts, postLogin);
 }
 
