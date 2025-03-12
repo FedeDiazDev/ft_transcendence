@@ -1,3 +1,5 @@
+import postRegister from "./components/register.js"
+
 const registerOpts = {
 	schema: {
 	  body: {
@@ -10,9 +12,6 @@ const registerOpts = {
   }
 }
 
-function postRegister(){}
-
 export default function routes(fastify) {
 	fastify.post("/register", registerOpts, postRegister);
 }
-
