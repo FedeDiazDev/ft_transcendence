@@ -31,5 +31,5 @@ export default function postSignup(request, reply){
 
 		const query = db.prepare("INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)");
 		query.run(request.body.username, request.body.email, passStruct.hash, passStruct.salt);
-		reply.status(200).send({message : "Registration complete"});
+		reply.status(200).send({statusCode : 200, message : "Registration complete"});
 }
