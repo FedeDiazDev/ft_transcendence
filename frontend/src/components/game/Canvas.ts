@@ -19,7 +19,7 @@ export const GameCanvas = (state: GameState) => {
             return;
         }
         console.log(gameState);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "white";
 
         ctx.beginPath();
@@ -30,11 +30,11 @@ export const GameCanvas = (state: GameState) => {
         });
     };
 
-    const loop = () => {
-        draw();
-        requestAnimationFrame(loop);
-    };
-    loop();
+    // const loop = () => {
+    //     draw();
+    //     requestAnimationFrame(loop);
+    // };
+    draw();
 
     const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {
         const paddle = gameState.paddles[player];
@@ -42,7 +42,7 @@ export const GameCanvas = (state: GameState) => {
 
         const speed = paddle.speed ?? 10;
         const newY = direction === "up" ? paddle.y - speed : paddle.y + speed;
-        
+
         gameState = {
             ...gameState,
             paddles: {
@@ -53,18 +53,25 @@ export const GameCanvas = (state: GameState) => {
     };
 
     const moveAndUpdate = async (player: "left" | "right", direction: "up" | "down") => {
-        updatePaddlePosition(player, direction);
-        await movePaddle(player, direction);
+        try {
+            const response = await movePaddle(player, direction);
+            if (!response || response.status == 204) return;
+            updatePaddlePosition(player, direction);
+            draw();
+        } catch (error) {
+            console.error("Error al mover la pala:", error);
+        }
     };
 
-    const cleanup = useKeyPress({
+
+
+    useKeyPress({
         "ArrowUp": () => moveAndUpdate("right", "up"),
         "ArrowDown": () => moveAndUpdate("right", "down"),
         "w": () => moveAndUpdate("left", "up"),
         "s": () => moveAndUpdate("left", "down"),
     });
 
-    window.addEventListener("beforeunload", cleanup);
 
     return canvas;
 };

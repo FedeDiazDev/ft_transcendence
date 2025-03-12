@@ -2,8 +2,6 @@ import { Game } from "../models/Game.js";
 import { GameStatus } from "../models/GameStatus.js";
 
 let game = null;
-export const canvasH = 400;
-export const canvasW = 800;
 
 export async function getGameInfo(request, reply) {
   if (game === null)
@@ -20,10 +18,17 @@ export async function movePaddle(request, reply) {
   if (!["left", "right"].includes(player) || !["up", "down"].includes(direction)) {
     return reply.status(400).send({ error: "Valores no validos" });
   }
-
+  const paddles = game.paddles;
+  const paddleSpeed = game.paddles.left.speed;
+  const paddleHeight = game.paddles.left.height;
+  if((player === "left" && direction === "up" && paddles.left.y - paddleSpeed <= 0) ||
+  (player === "left" && direction === "down" && paddles.left.y + paddleHeight + paddleSpeed >= 400) ||
+  (player === "right" && direction === "up" && paddles.right.y - paddleSpeed <= 0) ||
+  (player === "right" && direction === "down" && paddles.right.y + paddleHeight + paddleSpeed >= 400))
+    reply.status(204).send({ error: "Movement not allowed", message: "The paddle cannot move further in this direction"})  ;
+  
   game.movePaddle(player, direction);
-
-  reply.send({ gameState: game });
+  reply.status(200).send({ gameState: game });
 }
 
 export async function startGame(request, reply) {

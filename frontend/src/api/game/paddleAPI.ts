@@ -4,7 +4,7 @@ import { API_URLS } from "../apiConfig.js";
 type Player = "left" | "right";
 type Direction = "up" | "down";
 
-export const movePaddle = async (player: Player, direction: Direction): Promise<void> => {
+export const movePaddle = async (player: Player, direction: Direction): Promise<any> => {
     try {
         const response = await fetch(`${API_URLS.game}/game/movePaddle`, {
             method: "POST",
@@ -15,12 +15,14 @@ export const movePaddle = async (player: Player, direction: Direction): Promise<
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
-        const data = await response.json();
-        // console.log(data)
-        if (!data) {
-            throw new Error("Respuesta inválida del servidor");
+        if (response.status !== 204) {
+            const data = await response.json();
+            // console.log(data)
+            if (!data) {
+                throw new Error("Respuesta inválida del servidor");
+            }
+            return data;
         }
-        return data;
     } catch (error) {
         console.error("Error en /movePaddle:", error);
     }

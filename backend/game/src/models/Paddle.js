@@ -10,8 +10,13 @@ export class Paddle {
 	}
 
 	move(direction) {
-		if (direction === "up") this.y -= this.speed;
-		else if (direction === "down") this.y += this.speed;
+		if ((this.y - this.speed) >= 0 && (this.y + this.height + this.speed) <= 400) {			
+			if (direction === "up")
+				this.y -= this.speed;
+			else if (direction === "down")
+				this.y += this.speed;
+		}
+		
 	}
 }
 

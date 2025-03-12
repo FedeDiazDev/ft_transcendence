@@ -1,8 +1,6 @@
 import { GameStatus } from "./GameStatus.js";
 import { Paddle } from "./Paddle.js";
 import { Ball } from "./Ball.js";
-import { canvasH } from "../controllers/gameController.js";
-import { canvasW } from "../controllers/gameController.js";
 
 export class Game {
 	constructor(player1Id, player2Id) {
@@ -35,11 +33,11 @@ export class Game {
 			this.resetBall();
 			this.checkScore("left");
 		}
-		else if (this.ball.x + this.ball.width >= canvasW) {
+		else if (this.ball.x + this.ball.width >= 800) {
 			this.resetBall();
 			this.checkScore("right");
 		}
-		if (this.ball.y <= 0 || this.ball.y + this.ball.height >= canvasH) {
+		if (this.ball.y <= 0 || this.ball.y + this.ball.height >= 400) {
 			this.ball.vy *= -1;
 		}
 	}
