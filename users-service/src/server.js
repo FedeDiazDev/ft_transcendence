@@ -11,7 +11,7 @@ const opts = {
 //Create instance of fastify with opts
 const fastify = Fastify(opts);
 
-//Manages errors from
+//Manages errors
 fastify.setErrorHandler((error, request, reply) => {
 	fastify.log.error(error);    
 	reply.send(error);
@@ -20,7 +20,7 @@ fastify.setErrorHandler((error, request, reply) => {
 //Defines where it listens
 const connectOptions = {
     host: '0.0.0.0',
-    port: 3000
+    port: 4000
 }
 
 //Exit process if the init fails

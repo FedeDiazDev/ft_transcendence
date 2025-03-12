@@ -13,6 +13,7 @@ services:
     depends_on:
       - frontend
       - auth-service
+      - users-service
       # - game-service
     networks:
       - transcendence-network
@@ -32,8 +33,22 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
     volumes:
       - auth-db:/data/
+    networks:
+      - transcendence-network
+
+  users-service:
+    container_name: users-service
+    build:
+      context: ./users-service
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    volumes:
+      - users-db:/data/
     networks:
       - transcendence-network
 
@@ -53,6 +68,7 @@ services:
 volumes:
   front-spa:
   auth-db:
+  users-db:
   # game-data-db:
   
 

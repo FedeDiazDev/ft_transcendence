@@ -4,11 +4,28 @@
 //	Incorrect password format
 //	Incorrect email format
 //
-function handleResponse(data : { code?: string}, errorDiv : HTMLDivElement){
+
+async function registerInUserDatabase(username : string){
+	try{
+		const response = await fetch ("http://localhost:4000/register", {
+			method: "POST",
+			headers: {"Content-type" : "application/json; charset=UTF-8"},
+			body: JSON.stringify({ "username" : username })
+		});
+		const data = await response.json(); 
+		console.log(data)
+	} catch(error){
+		console.error("Fetch error:", error);
+	}
+}
+
+function handleResponse(data : { code?: string}, errorDiv : HTMLDivElement, username : string){
 	if (data.code === "SQLITE_CONSTRAINT_UNIQUE"){
 		errorDiv.className = "text-sm mt-2 h-6 text-red-400"
 		errorDiv.textContent = "*User or email already exists";
 	}
+	else
+		registerInUserDatabase(username);
 } //This error is the only one that can throw the server if everything is fine in the front parse
 
 function parseFront(sendData : { username? : string, email? : string, password? : string, confirmPassword? : string}){
@@ -73,7 +90,7 @@ async function fetchSignup(sendData : { username : string, email : string, passw
 			body: JSON.stringify(sendData),
 		})
 		const data = await response.json(); 
-		handleResponse(data, errorDiv);
+		handleResponse(data, errorDiv, sendData.username);
 	} catch(error){
 		console.error("Fetch error:", error);
 	}
