@@ -25,17 +25,27 @@ export async function movePaddle(request, reply) {
   (player === "left" && direction === "down" && paddles.left.y + paddleHeight + paddleSpeed >= 400) ||
   (player === "right" && direction === "up" && paddles.right.y - paddleSpeed <= 0) ||
   (player === "right" && direction === "down" && paddles.right.y + paddleHeight + paddleSpeed >= 400))
-    reply.status(204).send({ error: "Movement not allowed", message: "The paddle cannot move further in this direction"})  ;
+   return  reply.status(204).send({ error: "Movement not allowed", message: "The paddle cannot move further in this direction"})  ;
   
   game.movePaddle(player, direction);
-  reply.status(200).send({ gameState: game });
+  return reply.status(200).send({ gameState: game });
 }
 
+//TODO: pasar ID
 export async function startGame(request, reply) {
+  if (!game) {
+    return reply.status(500).send({ message: "Error: gameState no inicializado" });
+  }
+
   game.start();
   game.gameStatus = GameStatus.PLAYING;
-  reply.send({ message: "Juego iniciado", game: game });
+
+  return reply.status(200).send({
+    message: "Juego iniciado",
+    gameState: game, 
+  });
 }
+
 
 export async function createGame(request, reply) {
   const { leftPlayerId, rightPlayerId } = request.body;
@@ -45,10 +55,14 @@ export async function createGame(request, reply) {
 
   }
   game = new Game(leftPlayerId, rightPlayerId);
-  reply.status(200).send({ message: "Juego creado", gameState: game })
+  return reply.status(200).send({ message: "Juego creado", gameState: game })
 }
 
 export async function moveBall(request, reply) {
+  const body = request.body || {};
+  if (game.status !== GameStatus.PLAYING) {
+    return reply.send({ status: 'error', message: 'El juego no está en curso' });
+  }
   game.update();
   return reply.send({ status: 'success', gameState: game });
 }
