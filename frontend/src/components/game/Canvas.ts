@@ -14,7 +14,7 @@ export const GameCanvas = (state: GameState) => {
 
     const draw = () => {
         if (!ctx || !gameState?.ball) return;
-        console.log(" Redibujando con ball:", gameState.ball);
+        // console.log(" Redibujando con ball:", gameState.ball);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "white";
@@ -29,7 +29,7 @@ export const GameCanvas = (state: GameState) => {
     };
 
     const updateGameState = async () => {
-        console.log(" updateGameState ejecutado");
+        // console.log(" updateGameState ejecutado");
     
         if (gameState.status !== "playing") {
             console.warn(" Estado no es PLAYING:", gameState.status);
@@ -38,7 +38,7 @@ export const GameCanvas = (state: GameState) => {
     
         try {
             const updatedState = await updateBall();
-            console.log(" Estado recibido de updateBall:", updatedState);
+            // console.log(" Estado recibido de updateBall:", updatedState);
     
             if (updatedState && updatedState.ball) {
                 gameState = { ...gameState, ...updatedState }; // Evita perder claves

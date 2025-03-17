@@ -72,12 +72,12 @@ export class Game {
 		if (this.ball.x <= paddleLeft.x + paddleLeft.width && this.ball.y + this.ball.height > paddleLeft.y && this.ball.y < paddleLeft.y + paddleLeft.height) {
 			let hitZone = (this.ball.y - paddleLeft.y) / (paddleLeft.height / 8);
 			this.ball.vx *= -1;
-			this.ball.vy = (hitZone - 0.5) * 20 * (Math.abs(this.ball.vx) / 10);
+			this.ball.vy = (hitZone - 0.5) * 5 * (Math.abs(this.ball.vx) / 20);
 		}
 		else if (this.ball.x + this.ball.width >= paddleRight.x && this.ball.y + this.ball.height > paddleRight.y && this.ball.y < paddleRight.y + paddleRight.height) {
 			let hitZone = (this.ball.y - paddleRight.y) / (paddleRight.height / 8);
 			this.ball.vx *= -1;
-			this.ball.vy = (hitZone - 0.5) * 20 * (Math.abs(this.ball.vx) / 10);
+			this.ball.vy = (hitZone - 0.5) * 5 * (Math.abs(this.ball.vx) / 20);
 		}
 	}
 }
