@@ -13,6 +13,7 @@ services:
     depends_on:
       - frontend
       - auth-service
+      - users-service
       # - game-service
     networks:
       - transcendence-network
@@ -39,6 +40,7 @@ services:
     networks:
       - transcendence-network
 
+<<<<<<< HEAD
   game-service:
     container_name: game-service
     build:
@@ -50,6 +52,29 @@ services:
       - game-data-db:/data    # SQLite
     networks:
       - transcendence-network
+=======
+  users-service:
+    container_name: users-service
+    build:
+      context: ./users-service
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    volumes:
+      - users-db:/data/
+    networks:
+      - transcendence-network
+
+  # game-service:
+  #   container_name: game-service
+  #   build:
+  #     context: ./game-service
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - game-data-db:/data    # SQLite
+  #   networks:
+  #     - transcendence-network
+>>>>>>> main
 
   # Other services here
 
@@ -57,7 +82,12 @@ services:
 volumes:
   front-spa:
   auth-db:
+<<<<<<< HEAD
   game-data-db:
+=======
+  users-db:
+  # game-data-db:
+>>>>>>> main
   
 
 networks:
