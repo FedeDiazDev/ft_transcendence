@@ -10,7 +10,7 @@ export class Game {
 			left: new Paddle("left", 20, 150, player1Id),
 			right: new Paddle("right", 770, 150, player2Id),
 		};
-		this.points = 10;
+		this.points = 3;
 		this.leftPoints = 0;
 		this.rightPoints = 0;
 	}
@@ -31,11 +31,11 @@ export class Game {
 		}
 		if (this.ball.x <= 0) {
 			this.resetBall();
-			this.checkScore("left");
+			this.checkScore("right");
 		}
 		else if (this.ball.x + this.ball.width >= 800) {
 			this.resetBall();
-			this.checkScore("right");
+			this.checkScore("left");
 		}
 		if (this.ball.y <= 0 || this.ball.y + this.ball.height >= 400) {
 			this.ball.vy *= -1;
@@ -61,7 +61,7 @@ export class Game {
 			this.leftPoints++;
 		else if (player === "right")
 			this.rightPoints++;
-		if (this.leftPoints >= 10 || this.rightPoints >= 10)
+		if (this.leftPoints >= this.points || this.rightPoints >= this.points)
 			this.status = GameStatus.GAME_OVER;
 	}
 

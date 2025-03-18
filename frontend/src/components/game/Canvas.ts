@@ -30,18 +30,17 @@ export const GameCanvas = (state: GameState) => {
 
     const updateGameState = async () => {
         // console.log(" updateGameState ejecutado");
-    
+
         if (gameState.status !== "playing") {
             console.warn(" Estado no es PLAYING:", gameState.status);
             return;
         }
-    
         try {
             const updatedState = await updateBall();
             // console.log(" Estado recibido de updateBall:", updatedState);
-    
+
             if (updatedState && updatedState.ball) {
-                gameState = { ...gameState, ...updatedState }; // Evita perder claves
+                gameState = { ...gameState, ...updatedState };
                 draw();
             } else {
                 console.warn(" updateBall no devolvió datos válidos");
@@ -50,9 +49,17 @@ export const GameCanvas = (state: GameState) => {
             console.error("Error al actualizar la bola:", error);
         }
     };
-    
+
 
     const loop = async () => {
+        if (gameState.status === "game_over") {
+            console.log("GAME FINISHED:", gameState);
+            if (gameState.rightPoints == 10)
+                alert("El ganador es el jugador de la derecha");
+            else
+                alert("El ganador es el jugador de la izquierda");
+            return;
+        }
         await updateGameState();
         requestAnimationFrame(loop);
     };
