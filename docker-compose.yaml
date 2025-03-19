@@ -40,6 +40,17 @@ services:
     networks:
       - transcendence-network
 
+  game-service:
+    container_name: game-service
+    build:
+      context: ./backend/game
+      dockerfile: Dockerfile
+    ports:
+      - "4444:4444"
+    volumes:
+      - game-data-db:/data    # SQLite
+    networks:
+      - transcendence-network
   users-service:
     container_name: users-service
     build:
@@ -52,15 +63,6 @@ services:
     networks:
       - transcendence-network
 
-  # game-service:
-  #   container_name: game-service
-  #   build:
-  #     context: ./game-service
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - game-data-db:/data    # SQLite
-  #   networks:
-  #     - transcendence-network
 
   # Other services here
 
@@ -68,8 +70,8 @@ services:
 volumes:
   front-spa:
   auth-db:
+  game-data-db:
   users-db:
-  # game-data-db:
   
 
 networks:
