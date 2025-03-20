@@ -1,3 +1,4 @@
+import { createMatchmakingSocket } from "../../sockets/matchmakingSocket.js";
 export const WaitingRoom = () => {
     const container = document.createElement("div");
     container.className = "flex flex-col items-center justify-center h-screen bg-gray-900 text-white";
@@ -18,29 +19,8 @@ export const WaitingRoom = () => {
     text.appendChild(dots);
     container.appendChild(text);
 
-
-    // let socket = new WebSocket("ws://localhost:4444/online/matchmaking")
-
-    // socket.onopen = function (e) {
-    //     alert("[open] Conexión esablecida");
-    //     socket.send("Usuario conectado");
-    // }
-    
-    // socket.onmessage = function (event) {
-    //     alert(`[message] Datos recibidos del servidor: ${event.data}`)
-    // }
-    
-    // socket.onclose = function (event) {
-    //     if (event.wasClean) {
-    //         alert(`[close] Conexión cerrrada limpiamente, código=${event.code} motivo=${event.reason}`)
-    //     } else {
-    //         alert('[close] La conexión se cayó');
-    //     }
-    // };
-    
-    // socket.onerror = function (error) {
-    //     alert(`[error]`);
-    // };
+    //let number = Math.floor(Math.random() * 5);
+    createMatchmakingSocket();
 
     return container;
 };
