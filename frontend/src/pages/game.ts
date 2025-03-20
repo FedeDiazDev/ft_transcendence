@@ -21,7 +21,7 @@ export const Game = () => {
             }
             const gameState = gameData.gameState as GameState;
 
-            const canvas = GameCanvas(gameState);
+            const canvas = GameCanvas(gameState, "local");
             container.appendChild(canvas);
 
         })

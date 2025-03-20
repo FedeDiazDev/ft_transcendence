@@ -10,6 +10,7 @@ async function matchmakingSockets(fastify, opts) {
 				console.log(queue);
 				if (queue.length % 2 == 0) {
 					console.log("DOs jugadores listos para jugar");
+					socket.send("Preparaos para la partida");
 				}
 			})
 		})
