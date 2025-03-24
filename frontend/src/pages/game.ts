@@ -2,7 +2,7 @@ import { GameCanvas } from "../components/game/Canvas.js";
 import { createGame, startGame } from "../api/game/gameAPI.js";
 import { GameState } from "../types/types.js";
 
-export const Game = () => {
+export const Game = (mode: string) => {
     const container = document.createElement("div");
     container.className = "flex justify-center items-center h-screen bg-black mt-10";
 
@@ -21,9 +21,14 @@ export const Game = () => {
             }
             const gameState = gameData.gameState as GameState;
 
-            const canvas = GameCanvas(gameState, "local");
-            container.appendChild(canvas);
-
+            if (mode === "local") {
+                const canvas = GameCanvas(gameState, "local");
+                container.appendChild(canvas);
+            }
+            else if (mode === "online") {
+                const canvas = GameCanvas(gameState, "online");
+                container.appendChild(canvas);
+            }
         })
         .catch(err => console.error("Error al crear el juego:", err));
 

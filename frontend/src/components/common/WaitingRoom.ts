@@ -1,4 +1,5 @@
 import { createMatchmakingSocket } from "../../sockets/matchmakingSocket.js";
+import { GameCanvas } from "../game/Canvas.js";
 export const WaitingRoom = () => {
     const container = document.createElement("div");
     container.className = "flex flex-col items-center justify-center h-screen bg-gray-900 text-white";
@@ -6,7 +7,7 @@ export const WaitingRoom = () => {
     const text = document.createElement("p");
     text.className = "text-2xl font-semibold";
     text.textContent = "Esperando a un jugador";
-    
+
     const dots = document.createElement("span");
     dots.className = "text-2xl";
 
@@ -19,8 +20,12 @@ export const WaitingRoom = () => {
     text.appendChild(dots);
     container.appendChild(text);
 
-    //let number = Math.floor(Math.random() * 5);
-    createMatchmakingSocket();
+    const matchmakingSocket =  createMatchmakingSocket((gameState) => {
+        matchmakingSocket.close();
+        container.innerHTML = "";
+        container.className = "flex flex-col items-center justify-center bg-gray-900 text-white";
+        container.appendChild(GameCanvas(gameState, "online"));
+    });
 
     return container;
 };

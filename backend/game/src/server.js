@@ -3,6 +3,7 @@ import routes from './routes/router.js';
 import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
 import matchmakingSockets from './websockets/matchmaking.js';
+import gameLogic from './websockets/game.js';
 
 const opts = {
 	logger: true,
@@ -33,6 +34,7 @@ async function startServer(){
 		await fastify.register(routes);		
 		await fastify.register(ws);
 		await fastify.register(matchmakingSockets);
+		await fastify.register(gameLogic);
 		await fastify.listen(connectOptions, serverError);
 	}catch(error){
 		fastify.log.error(error);

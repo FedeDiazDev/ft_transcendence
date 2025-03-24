@@ -3,18 +3,28 @@ let queue = [];
 async function matchmakingSockets(fastify, opts) {
 	fastify.register(async function (fastify) {
 		fastify.get('/online/matchmaking', { websocket: true }, (socket, req) => {
-			console.log('Client connnected');
+			console.log('Client connected');
+			
 			socket.on('message', message => {
-				queue.push(JSON.parse(message).id);
-				console.log("HOOOOLAAA");
-				console.log(queue);
-				if (queue.length % 2 == 0) {
-					console.log("DOs jugadores listos para jugar");
-					socket.send("Preparaos para la partida");
+				const playerId = JSON.parse(message).id;
+				queue.push({ id: playerId, socket });
+
+				if (queue.length % 2 === 0) {
+					const player1 = queue.shift();
+					const player2 = queue.shift();
+
+					const matchInfo = {
+						status: "ready",
+						message: "Preparaos para la partida",
+						players: [player1.id, player2.id],
+						roomId: `room-${Date.now()}`
+					};
+					player1.socket.send(JSON.stringify(matchInfo));
+					player2.socket.send(JSON.stringify(matchInfo));
 				}
-			})
-		})
-	})
+			});
+		});
+	});
 }
 
 export default matchmakingSockets;
