@@ -1,4 +1,3 @@
-import { navigateTo } from "../router";
 export const createMatchmakingSocket = (onReady: (gameState: any) => void) => {
 
 	let socket = new WebSocket("ws://localhost:4444/online/matchmaking")

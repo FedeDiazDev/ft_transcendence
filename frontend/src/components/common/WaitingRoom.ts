@@ -1,5 +1,6 @@
 import { createMatchmakingSocket } from "../../sockets/matchmakingSocket.js";
 import { GameCanvas } from "../game/Canvas.js";
+
 export const WaitingRoom = () => {
     const container = document.createElement("div");
     container.className = "flex flex-col items-center justify-center h-screen bg-gray-900 text-white";

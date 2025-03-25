@@ -2,6 +2,7 @@ import { GameState, Paddle } from "../../types/types.js";
 import { movePaddle } from "../../api/game/paddleAPI.js";
 import { updateBall } from "../../api/game/gameAPI.js";
 import { useKeyPress } from "../../hooks/useKeyPress.js";
+import { gameSocket } from "../../sockets/gameSocket.js";
 
 export const GameCanvas = (state: GameState, mode: string) => {
     const canvas = document.createElement("canvas");
@@ -11,22 +12,22 @@ export const GameCanvas = (state: GameState, mode: string) => {
 
     const ctx = canvas.getContext("2d");
     let gameState: GameState = { ...state };
+    const draw = () => {
+        if (!ctx || !gameState?.ball) return;
+        // console.log(" Redibujando con ball:", gameState.ball);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+
+        ctx.beginPath();
+        ctx.arc(gameState.ball.x, gameState.ball.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        Object.values(gameState.paddles).forEach((paddle: Paddle) => {
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        });
+    };
     if (mode === "local") {
 
-        const draw = () => {
-            if (!ctx || !gameState?.ball) return;
-            // console.log(" Redibujando con ball:", gameState.ball);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "white";
-
-            ctx.beginPath();
-            ctx.arc(gameState.ball.x, gameState.ball.y, 10, 0, Math.PI * 2);
-            ctx.fill();
-
-            Object.values(gameState.paddles).forEach((paddle: Paddle) => {
-                ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-            });
-        };
 
         const updateGameState = async () => {
             // console.log(" updateGameState ejecutado");
@@ -98,8 +99,19 @@ export const GameCanvas = (state: GameState, mode: string) => {
         });
 
     } else if (mode === "online") {
-// Aquí puedes redirigir a la pantalla de juego, inicializar el canvas, etc.
+        const updateGameState = (newState: GameState) => {
+            gameState = { ...gameState, ...newState };
+            console.log("Nuevo estado del juego:", gameState);
+            renderGame(gameState);
+        }
+        const socket = gameSocket(updateGameState);
+
+        const renderGame = (state: GameState) => {
+            draw();
+            console.log("Renderizando juego con estado:", state);
+        }
     }
+
 
     return canvas;
 };

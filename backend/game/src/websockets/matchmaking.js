@@ -3,7 +3,7 @@ let queue = [];
 async function matchmakingSockets(fastify, opts) {
 	fastify.register(async function (fastify) {
 		fastify.get('/online/matchmaking', { websocket: true }, (socket, req) => {
-			console.log('Client connected');
+			// console.log('Client connected');
 			
 			socket.on('message', message => {
 				const playerId = JSON.parse(message).id;
