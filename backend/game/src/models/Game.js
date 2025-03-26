@@ -10,7 +10,7 @@ export class Game {
 			left: new Paddle("left", 20, 150, player1Id),
 			right: new Paddle("right", 770, 150, player2Id),
 		};
-		this.points = 3;
+		this.points = 10;
 		this.leftPoints = 0;
 		this.rightPoints = 0;
 	}

@@ -14,6 +14,7 @@ export interface Ball {
 }
 
 export interface GameState {
+    roomId ?: string;
     status: string;
     ball: Ball;
     paddles: {

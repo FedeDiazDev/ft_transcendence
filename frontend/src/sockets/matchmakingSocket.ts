@@ -17,6 +17,7 @@ export const createMatchmakingSocket = (onReady: (gameState: any) => void) => {
 			socket.close();
 		}
 	};
+
 	socket.onclose = function (event) {
 		if (event.wasClean) {
 			alert(`[close] Conexión cerrrada limpiamente, código=${event.code} motivo=${event.reason}`)

@@ -1,6 +1,4 @@
-
-
-export const gameSocket = (updateGameState : any) => {
+export const gameSocket = (updateGameState: any) => {
 	let socket = new WebSocket("ws://localhost:4444/online/game");
 	socket.onopen = function (e) {
 		alert("[open] Conexión establecida.");
@@ -12,15 +10,19 @@ export const gameSocket = (updateGameState : any) => {
 		updateGameState(data);
 	}
 	socket.onclose = function (event) {
-		if (event.wasClean) {
-			alert(`[close] Conexión cerrrada limpiamente, código=${event.code} motivo=${event.reason}`)
-		} else {
-			alert('[close] La conexión se cayó en gameSocket');
-		}
+        console.log(event.wasClean 
+            ? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`
+            : '[close] La conexión se cayó en gameSocket');
 	};
 
-	socket.onerror = function (error) { 
+	socket.onerror = function (error) {
 		alert(`[error]`);
 	}
-	return socket;
+	return {
+		sendMove: (direction: "up" | "down") => {
+			socket.send(JSON.stringify({ action: "move_paddle", direction }));
+		},
+		close: () => socket.close()
+	};
+
 }
