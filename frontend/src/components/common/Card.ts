@@ -18,4 +18,3 @@ export const Card = (icon: string, text: string, path: string) => {
   
     return card;
   };
-  

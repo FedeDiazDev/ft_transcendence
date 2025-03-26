@@ -35,6 +35,8 @@ async function fetchLogin(sendData : {user : string, password : string}, errorDi
 			errorDiv.textContent = data.message;
 		}
 		else{
+			const token = data.token;
+			localStorage.setItem("authToken", token);
 			errorDiv.className = "text-sm mt-2 h-6 text-green-400";
 			errorDiv.textContent = "Login complete";
 		}

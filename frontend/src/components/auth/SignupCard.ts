@@ -91,6 +91,8 @@ async function fetchSignup(sendData : { username : string, email : string, passw
 		})
 		const data = await response.json(); 
 		handleResponse(data, errorDiv, sendData.username);
+		const token = data.token;
+		localStorage.setItem("authToken", token);
 	} catch(error){
 		console.error("Fetch error:", error);
 	}

@@ -1,4 +1,4 @@
-import { render } from "../../router.js";
+import { navigateTo } from "../../router.js";
 
 export const Navbar = () => {
     const nav = document.createElement("nav");
@@ -27,8 +27,7 @@ export const Navbar = () => {
       a.className = "px-3 py-2 rounded-lg hover:bg-gray-700 transition";
       a.addEventListener("click", (e) => {
         e.preventDefault();
-        window.history.pushState({}, "", path);
-        render();
+		navigateTo(path);
       });
       menu.appendChild(a);
     });
@@ -38,4 +37,3 @@ export const Navbar = () => {
   
     return nav;
   };
-  
