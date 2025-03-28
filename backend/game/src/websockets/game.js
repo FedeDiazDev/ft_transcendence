@@ -16,7 +16,7 @@ async function gameLogic(fastify, opts) {
 					if (ids.length === 2) {
 						player1 = ids.shift();
 						player2 = ids.shift();
-						game = new Game(player1.id, player2.id);						
+						game = new Game(player1.id, player2.id);
 						game.start();
 						player1.socket.send((JSON.stringify(game)));
 						player2.socket.send((JSON.stringify(game)));
@@ -24,8 +24,16 @@ async function gameLogic(fastify, opts) {
 				}
 				else if (data.action === "move_paddle") {
 					console.log(data);
-					game.movePaddle(player1, data.direction);
-					player1.socket.send(JSON.stringify(game));
+					if (data.id == 2) {
+						game.movePaddle('left', data.direction);
+						// console.log("ID 2:", game);
+						player1.socket.send(JSON.stringify(game));
+					}
+					else if (data.id == 1){
+						game.movePaddle('right', data.direction);
+						// console.log("ID 1:", game);
+						player2.socket.send(JSON.stringify(game))
+					}
 				}
 			})
 		})

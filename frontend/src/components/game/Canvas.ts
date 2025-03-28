@@ -4,14 +4,14 @@ import { updateBall } from "../../api/game/gameAPI.js";
 import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
 
-export const GameCanvas = (state : GameState, mode: string) => {
+export const GameCanvas = (state: GameState, mode: string) => {
     const canvas = document.createElement("canvas");
     canvas.width = 800;
     canvas.height = 400;
     canvas.className = "border border-gray-600";
 
     const ctx = canvas.getContext("2d");
-    let gameState: GameState = { ...state };    
+    let gameState: GameState = { ...state };
     const draw = () => {
         if (!ctx || !gameState?.ball) return;
         // console.log(" Redibujando con ball:", gameState.ball);
@@ -90,7 +90,6 @@ export const GameCanvas = (state : GameState, mode: string) => {
                 console.error("Error al mover la pala:", error);
             }
         };
-
         useKeyPress({
             "ArrowUp": () => moveAndUpdate("right", "up"),
             "ArrowDown": () => moveAndUpdate("right", "down"),
@@ -99,20 +98,21 @@ export const GameCanvas = (state : GameState, mode: string) => {
         });
 
     } else if (mode === "online") {
+        const id = localStorage.getItem("id");
         console.log("State", gameState);
         const updateGameState = (newState: GameState) => {
             gameState = { ...gameState, ...newState };
             console.log("Nuevo estado del juego:", gameState);
             renderGame(gameState);
         }
-        const socket = gameSocket(updateGameState);
+        const socket = gameSocket(updateGameState, Number(id));
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowUp" || event.key === "w") {
-                // console.log("PULSADO");
-                socket.sendMove("up");
+                console.log("PULSADO");
+                socket.sendMove("up",  Number(id));
             }
             else if (event.key === "ArrowDown" || event.key === "s") {
-                socket.sendMove("down");
+                socket.sendMove("down", Number(id));
             }
         })
         const renderGame = (state: GameState) => {
