@@ -4,6 +4,21 @@ let ids = [];
 let player1;
 let player2;
 let game = null;
+let gameLoopRunning = false;
+
+function startGameLoop() {
+    if (gameLoopRunning) return;
+    gameLoopRunning = true;
+
+    setInterval(() => {
+        game.update();
+        player1.socket.send(JSON.stringify(game));
+        player2.socket.send(JSON.stringify(game));
+    }, 1000 / 60);
+}
+
+
+
 async function gameLogic(fastify, opts) {
 	fastify.register(async function (fastify) {
 		fastify.get('/online/game', { websocket: true }, (socket, req) => {
@@ -27,13 +42,14 @@ async function gameLogic(fastify, opts) {
 					if (data.id == 2) {
 						game.movePaddle('left', data.direction);
 						// console.log("ID 2:", game);
-						player1.socket.send(JSON.stringify(game));
 					}
-					else if (data.id == 1){
+					else if (data.id == 1) {
 						game.movePaddle('right', data.direction);
 						// console.log("ID 1:", game);
-						player2.socket.send(JSON.stringify(game))
 					}
+					player1.socket.send(JSON.stringify(game));
+					player2.socket.send(JSON.stringify(game));
+					startGameLoop();
 				}
 			})
 		})

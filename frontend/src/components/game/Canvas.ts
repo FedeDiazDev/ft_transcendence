@@ -120,7 +120,5 @@ export const GameCanvas = (state: GameState, mode: string) => {
             console.log("Renderizando juego con estado:", state);
         }
     }
-
-
     return canvas;
 };
