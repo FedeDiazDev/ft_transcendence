@@ -16,7 +16,7 @@ const routes: Record<string, () => HTMLElement> = {
   "/profile": Profile,
   "/stats": StatsView,
   "/friends": Friend,
-  "/local_game": Game,
+  "/local_game": () => Game("local"),
   "/online_game": Online,
   "/create_tournament": CreateTournament,
   "/tournament/waiting_room": Online
