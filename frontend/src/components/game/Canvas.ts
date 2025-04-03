@@ -27,8 +27,7 @@ export const GameCanvas = (state: GameState, mode: string) => {
         });
     };
     if (mode === "local") {
-
-
+        //!: al cambair de vista el juego se sigue ejecutando en 2º plano
         const updateGameState = async () => {
             // console.log(" updateGameState ejecutado");
             if (gameState.status !== "playing") {
