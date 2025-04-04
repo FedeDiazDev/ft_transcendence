@@ -1,0 +1,23 @@
+{
+	"name": "game",
+	"version": "1.0.0",
+	"description": "App del juego",
+	"main": "server.js",
+	"type": "module",
+	"scripts": {
+	  "start": "node ./src/server.js",
+	  "dev": "nodemon ./src/server.js"
+	},
+	"dependencies": {
+	  "fastify": "^5.2.1",
+	  "@fastify/cors": "^11.0.0",
+	  "@fastify/websocket": "^11.0.2"
+	},
+	"devDependencies": {
+	  "nodemon": "^3.0.2"
+	},
+	"engines": {
+	  "node": ">=18"
+	}
+  }
+  

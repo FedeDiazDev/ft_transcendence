@@ -12,6 +12,6 @@ export default function createWebToken(user, email){
 		expiresIn : "1h",
 		algorithm : "HS256"
 	};
-	const token = jwt.sign(payload, process.env.JWT_SECRET);
+	const token = jwt.sign(payload, "production_password"); //QUITAR
 	return token;
 }
