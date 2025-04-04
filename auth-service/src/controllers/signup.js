@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import createWebToken from "./jwt.js";
 
 //SALT: Random values than interacts with the hasing aside of regular string that comes
 //HASH: Math iterations to transform the password
@@ -25,11 +26,14 @@ function hashPassword(password){
 
 export default function postSignup(request, reply){
 
-		confirmPassword(request.body.password, request.body.confirmPassword);
-		const passStruct = hashPassword(request.body.password);
-		const db = request.server.db;
+	confirmPassword(request.body.password, request.body.confirmPassword);
+	const passStruct = hashPassword(request.body.password);
+	const db = request.server.db;
 
-		const query = db.prepare("INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)");
-		query.run(request.body.username, request.body.email, passStruct.hash, passStruct.salt);
-		reply.status(200).send({statusCode : 200, message : "Registration complete"});
+	const query = db.prepare("INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)");
+	query.run(request.body.username, request.body.email, passStruct.hash, passStruct.salt);
+
+	const userToken = createWebToken(request.body.username, request.body.email);
+
+	reply.send({ message: "Registration complete" , token : userToken});
 }

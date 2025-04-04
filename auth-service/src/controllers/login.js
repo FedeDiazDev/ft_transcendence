@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import createWebToken from "./jwt.js";
 
 function checkHashPassword(password, salt){
 	const hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
@@ -22,5 +23,7 @@ export default function postLogin(request, reply){
 		error.statusCode = 400;
 		throw error;
 	}
-	reply.status(200).send({message : "Log In complete"});
+
+	const userToken = createWebToken(response.username, response.email);
+	reply.status(200).send({message : "Log In complete", token : userToken});
 }

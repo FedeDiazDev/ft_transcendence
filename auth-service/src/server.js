@@ -39,7 +39,6 @@ async function startServer(){
 		await fastify.register(cors);
 		await fastify.register(routes);
 		await fastify.register(dbConnector);
-
 		await fastify.listen(connectOptions, serverError);
 	}catch(error){
 		fastify.log.error(error);

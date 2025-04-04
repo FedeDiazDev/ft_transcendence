@@ -8,6 +8,7 @@ import { StatsView } from "./pages/stats.js";
 import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
+
 const routes: Record<string, () => HTMLElement> = {
   "/loghome": LogHome,
   "/login": Login,
@@ -62,7 +63,26 @@ export const render = () => {
 window.addEventListener("popstate", render);
 document.addEventListener("DOMContentLoaded", render);
 
+export const authToken = () =>{
+	const token = localStorage.getItem("authToken");
+	console.log(token);
+	if (!token || token === ""){
+		return false;
+	}
+	else{
+		return true;
+	}
+}
+
 export const navigateTo = (path: string) => {
-  window.history.pushState({}, "", path);
-  render();
+	if (path != "/loghome" && path != "/login" && path != "/signup")
+	{
+		if (!authToken())
+			window.history.pushState({}, "", "/loghome");
+		else
+			window.history.pushState({}, "", path);
+	}
+	else
+		window.history.pushState({}, "", path);
+	render();
 };
