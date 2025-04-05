@@ -33,4 +33,3 @@ export default function routes(fastify) {
 	fastify.post("/signup", signupOpts, postSignup);
 	fastify.post("/login", loginOpts, postLogin);
 }
-

@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import dbConnector from './database.js';
 import routes from './routes.js';
-import cors from '@fastify/cors'
+import cors from '@fastify/cors';
 
 //Activate logger inside fastify
 const opts = {

@@ -1,10 +1,11 @@
 import crypto from "crypto";
 import createWebToken from "./jwt.js";
+import createQR from "./createQR.js";
 
 //SALT: Random values than interacts with the hasing aside of regular string that comes
 //HASH: Math iterations to transform the password
 
-function confirmPassword(password, confirmPassword){
+function confirmPassword(password, confirmPassword){	
 	if (password != confirmPassword){
 		const error = new Error("Passwords do not match");
 		error.statusCode = 400;
@@ -24,7 +25,7 @@ function hashPassword(password){
 	}
 }
 
-export default function postSignup(request, reply){
+export default async function postSignup(request, reply){
 
 	confirmPassword(request.body.password, request.body.confirmPassword);
 	const passStruct = hashPassword(request.body.password);
@@ -33,7 +34,10 @@ export default function postSignup(request, reply){
 	const query = db.prepare("INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)");
 	query.run(request.body.username, request.body.email, passStruct.hash, passStruct.salt);
 
-	const userToken = createWebToken(request.body.username, request.body.email);
+	const qrcode = await createQR();
 
-	reply.send({ message: "Registration complete" , token : userToken});
+	//const userToken = createWebToken(request.body.username, request.body.email);
+
+	//reply.send({ message: "Registration complete" , token : userToken});
+	reply.send({ message: "Generate QR", QR: qrcode});
 }
