@@ -73,7 +73,9 @@ function clickOnButtonSignup(button : HTMLButtonElement, names : string[], error
 			"password" : inputs[2],
 			"confirmPassword" : inputs[3]
 		}
-		//Parse in front to show all the errors in the front
+
+		localStorage.setItem("username", inputs[0].trim()); //For later
+
 		let frontErrors: string[] = parseFront(sendData);
 
 		showErrors(frontErrors, errorDiv);
@@ -93,7 +95,7 @@ async function fetchSignup(sendData : { username : string, email : string, passw
 		})
 		const data = await response.json(); 
 		handleResponse(data, errorDiv, sendData.username);
-		localStorage.setItem("QRCode", data.QR);
+		localStorage.setItem("QRCode", data.qr);
 		navigateTo("/qrcode");
 		//const token = data.token;
 		//localStorage.setItem("authToken", token);

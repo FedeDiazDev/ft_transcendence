@@ -17,7 +17,8 @@ function dbConnector(fastify) {
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
-        salt TEXT NOT NULL
+        salt TEXT NOT NULL,
+		qrSecret TEXT
       );
     `);
  

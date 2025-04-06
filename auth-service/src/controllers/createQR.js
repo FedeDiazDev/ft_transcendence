@@ -5,7 +5,11 @@ export default async function createQR(){
 	try{
 		const secret = speakeasy.generateSecret();
 		const qrcode = await QRCode.toDataURL(secret.otpauth_url)
-		return qrcode;
+		const data = {
+			sr : secret,
+			qr : qrcode
+		}
+		return data;
 	}catch(error){
 		throw error;
 	}
