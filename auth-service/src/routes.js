@@ -30,7 +30,7 @@ const signupOpts = {
   };
 
 export default function routes(fastify) {
-	fastify.post("/signup", signupOpts, postSignup);
-	fastify.post("/login", loginOpts, postLogin);
+	fastify.post("/api/auth/signup", signupOpts, postSignup);
+	fastify.post("/api/auth/login", loginOpts, postLogin);
 }
 
