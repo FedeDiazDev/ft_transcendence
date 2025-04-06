@@ -8,11 +8,13 @@ import { StatsView } from "./pages/stats.js";
 import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
+import { QRCode } from "./pages/qrcode.js"
 
 const routes: Record<string, () => HTMLElement> = {
   "/loghome": LogHome,
   "/login": Login,
   "/signup": Signup,
+  "/qrcode" : QRCode,
   "/profile": Profile,
   "/stats": StatsView,
   "/friends": Friend,
@@ -75,7 +77,7 @@ export const authToken = () =>{
 }
 
 export const navigateTo = (path: string) => {
-	if (path != "/loghome" && path != "/login" && path != "/signup")
+	if (path != "/loghome" && path != "/login" && path != "/signup" && path != "/qrcode")
 	{
 		if (!authToken())
 			window.history.pushState({}, "", "/loghome");
