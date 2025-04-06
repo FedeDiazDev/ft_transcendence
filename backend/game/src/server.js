@@ -29,7 +29,7 @@ function serverError(err) {
 }
 
 async function startServer(){
-	try{
+	try {
 		await fastify.register(cors);
 		await fastify.register(routes);		
 		await fastify.register(ws);
