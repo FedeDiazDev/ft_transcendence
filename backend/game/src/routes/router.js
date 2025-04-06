@@ -8,7 +8,7 @@ async function routes (fastify, opts)
 	//*POST
 	fastify.post("/api/game/create", createGame);
 	fastify.post("/api/game/start", startGame);
-	//curl -X POST -H "Content-Type: application/json" -d '{"player":"left", "direction":"down"}' http://0.0.0.0:4444/game/movePaddle
+	//curl -X POST -H "Content-Type: application/json" -d '{"player":"left", "direction":"down"}' http://0.0.0.0:3000/game/movePaddle
 	fastify.post("/api/game/movePaddle", movePaddle);
 	fastify.post("/api/game/moveBall", moveBall);
 }

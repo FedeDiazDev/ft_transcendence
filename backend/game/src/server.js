@@ -18,7 +18,7 @@ fastify.setErrorHandler((error, request, reply) => {
 
 const connectOptions = {
     host: '0.0.0.0',
-    port: 4444
+    port: 3000
 }
 
 function serverError(err) {
