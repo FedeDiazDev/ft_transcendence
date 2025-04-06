@@ -1,4 +1,4 @@
-FROM nginx:latest
+FROM nginx:1.27.4
 
 RUN openssl req -newkey rsa:2048 -days 365 -nodes -x509 \
     -keyout /etc/ssl/private/nginx.key \
