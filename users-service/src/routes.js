@@ -1,4 +1,5 @@
 import postRegister from "./components/register.js"
+import postProfile from './components/profile.js'
 
 const registerOpts = {
 	schema: {
@@ -12,6 +13,19 @@ const registerOpts = {
   }
 }
 
+const profileOpts = {
+	schema: {
+	  body: {
+		type: "object",
+		properties: {
+			user: { type: "string", minLength : 1},
+		},
+		required: ["user"],
+	  }
+	}
+  };
+
 export default function routes(fastify) {
 	fastify.post("/register", registerOpts, postRegister);
+	fastify.post("/profile", profileOpts, postProfile);
 }
