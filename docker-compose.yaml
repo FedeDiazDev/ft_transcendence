@@ -35,8 +35,6 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env 
-    ports:
-      - "3000:3000"
     volumes:
       - auth-db:/data/
     networks:
@@ -47,8 +45,6 @@ services:
     build:
       context: ./backend/game
       dockerfile: Dockerfile
-    ports:
-      - "4444:4444"
     volumes:
       - game-data-db:/data    # SQLite
     networks:
@@ -58,8 +54,6 @@ services:
     build:
       context: ./users-service
       dockerfile: Dockerfile
-    ports:
-      - "4000:4000"
     volumes:
       - users-db:/data/
     networks:

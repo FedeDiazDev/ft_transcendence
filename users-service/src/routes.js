@@ -26,6 +26,6 @@ const profileOpts = {
   };
 
 export default function routes(fastify) {
-	fastify.post("/register", registerOpts, postRegister);
-	fastify.post("/profile", profileOpts, postProfile);
+	fastify.post("/api/users/register", registerOpts, postRegister);
+	fastify.post("/api/users/profile", profileOpts, postProfile);
 }
