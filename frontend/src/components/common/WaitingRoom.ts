@@ -21,11 +21,12 @@ export const WaitingRoom = () => {
     text.appendChild(dots);
     container.appendChild(text);
 
-    const matchmakingSocket =  createMatchmakingSocket((gameState) => {
+    const matchmakingSocket = createMatchmakingSocket((gameState) => {
+        const score = document.createElement("p");
         matchmakingSocket.close();
         container.innerHTML = "";
         container.className = "flex flex-col items-center justify-center bg-gray-900 text-white";
-        container.appendChild(GameCanvas(gameState, "online"));
+        container.appendChild(GameCanvas(gameState, "online", score));
     });
 
     return container;

@@ -2,7 +2,7 @@ import { API_URLS } from "../apiConfig.js"
 
 export const createGame = async (leftPlayerId: number, rightPlayerId: number): Promise<{ gameState: string }> => {
     try {
-        const response = await fetch(`${API_URLS.game}/api/game/create`, {
+        const response = await fetch(`${API_URLS.game}/create`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ leftPlayerId: leftPlayerId, rightPlayerId: rightPlayerId }),
@@ -23,7 +23,7 @@ export const createGame = async (leftPlayerId: number, rightPlayerId: number): P
 
 export const getGameState = async (): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.game}/api/game/state`);
+        const response = await fetch(`${API_URLS.game}/state`);
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
@@ -37,7 +37,7 @@ export const getGameState = async (): Promise<any> => {
 
 export const updateBall = async (): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.game}/api/game/moveBall`, {
+        const response = await fetch(`${API_URLS.game}/moveBall`, {
             method: "POST",
         });
 
@@ -59,7 +59,7 @@ export const updateBall = async (): Promise<any> => {
 
 export const startGame = async (): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.game}/api/game/start`, {
+        const response = await fetch(`${API_URLS.game}/start`, {
             method: "POST",
         })
         if (!response.ok)

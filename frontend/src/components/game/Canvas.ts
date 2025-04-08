@@ -4,11 +4,11 @@ import { updateBall } from "../../api/game/gameAPI.js";
 import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
 
-export const GameCanvas = (state: GameState, mode: string) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement : any) => {
     const canvas = document.createElement("canvas");
     canvas.width = 800;
     canvas.height = 400;
-    canvas.className = "border border-gray-600";
+    canvas.className = "border border-gray-600";    
 
     const ctx = canvas.getContext("2d");
     let gameState: GameState = { ...state };
@@ -28,22 +28,20 @@ export const GameCanvas = (state: GameState, mode: string) => {
     };
     if (mode === "local") {
         //!: al cambair de vista el juego se sigue ejecutando en 2º plano
-
-        const pressedKeys = useKeyPress();        
+        const pressedKeys = useKeyPress();
 
         const updateGameState = async () => {
             if (gameState.status !== "playing") {
                 console.warn(" Estado no es PLAYING:", gameState.status);
                 return;
             }
-            // console.log(pressedKeys);
             if (pressedKeys.w) moveAndUpdate("left", "up");
             if (pressedKeys.s) moveAndUpdate("left", "down");
             if (pressedKeys.ArrowUp) moveAndUpdate("right", "up");
             if (pressedKeys.ArrowDown) moveAndUpdate("right", "down");
             draw();
             try {
-                const updatedState = await updateBall();                
+                const updatedState = await updateBall();
                 if (updatedState && updatedState.ball) {
                     gameState = { ...gameState, ...updatedState };
                     draw();
@@ -53,7 +51,11 @@ export const GameCanvas = (state: GameState, mode: string) => {
             }
         };
 
-        const loop = async () => {            
+        const loop = async () => {
+            if (scoreElement != null) {
+                scoreElement.innerHTML = `${gameState.leftPoints} - ${gameState.rightPoints}`;
+            }
+            
             if (gameState.status === "game_over") {
                 console.log("GAME FINISHED:", gameState);
                 if (gameState.rightPoints == 10)
@@ -62,16 +64,15 @@ export const GameCanvas = (state: GameState, mode: string) => {
                     alert("El ganador es el jugador de la izquierda");
                 return;
             }
-            await updateGameState();            
+            await updateGameState();
             requestAnimationFrame(loop);
         };
 
         loop();
 
-        const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {            
+        const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {
             const paddle = gameState.paddles[player];
             if (!paddle) return;
-            console.log("Paddle before update", paddle);
             const speed = paddle.speed ?? 10;
             const newY = direction === "up" ? paddle.y - speed : paddle.y + speed;
 
@@ -82,7 +83,6 @@ export const GameCanvas = (state: GameState, mode: string) => {
                     [player]: { ...paddle, y: newY }
                 }
             };
-            console.log("Paddle after update", gameState.paddles[player]);
         };
         const moveAndUpdate = async (player: "left" | "right", direction: "up" | "down") => {
             try {
@@ -94,7 +94,7 @@ export const GameCanvas = (state: GameState, mode: string) => {
                 console.error("Error al mover la pala:", error);
             }
         };
-
+        //*ONLINE
     } else if (mode === "online") {
         const id = localStorage.getItem("id");
         console.log("State", gameState);
@@ -115,6 +115,7 @@ export const GameCanvas = (state: GameState, mode: string) => {
         })
         const renderGame = (state: GameState) => {
             draw();
+            // scoreElement.innerHTML = `${state.leftPoints} - ${state.rightPoints}`;
             console.log("Renderizando juego con estado:", state);
         }
     }

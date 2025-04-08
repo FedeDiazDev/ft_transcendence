@@ -2,7 +2,7 @@ let queue = [];
 
 async function matchmakingSockets(fastify, opts) {
 	fastify.register(async function (fastify) {
-		fastify.get('/online/matchmaking', { websocket: true }, (socket, req) => {
+		fastify.get('/api/game/online/matchmaking', { websocket: true }, (socket, req) => {
 			// console.log('Client connected');
 			
 			socket.on('message', message => {

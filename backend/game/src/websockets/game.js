@@ -21,7 +21,7 @@ function startGameLoop() {
 
 async function gameLogic(fastify, opts) {
 	fastify.register(async function (fastify) {
-		fastify.get('/online/game', { websocket: true }, (socket, req) => {
+		fastify.get('/api/game/online/game', { websocket: true }, (socket, req) => {
 
 			socket.on('message', message => {
 				const data = JSON.parse(message);
