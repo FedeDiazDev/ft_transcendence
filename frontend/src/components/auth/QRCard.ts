@@ -74,7 +74,7 @@ export const QRCard = () => {
 	const div = document.createElement("div");
 	const qr = document.createElement("img");
 	const qrImg = localStorage.getItem("QRCode");
-	localStorage.removeItem("QRCode");
+	//localStorage.removeItem("QRCode");
 	if (qrImg)
 		formatCorrectCard(div, qr, qrImg);
 	else

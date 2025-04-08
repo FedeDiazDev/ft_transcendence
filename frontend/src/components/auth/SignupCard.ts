@@ -94,8 +94,8 @@ async function fetchSignup(sendData : { username : string, email : string, passw
 			body: JSON.stringify(sendData),
 		})
 		const data = await response.json(); 
+		localStorage.setItem("QRCode", data.QR);
 		handleResponse(data, errorDiv, sendData.username);
-		localStorage.setItem("QRCode", data.qr);
 		navigateTo("/qrcode");
 		//const token = data.token;
 		//localStorage.setItem("authToken", token);
