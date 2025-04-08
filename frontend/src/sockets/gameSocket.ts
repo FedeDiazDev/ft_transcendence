@@ -1,5 +1,5 @@
 export const gameSocket = (updateGameState: any, id : number) => {
-	let socket = new WebSocket("ws://localhost:8080/api/game/online_game");
+	let socket = new WebSocket("wss://localhost:8080/api/game/online_game");
 	socket.onopen = function (e) {
 		alert("[open] Conexión establecida.");
 		socket.send(JSON.stringify({ id: id, roomId: Date.now(), status: "ready", action: "join_game" }));
