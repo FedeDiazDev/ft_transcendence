@@ -10,7 +10,7 @@ async function fetchProfile(container : HTMLDivElement){
     const decodedPayload = atob(payload);//payload is decoded from Base64 format
     const jsonPayload = JSON.parse(decodedPayload);//decodedPayload is a string generated from a previous json when token was created. Now is rebuilt into a json object
     try{
-        const response = await fetch("http://localhost:4000/profile", {
+        const response = await fetch("https://localhost:8080/api/users/profile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
