@@ -26,6 +26,8 @@ export const WaitingRoom = () => {
         matchmakingSocket.close();
         container.innerHTML = "";
         container.className = "flex flex-col items-center justify-center bg-gray-900 text-white";
+        score.innerHTML = '0 - 0';
+        container.appendChild(score);
         container.appendChild(GameCanvas(gameState, "online", score));
     });
 

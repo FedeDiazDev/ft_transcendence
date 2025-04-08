@@ -28,7 +28,7 @@ export const render = () => {
   if (!app) return;  
   app.innerHTML = "";
 
-  const path = window.location.pathname;  
+  const path = window.location.pathname;
   const pathParts = path.split("/");
   //TODO: en un futuro hacer que StatsView reciba el id del usuario que queremos ver
   if (pathParts[1] === "stats" && pathParts.length === 3) {

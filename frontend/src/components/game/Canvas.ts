@@ -4,11 +4,11 @@ import { updateBall } from "../../api/game/gameAPI.js";
 import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement : any) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any) => {
     const canvas = document.createElement("canvas");
     canvas.width = 800;
     canvas.height = 400;
-    canvas.className = "border border-gray-600";    
+    canvas.className = "border border-gray-600";
 
     const ctx = canvas.getContext("2d");
     let gameState: GameState = { ...state };
@@ -55,7 +55,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement : any) =
             if (scoreElement != null) {
                 scoreElement.innerHTML = `${gameState.leftPoints} - ${gameState.rightPoints}`;
             }
-            
+
             if (gameState.status === "game_over") {
                 console.log("GAME FINISHED:", gameState);
                 if (gameState.rightPoints == 10)
@@ -65,7 +65,11 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement : any) =
                 return;
             }
             await updateGameState();
-            requestAnimationFrame(loop);
+            const path = window.location.pathname;            
+            if (path.endsWith("/local_game")) {
+                requestAnimationFrame(loop);
+            }
+            else return ;
         };
 
         loop();
