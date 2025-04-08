@@ -4,7 +4,7 @@ import { GameState } from "../types/types.js";
 
 export const Game = (mode: string) => {
     const container = document.createElement("div");
-    container.className = "flex justify-center items-center h-screen bg-black mt-10";
+    container.className = "flex justify-center items-center bg-black mt-10";
     let gameState: GameState = {
         roomId: "",
         status: "waiting",

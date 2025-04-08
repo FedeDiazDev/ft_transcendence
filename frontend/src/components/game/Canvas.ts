@@ -28,27 +28,32 @@ export const GameCanvas = (state: GameState, mode: string) => {
     };
     if (mode === "local") {
         //!: al cambair de vista el juego se sigue ejecutando en 2º plano
+
+        const pressedKeys = useKeyPress();        
+
         const updateGameState = async () => {
-            // console.log(" updateGameState ejecutado");
             if (gameState.status !== "playing") {
                 console.warn(" Estado no es PLAYING:", gameState.status);
                 return;
             }
+            // console.log(pressedKeys);
+            if (pressedKeys.w) moveAndUpdate("left", "up");
+            if (pressedKeys.s) moveAndUpdate("left", "down");
+            if (pressedKeys.ArrowUp) moveAndUpdate("right", "up");
+            if (pressedKeys.ArrowDown) moveAndUpdate("right", "down");
+            draw();
             try {
-                const updatedState = await updateBall();
-                // console.log(" Estado recibido de updateBall:", updatedState);
+                const updatedState = await updateBall();                
                 if (updatedState && updatedState.ball) {
                     gameState = { ...gameState, ...updatedState };
                     draw();
-                } else {
-                    console.warn(" updateBall no devolvió datos válidos");
                 }
             } catch (error) {
                 console.error("Error al actualizar la bola:", error);
             }
         };
 
-        const loop = async () => {
+        const loop = async () => {            
             if (gameState.status === "game_over") {
                 console.log("GAME FINISHED:", gameState);
                 if (gameState.rightPoints == 10)
@@ -57,16 +62,16 @@ export const GameCanvas = (state: GameState, mode: string) => {
                     alert("El ganador es el jugador de la izquierda");
                 return;
             }
-            await updateGameState();
+            await updateGameState();            
             requestAnimationFrame(loop);
         };
 
         loop();
 
-        const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {
+        const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {            
             const paddle = gameState.paddles[player];
             if (!paddle) return;
-
+            console.log("Paddle before update", paddle);
             const speed = paddle.speed ?? 10;
             const newY = direction === "up" ? paddle.y - speed : paddle.y + speed;
 
@@ -77,8 +82,8 @@ export const GameCanvas = (state: GameState, mode: string) => {
                     [player]: { ...paddle, y: newY }
                 }
             };
+            console.log("Paddle after update", gameState.paddles[player]);
         };
-
         const moveAndUpdate = async (player: "left" | "right", direction: "up" | "down") => {
             try {
                 const response = await movePaddle(player, direction);
@@ -89,12 +94,6 @@ export const GameCanvas = (state: GameState, mode: string) => {
                 console.error("Error al mover la pala:", error);
             }
         };
-        useKeyPress({
-            "ArrowUp": () => moveAndUpdate("right", "up"),
-            "ArrowDown": () => moveAndUpdate("right", "down"),
-            "w": () => moveAndUpdate("left", "up"),
-            "s": () => moveAndUpdate("left", "down"),
-        });
 
     } else if (mode === "online") {
         const id = localStorage.getItem("id");
@@ -108,7 +107,7 @@ export const GameCanvas = (state: GameState, mode: string) => {
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowUp" || event.key === "w") {
                 console.log("PULSADO");
-                socket.sendMove("up",  Number(id));
+                socket.sendMove("up", Number(id));
             }
             else if (event.key === "ArrowDown" || event.key === "s") {
                 socket.sendMove("down", Number(id));
