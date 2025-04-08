@@ -6,7 +6,7 @@ type Direction = "up" | "down";
 
 export const movePaddle = async (player: Player, direction: Direction): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.game}/api/game/movePaddle`, {
+        const response = await fetch(`${API_URLS.game}/movePaddle`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ player, direction }),
