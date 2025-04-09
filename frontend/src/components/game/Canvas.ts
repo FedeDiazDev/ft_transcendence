@@ -26,8 +26,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
             ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         });
     };
-    if (mode === "local") {
-        //!: al cambair de vista el juego se sigue ejecutando en 2º plano
+    if (mode === "local") {        
         const pressedKeys = useKeyPress();
 
         const updateGameState = async () => {
@@ -101,10 +100,11 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
         //*ONLINE
     } else if (mode === "online") {
         const id = localStorage.getItem("id");
-        console.log("State", gameState);
+        //console.log("State", gameState);
         const updateGameState = (newState: GameState) => {
             gameState = { ...gameState, ...newState };
-            console.log("Nuevo estado del juego:", gameState);
+          //  console.log("Nuevo estado del juego:", gameState);
+          //console.log("DATAAAAAAAAAAAAAA", `${gameState.leftPoints} - ${gameState.rightPoints}`)
             renderGame(gameState);
         }
         const socket = gameSocket(updateGameState, Number(id));
@@ -119,7 +119,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
         })
         const renderGame = (state: GameState) => {
             draw();
-            // scoreElement.innerHTML = `${state.leftPoints} - ${state.rightPoints}`;
+            scoreElement.innerHTML = `${state.leftPoints} - ${state.rightPoints}`;
             console.log("Renderizando juego con estado:", state);
         }
     }
