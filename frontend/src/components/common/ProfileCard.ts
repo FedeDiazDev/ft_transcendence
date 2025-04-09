@@ -1,4 +1,5 @@
 import { Input } from "./Input.js"
+import { getUserData } from "../../api/profile/profileAPI.js"
 
 async function fetchProfile(container : HTMLDivElement){
     const token = localStorage.getItem("authToken");
@@ -19,7 +20,9 @@ async function fetchProfile(container : HTMLDivElement){
             body: JSON.stringify({ user: jsonPayload.username })
         })
 
-        const data = await response.json(); 
+        const data = await response.json();
+
+        console.log(data);
         const textInput = Input("text", data.username || "", "Username", false);
         const idInput = Input("number", data.id || "", "id", false);
         
@@ -29,8 +32,18 @@ async function fetchProfile(container : HTMLDivElement){
     catch(error){
         console.error("Fetch error:", error);
     }
+    async function fetchUserData() {
+        try {
+            const data = await getUserData();  // Esperamos a que getUserData() termine
+            console.log(data);  // Mostramos los datos
+        } catch (error) {
+            console.error("Error al obtener los datos del usuario:", error);
+        }
+    }
+    
+    // Llamamos a la función para obtener los datos
+    fetchUserData();
 }
-
 export const ProfileView = () => {
     const container = document.createElement("div");
     container.className = "flex flex-col gap-4 p-4 border";
