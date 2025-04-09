@@ -6,8 +6,8 @@ import { gameSocket } from "../../sockets/gameSocket.js";
 
 export const GameCanvas = (state: GameState, mode: string, scoreElement: any) => {
     const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 400;
+    canvas.width = 1200;
+    canvas.height = 600;
     canvas.className = "border border-gray-600";
 
     const ctx = canvas.getContext("2d");
@@ -19,7 +19,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
         ctx.fillStyle = "white";
 
         ctx.beginPath();
-        ctx.arc(gameState.ball.x, gameState.ball.y, 10, 0, Math.PI * 2);
+        ctx.arc(gameState.ball.x, gameState.ball.y, 15, 0, Math.PI * 2);
         ctx.fill();
 
         Object.values(gameState.paddles).forEach((paddle: Paddle) => {
