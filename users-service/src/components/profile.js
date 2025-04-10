@@ -2,8 +2,7 @@ export async function postProfile(request, reply) {
 
     const db = request.server.db;
     const query = db.prepare("SELECT * FROM users WHERE username = ?")
-
-    const response = query.get(request.body.username);
+    const response = query.get(request.body.user);
     if (response === undefined) {
         const error = new Error("User does not exist");
         error.statusCode = 400;
@@ -19,7 +18,6 @@ export async function postProfile(request, reply) {
 
 export async function getUser(request, reply) {
     const authHeader = request.headers['authorization'];
-    console.log("HEADEEEEEEEEEEER", authHeader);
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         const error = new Error("Token no proporcionado");
         error.statusCode = 401;
@@ -27,11 +25,8 @@ export async function getUser(request, reply) {
     }
 
     const token = authHeader.split('.')[1];
-    console.log("Token recibido:", token); // Log para verificar el token recibido
     const decodedPayload = atob(token);
-    console.log("DecodedPayload", decodedPayload);
     const jsonPayload = JSON.parse(decodedPayload);
-    console.log("Payload decodificado:", jsonPayload); // Log para verificar el payload decodificado
 
     if (!jsonPayload || !jsonPayload.username) {
         const error = new Error("Token no válido o sin username");
@@ -40,7 +35,6 @@ export async function getUser(request, reply) {
     }
 
     const username = jsonPayload.username;
-    console.log("Username extraído:", username); // Log para verificar el username extraído
 
     const db = request.server.db;
     const query = db.prepare("SELECT * FROM users WHERE username = ?");

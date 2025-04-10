@@ -1,5 +1,6 @@
 import { createMatchmakingSocket } from "../../sockets/matchmakingSocket.js";
 import { GameCanvas } from "../game/Canvas.js";
+import { fetchUserData } from "../../hooks/fetchUserData.js";
 
 export const WaitingRoom = () => {
     const container = document.createElement("div");
@@ -21,14 +22,16 @@ export const WaitingRoom = () => {
     text.appendChild(dots);
     container.appendChild(text);
 
-    const matchmakingSocket = createMatchmakingSocket((gameState) => {
-        const score = document.createElement("p");
-        matchmakingSocket.close();
-        container.innerHTML = "";
-        container.className = "flex flex-col items-center justify-center bg-gray-900 text-white";
-        score.innerHTML = '0 - 0';
-        container.appendChild(score);
-        container.appendChild(GameCanvas(gameState, "online", score));
+    fetchUserData((user) => {
+        const matchmakingSocket = createMatchmakingSocket((gameState) => {
+            const score = document.createElement("p");
+            matchmakingSocket.close();
+            container.innerHTML = "";
+            container.className = "flex flex-col items-center justify-center bg-gray-900 text-white";
+            score.innerHTML = '0 - 0';
+            container.appendChild(score);
+            container.appendChild(GameCanvas(gameState, "online", score));
+        }, user.id);
     });
 
     return container;

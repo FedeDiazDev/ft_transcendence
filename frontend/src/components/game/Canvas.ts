@@ -3,8 +3,11 @@ import { movePaddle } from "../../api/game/paddleAPI.js";
 import { updateBall } from "../../api/game/gameAPI.js";
 import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
+import { fetchUserData } from "../../hooks/fetchUserData.js";
 
 export const GameCanvas = (state: GameState, mode: string, scoreElement: any) => {
+
+    // Llamamos a la función para obtener los datos
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
     canvas.height = 600;
@@ -26,7 +29,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
             ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         });
     };
-    if (mode === "local") {        
+    if (mode === "local") {
         const pressedKeys = useKeyPress();
 
         const updateGameState = async () => {
@@ -64,11 +67,11 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
                 return;
             }
             await updateGameState();
-            const path = window.location.pathname;            
+            const path = window.location.pathname;
             if (path.endsWith("/local_game")) {
                 requestAnimationFrame(loop);
             }
-            else return ;
+            else return;
         };
 
         loop();
@@ -99,24 +102,24 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
         };
         //*ONLINE
     } else if (mode === "online") {
-        const id = localStorage.getItem("id");
+        // const id = localStorage.getItem("id");
         //console.log("State", gameState);
         const updateGameState = (newState: GameState) => {
             gameState = { ...gameState, ...newState };
-          //  console.log("Nuevo estado del juego:", gameState);
-          //console.log("DATAAAAAAAAAAAAAA", `${gameState.leftPoints} - ${gameState.rightPoints}`)
+            //  console.log("Nuevo estado del juego:", gameState);
+            //console.log("DATAAAAAAAAAAAAAA", `${gameState.leftPoints} - ${gameState.rightPoints}`)
             renderGame(gameState);
         }
-        const socket = gameSocket(updateGameState, Number(id));
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowUp" || event.key === "w") {
-                console.log("PULSADO");
-                socket.sendMove("up", Number(id));
-            }
-            else if (event.key === "ArrowDown" || event.key === "s") {
-                socket.sendMove("down", Number(id));
-            }
-        })
+        fetchUserData((user) => {
+            const socket = gameSocket(updateGameState, user.id);
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "ArrowUp" || event.key === "w") {
+                    socket.sendMove("up", user.id);
+                } else if (event.key === "ArrowDown" || event.key === "s") {
+                    socket.sendMove("down", user.id);
+                }
+            });
+        });
         const renderGame = (state: GameState) => {
             draw();
             scoreElement.innerHTML = `${state.leftPoints} - ${state.rightPoints}`;

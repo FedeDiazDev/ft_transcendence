@@ -1,22 +1,19 @@
 import { Game } from "../models/Game.js";
 
-let ids = [];
-let player1;
-let player2;
+let players = [];
 let game = null;
 let gameLoopRunning = false;
 
 function startGameLoop() {
-    if (gameLoopRunning) return;
-    gameLoopRunning = true;
-
-    setInterval(() => {
-        game.update();
-        player1.socket.send(JSON.stringify(game));
-        player2.socket.send(JSON.stringify(game));
-    }, 1000 / 60);
+	if (gameLoopRunning) return;
+	gameLoopRunning = true;
+	setInterval(() => {
+		game.update();
+		players.forEach(player => {
+			player.socket.send(JSON.stringify(game));
+		});
+	}, 1000 / 60);
 }
-
 
 
 async function gameLogic(fastify, opts) {
@@ -27,28 +24,27 @@ async function gameLogic(fastify, opts) {
 				const data = JSON.parse(message);
 				if (data.action === "join_game") {
 					const playerId = data.id;
-					ids.push({ id: playerId, socket });
-					if (ids.length === 2) {
-						player1 = ids.shift();
-						player2 = ids.shift();
-						game = new Game(player1.id, player2.id);
+					players.push({ id: playerId, socket });
+					if (players.length === 2) {
+						game = new Game(players[0].id, players[1].id);
 						game.start();
-						player1.socket.send((JSON.stringify(game)));
-						player2.socket.send((JSON.stringify(game)));
+						players.forEach(player => {
+							player.socket.send(JSON.stringify(game));
+						});
 					}
 				}
 				else if (data.action === "move_paddle") {
 					console.log(data);
-					if (data.id == 2) {
+					if (!game) return;
+					if (data.id === game.paddles.left.playerId) {
 						game.movePaddle('left', data.direction);
-						// console.log("ID 2:", game);
-					}
-					else if (data.id == 1) {
+					} else if (data.id === game.paddles.right.playerId) {
 						game.movePaddle('right', data.direction);
-						// console.log("ID 1:", game);
 					}
-					player1.socket.send(JSON.stringify(game));
-					player2.socket.send(JSON.stringify(game));
+					players.forEach(player => {
+						player.socket.send(JSON.stringify(game));
+					});
+
 					startGameLoop();
 				}
 			})
