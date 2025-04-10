@@ -111,7 +111,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
             renderGame(gameState);
         }
         fetchUserData((user) => {
-            const socket = gameSocket(updateGameState, user.id);
+            const socket = gameSocket(updateGameState, user.id, user.username);
             document.addEventListener("keydown", (event) => {
                 if (event.key === "ArrowUp" || event.key === "w") {
                     socket.sendMove("up", user.id);
@@ -120,10 +120,12 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
                 }
             });
         });
-        const renderGame = (state: GameState) => {
+        const renderGame = (state: any) => {
+            const { gameState, player1Name, player2Name } = state;
+
             draw();
-            scoreElement.innerHTML = `${state.leftPoints} - ${state.rightPoints}`;
-            console.log("Renderizando juego con estado:", state);
+            //scoreElement.innerHTML = `${gameState.leftPoints} - ${gameState.rightPoints}`;
+            scoreElement.innerHTML = `<span>Jugador 1: ${player1Name} </span> ${gameState.leftPoints} - ${gameState.rightPoints} <span> : Jugador 2${player2Name}</span>`;
         }
     }
     return canvas;

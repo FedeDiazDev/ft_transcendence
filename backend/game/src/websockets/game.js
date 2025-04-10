@@ -10,7 +10,11 @@ function startGameLoop() {
 	setInterval(() => {
 		game.update();
 		players.forEach(player => {
-			player.socket.send(JSON.stringify(game));
+			const gameData = {
+				player1Name: players[0].name,
+				player2Name: players[1].name
+			};
+			player.socket.send(JSON.stringify(gameData));
 		});
 	}, 1000 / 60);
 }
@@ -24,12 +28,18 @@ async function gameLogic(fastify, opts) {
 				const data = JSON.parse(message);
 				if (data.action === "join_game") {
 					const playerId = data.id;
-					players.push({ id: playerId, socket });
+					const playerName = data.name;
+					players.push({ id: playerId, name: playerName, socket });
 					if (players.length === 2) {
 						game = new Game(players[0].id, players[1].id);
 						game.start();
 						players.forEach(player => {
-							player.socket.send(JSON.stringify(game));
+							const gameData = {
+								gameState: game,
+								player1Name: players[0].name,
+								player2Name: players[1].name
+							};
+							player.socket.send(JSON.stringify(gameData));
 						});
 					}
 				}
@@ -42,7 +52,12 @@ async function gameLogic(fastify, opts) {
 						game.movePaddle('right', data.direction);
 					}
 					players.forEach(player => {
-						player.socket.send(JSON.stringify(game));
+						const gameData = {
+							gameState: game,
+							player1Name: players[0].name,
+							player2Name: players[1].name
+						};
+						player.socket.send(JSON.stringify(gameData));
 					});
 
 					startGameLoop();
