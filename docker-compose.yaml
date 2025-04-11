@@ -58,6 +58,8 @@ services:
       - users-db:/data/
     networks:
       - transcendence-network
+    env_file:
+      - .env 
 
 
   # Other services here

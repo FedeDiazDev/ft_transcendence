@@ -69,7 +69,7 @@ async function gameLogic(fastify, opts) {
 					}
 				}
 				else if (data.action === "move_paddle") {
-					console.log(data);
+					//console.log(data);
 					if (!game) return;
 					if (data.id === game.paddles.left.playerId) {
 						game.movePaddle('left', data.direction);

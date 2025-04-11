@@ -1,3 +1,8 @@
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config(); 
+
 export async function postProfile(request, reply) {
 
     const db = request.server.db;
@@ -15,7 +20,7 @@ export async function postProfile(request, reply) {
     });
 }
 
-
+//TODO: validar jwt, no solo decodificar
 export async function getUser(request, reply) {
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -23,18 +28,16 @@ export async function getUser(request, reply) {
         error.statusCode = 401;
         throw error;
     }
-
-    const token = authHeader.split('.')[1];
-    const decodedPayload = atob(token);
-    const jsonPayload = JSON.parse(decodedPayload);
-
-    if (!jsonPayload || !jsonPayload.username) {
-        const error = new Error("Token no válido o sin username");
-        error.statusCode = 401;
-        throw error;
+    const token = authHeader.split(' ')[1];
+    console.log("TOKEN", token);
+    let payload;
+    try {        
+        payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        return reply.status(401).send({ error: "Token inválido o expirado" });
     }
-
-    const username = jsonPayload.username;
+    console.log("PAYLOADDD", payload);
+    const username = payload.username;
 
     const db = request.server.db;
     const query = db.prepare("SELECT * FROM users WHERE username = ?");
