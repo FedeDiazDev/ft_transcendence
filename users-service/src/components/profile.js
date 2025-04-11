@@ -20,7 +20,7 @@ export async function postProfile(request, reply) {
     });
 }
 
-//TODO: validar jwt, no solo decodificar
+
 export async function getUser(request, reply) {
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
