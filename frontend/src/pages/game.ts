@@ -35,9 +35,9 @@ export const Game = (mode: string) => {
     };
 
     const score = document.createElement("p");
+    score.id = "score";
+    score.className = "text-2xl text-white m-2 p-2"
     if (mode == "local") {
-        score.id = "score";
-        score.className = "text-2xl text-white m-2 p-2"
         createGame(1, 2)
             .then(gameData => {
                 if (!gameData?.gameState) {

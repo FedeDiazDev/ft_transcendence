@@ -104,12 +104,12 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
     } else if (mode === "online") {
         // const id = localStorage.getItem("id");
         //console.log("State", gameState);
-        const updateGameState = (newState: GameState) => {
-            gameState = { ...gameState, ...newState };
-            //  console.log("Nuevo estado del juego:", gameState);
-            //console.log("DATAAAAAAAAAAAAAA", `${gameState.leftPoints} - ${gameState.rightPoints}`)
-            renderGame(gameState);
-        }
+        const updateGameState = (newState: any) => {
+            const { gameState: receivedGameState, player1Name, player2Name } = newState;
+            gameState = { ...gameState, ...receivedGameState };
+            renderGame(player1Name, player2Name);
+          };
+          
         fetchUserData((user) => {
             const socket = gameSocket(updateGameState, user.id, user.username);
             document.addEventListener("keydown", (event) => {
@@ -120,13 +120,11 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
                 }
             });
         });
-        const renderGame = (state: any) => {
-            const { gameState, player1Name, player2Name } = state;
-
+        const renderGame = (player1Name: string, player2Name: string) => {
             draw();
-            //scoreElement.innerHTML = `${gameState.leftPoints} - ${gameState.rightPoints}`;
-            scoreElement.innerHTML = `<span>Jugador 1: ${player1Name} </span> ${gameState.leftPoints} - ${gameState.rightPoints} <span> : Jugador 2${player2Name}</span>`;
-        }
+            scoreElement.innerHTML = `<span>Jugador 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span>: Jugador 2 ${player2Name}</span>`;
+          };
+          
     }
     return canvas;
 };

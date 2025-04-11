@@ -7,10 +7,34 @@ let gameLoopRunning = false;
 function startGameLoop() {
 	if (gameLoopRunning) return;
 	gameLoopRunning = true;
-	setInterval(() => {
+
+	const interval = setInterval(() => {
 		game.update();
+		if (game.leftPoints === 10 || game.rightPoints === 10) {
+			const winnerId = game.leftPoints === 10
+				? game.paddles.left.playerId
+				: game.paddles.right.playerId;
+			const winnerName = players.find(p => p.id === winnerId)?.name || "Desconocido";
+			players.forEach(player => {
+				player.socket.send(JSON.stringify({
+					type: "game_over",
+					gameState: game,
+					winner: winnerName
+				}));
+				player.socket.close();
+			});
+
+			// Reset
+			clearInterval(interval);
+			players = [];
+			game = null;
+			gameLoopRunning = false;
+			return;
+		}
+
 		players.forEach(player => {
 			const gameData = {
+				gameState: game,
 				player1Name: players[0].name,
 				player2Name: players[1].name
 			};
@@ -18,6 +42,7 @@ function startGameLoop() {
 		});
 	}, 1000 / 60);
 }
+
 
 
 async function gameLogic(fastify, opts) {

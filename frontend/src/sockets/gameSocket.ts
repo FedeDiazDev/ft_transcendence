@@ -7,7 +7,14 @@ export const gameSocket = (updateGameState: any, id: number, name: string) => {
 	socket.onmessage = (event) => {
 		const data = JSON.parse(event.data);
 		console.log(data);
-		updateGameState(data);
+		if (data.type === "game_over") {
+			console.log("Partida terminada, ganador:", data.winner);
+			alert(`¡Fin del juego! Ganador: ${data.winner}`);
+			return;
+		}
+		if (data.gameState) {
+			updateGameState(data);
+		}
 	}
 	socket.onclose = function (event) {
 		console.log(event.wasClean
