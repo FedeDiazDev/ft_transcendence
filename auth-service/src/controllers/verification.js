@@ -3,8 +3,9 @@ import speakeasy from 'speakeasy';
 export default function postVerification(request, reply)
 {
 	const otpCode = request.body.verification;
-	const db = request.server.db;
 	const name = request.body.username;
+
+	const db = request.server.db;
 
 	const query = db.prepare("SELECT qrSecret FROM users WHERE username = ?");
 	const secret = query.get(name);

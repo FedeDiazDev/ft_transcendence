@@ -49,7 +49,7 @@ async function fetchVerify(verifyInput : string)
 		})
 	});
 
-	localStorage.removeItem("username")
+	//localStorage.removeItem("username")
 
 	const data = await response.json();
 	if (data.message === "Verified OTP Code")
@@ -78,6 +78,6 @@ export const QRCard = () => {
 		formatCorrectCard(div, qr, qrImg);
 	else
 		formatIncorrectCard(div);
-	localStorage.removeItem("QRCode");
+	//localStorage.removeItem("QRCode");
 	return div;
 }
