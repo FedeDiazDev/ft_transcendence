@@ -74,7 +74,8 @@ function clickOnButtonSignup(button : HTMLButtonElement, names : string[], error
 			"confirmPassword" : inputs[3]
 		}
 
-		localStorage.setItem("username", inputs[0].trim()); //For later
+		localStorage.setItem("username", inputs[0].trim());
+		localStorage.setItem("email", inputs[1].trim());
 
 		let frontErrors: string[] = parseFront(sendData);
 

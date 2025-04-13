@@ -1,3 +1,5 @@
+import { navigateTo } from "../../router.js";
+
 function formatCorrectCard(div : HTMLDivElement, qr : HTMLImageElement, qrImg : string)
 {
 	div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-100 min-h-100 mx-auto text-white justify-evenly";
@@ -24,17 +26,26 @@ function formatCorrectCard(div : HTMLDivElement, qr : HTMLImageElement, qrImg : 
 	const button = document.createElement("button");
 	button.textContent = "Verify";
 	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
-	clickVerify(button, input);
+	clickVerify(button, input, div);
 	div.appendChild(button);
 	return (div);
 }
 
-function clickVerify(button : HTMLButtonElement, input : HTMLInputElement)
+function clickVerify(button : HTMLButtonElement, input : HTMLInputElement, div : HTMLDivElement)
 {
 	let verifyInput = null;
+	let errorText: HTMLParagraphElement;
 	button.addEventListener("click", async() => {
 		verifyInput = input.value;
-		fetchVerify(verifyInput);
+		const flag = await fetchVerify(verifyInput)
+		
+		if (flag == false && errorText == null)
+		{
+			errorText = document.createElement("p");
+			errorText.className = "text-sm text-red-400";
+			errorText.textContent = "Incorrect OTP Code. Please, try again."
+			div.appendChild(errorText);
+		}
 	})
 }
 
@@ -45,17 +56,21 @@ async function fetchVerify(verifyInput : string)
 		headers: {"Content-type" : "application/json; charset=UTF-8"},
 		body: JSON.stringify({ 
 			verification : verifyInput,
-			username : localStorage.getItem("username")
+			username : localStorage.getItem("username"),
+			email : localStorage.getItem("email")
 		})
 	});
 
-	//localStorage.removeItem("username")
-
 	const data = await response.json();
 	if (data.message === "Verified OTP Code")
-		console.log("Correct Verification!");
+	{
+		localStorage.setItem("authToken", data.token);
+		localStorage.removeItem("QRCode");
+		navigateTo("/");
+		return true;
+	}
 	else
-		console.log("Incorrect Verification");
+		return false;
 }
 
 function formatIncorrectCard(div : HTMLDivElement)
@@ -78,6 +93,6 @@ export const QRCard = () => {
 		formatCorrectCard(div, qr, qrImg);
 	else
 		formatIncorrectCard(div);
-	//localStorage.removeItem("QRCode");
+
 	return div;
 }

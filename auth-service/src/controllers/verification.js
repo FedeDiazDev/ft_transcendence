@@ -1,4 +1,5 @@
 import speakeasy from 'speakeasy';
+import createWebToken from "./jwt.js";
 
 export default function postVerification(request, reply)
 {
@@ -17,7 +18,10 @@ export default function postVerification(request, reply)
 		window : 1
 	});
 	if (verified)
-		reply.send({message : "Verified OTP Code"});
+	{
+		const userToken = createWebToken(request.body.username, request.body.email);
+		reply.send({message : "Verified OTP Code", token : userToken});
+	}
 	else
 		reply.status(401).send({message : "OTP Verification failed"});
 }

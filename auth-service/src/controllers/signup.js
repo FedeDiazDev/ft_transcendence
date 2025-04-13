@@ -1,5 +1,4 @@
 import crypto from "crypto";
-import createWebToken from "./jwt.js";
 import createQR from "./createQR.js";
 
 //SALT: Random values than interacts with the hasing aside of regular string that comes
@@ -39,8 +38,5 @@ export default async function postSignup(request, reply){
 	const queryQr = db.prepare("UPDATE users SET qrSecret = ? WHERE username = ?");
 	queryQr.run(data.sr.base32, request.body.username);
 
-	//const userToken = createWebToken(request.body.username, request.body.email);
-
-	//reply.send({ message: "Registration complete" , token : userToken});
 	reply.send({ message: "Generate QR", QR: data.qr});
 }
