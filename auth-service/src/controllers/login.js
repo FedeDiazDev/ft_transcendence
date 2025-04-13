@@ -24,6 +24,5 @@ export default function postLogin(request, reply){
 		throw error;
 	}
 
-	const userToken = createWebToken(response.username, response.email);
-	reply.status(200).send({message : "Log In complete", token : userToken});
+	reply.status(200).send({message : "Log In complete"});
 }

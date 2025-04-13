@@ -9,12 +9,14 @@ import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
 import { QRCode } from "./pages/qrcode.js"
+import { TwoFALogin } from "./pages/twofalogin.js"
 
 const routes: Record<string, () => HTMLElement> = {
   "/loghome": LogHome,
   "/login": Login,
   "/signup": Signup,
   "/qrcode" : QRCode,
+  "/twofalogin" : TwoFALogin,
   "/profile": Profile,
   "/stats": StatsView,
   "/friends": Friend,
@@ -71,9 +73,8 @@ export const authToken = () =>{
 	if (!token || token === ""){
 		return false;
 	}
-	else{
+	else
 		return true;
-	}
 }
 
 export const navigateTo = (path: string) => {
