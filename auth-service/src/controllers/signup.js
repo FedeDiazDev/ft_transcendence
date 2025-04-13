@@ -1,9 +1,6 @@
 import crypto from "crypto";
 import createQR from "./createQR.js";
 
-//SALT: Random values than interacts with the hasing aside of regular string that comes
-//HASH: Math iterations to transform the password
-
 function confirmPassword(password, confirmPassword){	
 	if (password != confirmPassword){
 		const error = new Error("Passwords do not match");

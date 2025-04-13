@@ -1,10 +1,3 @@
-//
-// Possible Parse Errors in Front and backend
-//	Password and confirmPassword does not match
-//	Incorrect password format
-//	Incorrect email format
-//
-
 import { navigateTo } from "../../router.js";
 
 async function registerInUserDatabase(username : string){
