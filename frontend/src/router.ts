@@ -8,11 +8,15 @@ import { StatsView } from "./pages/stats.js";
 import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
+import { QRCode } from "./pages/qrcode.js"
+import { TwoFALogin } from "./pages/twofalogin.js"
 
 const routes: Record<string, () => HTMLElement> = {
   "/loghome": LogHome,
   "/login": Login,
   "/signup": Signup,
+  "/qrcode" : QRCode,
+  "/twofalogin" : TwoFALogin,
   "/profile": Profile,
   "/stats": StatsView,
   "/friends": Friend,
@@ -69,20 +73,41 @@ export const authToken = () =>{
 	if (!token || token === ""){
 		return false;
 	}
-	else{
+	else
 		return true;
-	}
 }
 
 export const navigateTo = (path: string) => {
-	if (path != "/loghome" && path != "/login" && path != "/signup")
-	{
-		if (!authToken())
-			window.history.pushState({}, "", "/loghome");
-		else
-			window.history.pushState({}, "", path);
-	}
-	else
+
+	const publicRoutes = ["/loghome", "/login", "/signup"];
+	const twoFARoutes = ["/qrcode", "/twofalogin"];
+
+	const username = localStorage.getItem("username");
+	const token = authToken(); 
+
+	if (publicRoutes.includes(path)) {
 		window.history.pushState({}, "", path);
-	render();
+		render();
+		return;
+	}
+
+	if (twoFARoutes.includes(path)) {
+		if (username && !token) {
+			window.history.pushState({}, "", path);
+			render();
+			return;
+		} else {
+			window.history.pushState({}, "", "/loghome");
+			render();
+			return;
+		}
+	}
+
+	if (token) {
+		window.history.pushState({}, "", path);
+		render();
+	} else {
+		window.history.pushState({}, "", "/loghome");
+		render();
+	}
 };

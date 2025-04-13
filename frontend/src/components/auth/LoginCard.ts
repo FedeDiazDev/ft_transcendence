@@ -1,3 +1,5 @@
+import { navigateTo } from "../../router.js";
+
 function clickOnButtonLogin(button : HTMLButtonElement, names : string[], errorDiv : HTMLDivElement){
 	button.addEventListener("click", async () => {
 	errorDiv.innerHTML = '';
@@ -6,7 +8,8 @@ function clickOnButtonLogin(button : HTMLButtonElement, names : string[], errorD
 		const inputElement = document.getElementById(names[i]);
 			if (inputElement instanceof HTMLInputElement)
 				inputs[i] = inputElement.value;
-		}
+	}
+
 	const sendData = {
 		"user" : inputs[0].trim(),
 		"password" : inputs[1]
@@ -29,17 +32,17 @@ async function fetchLogin(sendData : {user : string, password : string}, errorDi
 			body: JSON.stringify(sendData),
 		})
 		const data = await response.json(); 
-		console.log(data);
+
 		if (data.statusCode){
 			errorDiv.className = "text-sm mt-2 h-6 text-red-400";
 			errorDiv.textContent = data.message;
 		}
 		else{
-			const token = data.token;
-			localStorage.setItem("authToken", token);
-			errorDiv.className = "text-sm mt-2 h-6 text-green-400";
-			errorDiv.textContent = "Login complete";
+			localStorage.setItem("username", data.username);
+			localStorage.setItem("email", data.email);
+			navigateTo("/twofalogin");
 		}
+		
 	} catch(error){
 		console.error("Fetch error:", error);
 	}
@@ -64,6 +67,7 @@ export const LoginCard = () => {
 		input.id = names[i];
         div.appendChild(input);
     }
+
 	const errorDiv = document.createElement("div");
 	div.appendChild(errorDiv);
 
