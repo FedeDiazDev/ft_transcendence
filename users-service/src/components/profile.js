@@ -13,10 +13,16 @@ export async function postProfile(request, reply) {
         error.statusCode = 400;
         throw error;
     }
-    //
+    console.log("retrieved from db: ", response);
+    // Convert the blob to a base64 string since Browsers cannot directly render binary data (blob) as an image.
+    // Instead, the binary data must be encoded into a Base64 string and prefixed with the appropriate MIME type (e.g., data:image/png;base64,) to make it usable as the src attribute of an <img> tag
+    const avatarBase64 = Buffer.from(response.avatar_blob).toString('base64');
+
     reply.status(200).send({
         username: response.username,
-        id: response.id
+        id: response.id,
+        avatar_blob: `data:image/png;base64,${avatarBase64}`,
+        presentacion: response.presentacion
     });
 }
 

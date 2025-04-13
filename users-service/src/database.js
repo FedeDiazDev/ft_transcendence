@@ -14,7 +14,9 @@ function dbConnector(fastify) {
     db.exec(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL
+        username TEXT UNIQUE NOT NULL,
+        avatar_blob BLOB,
+        presentacion TEXT
       );
     `);
  
