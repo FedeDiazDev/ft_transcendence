@@ -1,5 +1,4 @@
 import crypto from "crypto";
-import createWebToken from "./jwt.js";
 
 function checkHashPassword(password, salt){
 	const hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
