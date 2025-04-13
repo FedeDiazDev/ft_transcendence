@@ -24,5 +24,9 @@ export default function postLogin(request, reply){
 		throw error;
 	}
 
-	reply.status(200).send({message : "Log In complete"});
+	reply.status(200).send({
+		message : "Log In complete", 
+		username : response.username,
+		email : response.email
+	});
 }

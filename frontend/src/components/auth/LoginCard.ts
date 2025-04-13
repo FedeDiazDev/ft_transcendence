@@ -37,8 +37,12 @@ async function fetchLogin(sendData : {user : string, password : string}, errorDi
 			errorDiv.className = "text-sm mt-2 h-6 text-red-400";
 			errorDiv.textContent = data.message;
 		}
-		else
+		else{
+			localStorage.setItem("username", data.username);
+			localStorage.setItem("email", data.email);
 			navigateTo("/twofalogin");
+		}
+		
 	} catch(error){
 		console.error("Fetch error:", error);
 	}

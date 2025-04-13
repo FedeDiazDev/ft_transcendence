@@ -14,15 +14,6 @@ async function registerInUserDatabase(username : string){
 	}
 }
 
-function handleResponse(data : { code?: string}, errorDiv : HTMLDivElement, username : string){
-	if (data.code === "SQLITE_CONSTRAINT_UNIQUE"){
-		errorDiv.className = "text-sm mt-2 h-6 text-red-400"
-		errorDiv.textContent = "*User or email already exists";
-	}
-	else
-		registerInUserDatabase(username);
-} //This error is the only one that can throw the server if everything is fine in the front parse
-
 function parseFront(sendData : { username? : string, email? : string, password? : string, confirmPassword? : string}){
 
 	let errors: string[] = [];
@@ -87,12 +78,16 @@ async function fetchSignup(sendData : { username : string, email : string, passw
 			headers: {"Content-type" : "application/json; charset=UTF-8"},
 			body: JSON.stringify(sendData),
 		})
+		if (response.status !== 200)
+		{
+			errorDiv.className = "text-sm mt-2 h-6 text-red-400"
+			errorDiv.textContent = "*User or email already exists";
+			return;
+		}
 		const data = await response.json(); 
 		localStorage.setItem("QRCode", data.QR);
-		handleResponse(data, errorDiv, sendData.username);
+		registerInUserDatabase(sendData.username);
 		navigateTo("/qrcode");
-		//const token = data.token;
-		//localStorage.setItem("authToken", token);
 	} catch(error){
 		console.error("Fetch error:", error);
 	}
