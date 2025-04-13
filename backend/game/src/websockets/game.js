@@ -1,54 +1,90 @@
 import { Game } from "../models/Game.js";
 
-let ids = [];
-let player1;
-let player2;
+let players = [];
 let game = null;
 let gameLoopRunning = false;
 
 function startGameLoop() {
-    if (gameLoopRunning) return;
-    gameLoopRunning = true;
+	if (gameLoopRunning) return;
+	gameLoopRunning = true;
 
-    setInterval(() => {
-        game.update();
-        player1.socket.send(JSON.stringify(game));
-        player2.socket.send(JSON.stringify(game));
-    }, 1000 / 60);
+	const interval = setInterval(() => {
+		game.update();
+		if (game.leftPoints === 10 || game.rightPoints === 10) {
+			const winnerId = game.leftPoints === 10
+				? game.paddles.left.playerId
+				: game.paddles.right.playerId;
+			const winnerName = players.find(p => p.id === winnerId)?.name || "Desconocido";
+			players.forEach(player => {
+				player.socket.send(JSON.stringify({
+					type: "game_over",
+					gameState: game,
+					winner: winnerName
+				}));
+				player.socket.close();
+			});
+
+			// Reset
+			clearInterval(interval);
+			players = [];
+			game = null;
+			gameLoopRunning = false;
+			return;
+		}
+
+		players.forEach(player => {
+			const gameData = {
+				gameState: game,
+				player1Name: players[0].name,
+				player2Name: players[1].name
+			};
+			player.socket.send(JSON.stringify(gameData));
+		});
+	}, 1000 / 60);
 }
 
 
 
 async function gameLogic(fastify, opts) {
 	fastify.register(async function (fastify) {
-		fastify.get('/online/game', { websocket: true }, (socket, req) => {
+		fastify.get('/api/game/online_game', { websocket: true }, (socket, req) => {
 
 			socket.on('message', message => {
 				const data = JSON.parse(message);
 				if (data.action === "join_game") {
 					const playerId = data.id;
-					ids.push({ id: playerId, socket });
-					if (ids.length === 2) {
-						player1 = ids.shift();
-						player2 = ids.shift();
-						game = new Game(player1.id, player2.id);
+					const playerName = data.name;
+					players.push({ id: playerId, name: playerName, socket });
+					if (players.length === 2) {
+						game = new Game(players[0].id, players[1].id);
 						game.start();
-						player1.socket.send((JSON.stringify(game)));
-						player2.socket.send((JSON.stringify(game)));
+						players.forEach(player => {
+							const gameData = {
+								gameState: game,
+								player1Name: players[0].name,
+								player2Name: players[1].name
+							};
+							player.socket.send(JSON.stringify(gameData));
+						});
 					}
 				}
 				else if (data.action === "move_paddle") {
-					console.log(data);
-					if (data.id == 2) {
+					//console.log(data);
+					if (!game) return;
+					if (data.id === game.paddles.left.playerId) {
 						game.movePaddle('left', data.direction);
-						// console.log("ID 2:", game);
-					}
-					else if (data.id == 1) {
+					} else if (data.id === game.paddles.right.playerId) {
 						game.movePaddle('right', data.direction);
-						// console.log("ID 1:", game);
 					}
-					player1.socket.send(JSON.stringify(game));
-					player2.socket.send(JSON.stringify(game));
+					players.forEach(player => {
+						const gameData = {
+							gameState: game,
+							player1Name: players[0].name,
+							player2Name: players[1].name
+						};
+						player.socket.send(JSON.stringify(gameData));
+					});
+
 					startGameLoop();
 				}
 			})

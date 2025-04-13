@@ -1,9 +1,9 @@
-export const createMatchmakingSocket = (onReady: (gameState: any) => void) => {
+export const createMatchmakingSocket = (onReady: (gameState: any) => void, userId : number) => {
 
-	let socket = new WebSocket("ws://localhost:3000/online/matchmaking")
+	let socket = new WebSocket("wss://localhost:8080/api/game/online_matchmaking")
 	socket.onopen = function (e) {
 		alert("[open] Conexión esablecida");
-		socket.send(JSON.stringify({ id: Math.floor(Math.random() * 5), action: "join_queue"}));
+		socket.send(JSON.stringify({ id: userId, action: "join_queue"}));
 	}
 
 	socket.onmessage = (event) => {

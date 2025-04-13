@@ -19,7 +19,9 @@ async function fetchProfile(container : HTMLDivElement){
             body: JSON.stringify({ user: jsonPayload.username })
         })
 
-        const data = await response.json(); 
+        const data = await response.json();
+
+        console.log(data);
         const textInput = Input("text", data.username || "", "Username", false);
         const idInput = Input("number", data.id || "", "id", false);
         
@@ -30,7 +32,6 @@ async function fetchProfile(container : HTMLDivElement){
         console.error("Fetch error:", error);
     }
 }
-
 export const ProfileView = () => {
     const container = document.createElement("div");
     container.className = "flex flex-col gap-4 p-4 border";

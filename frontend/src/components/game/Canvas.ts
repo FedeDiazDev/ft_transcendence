@@ -3,11 +3,14 @@ import { movePaddle } from "../../api/game/paddleAPI.js";
 import { updateBall } from "../../api/game/gameAPI.js";
 import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
+import { fetchUserData } from "../../hooks/fetchUserData.js";
 
-export const GameCanvas = (state: GameState, mode: string) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any) => {
+
+    // Llamamos a la función para obtener los datos
     const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 400;
+    canvas.width = 1200;
+    canvas.height = 600;
     canvas.className = "border border-gray-600";
 
     const ctx = canvas.getContext("2d");
@@ -19,7 +22,7 @@ export const GameCanvas = (state: GameState, mode: string) => {
         ctx.fillStyle = "white";
 
         ctx.beginPath();
-        ctx.arc(gameState.ball.x, gameState.ball.y, 10, 0, Math.PI * 2);
+        ctx.arc(gameState.ball.x, gameState.ball.y, 15, 0, Math.PI * 2);
         ctx.fill();
 
         Object.values(gameState.paddles).forEach((paddle: Paddle) => {
@@ -27,21 +30,23 @@ export const GameCanvas = (state: GameState, mode: string) => {
         });
     };
     if (mode === "local") {
-        //!: al cambair de vista el juego se sigue ejecutando en 2º plano
+        const pressedKeys = useKeyPress();
+
         const updateGameState = async () => {
-            // console.log(" updateGameState ejecutado");
             if (gameState.status !== "playing") {
                 console.warn(" Estado no es PLAYING:", gameState.status);
                 return;
             }
+            if (pressedKeys.w) moveAndUpdate("left", "up");
+            if (pressedKeys.s) moveAndUpdate("left", "down");
+            if (pressedKeys.ArrowUp) moveAndUpdate("right", "up");
+            if (pressedKeys.ArrowDown) moveAndUpdate("right", "down");
+            draw();
             try {
                 const updatedState = await updateBall();
-                // console.log(" Estado recibido de updateBall:", updatedState);
                 if (updatedState && updatedState.ball) {
                     gameState = { ...gameState, ...updatedState };
                     draw();
-                } else {
-                    console.warn(" updateBall no devolvió datos válidos");
                 }
             } catch (error) {
                 console.error("Error al actualizar la bola:", error);
@@ -49,6 +54,10 @@ export const GameCanvas = (state: GameState, mode: string) => {
         };
 
         const loop = async () => {
+            if (scoreElement != null) {
+                scoreElement.innerHTML = `${gameState.leftPoints} - ${gameState.rightPoints}`;
+            }
+
             if (gameState.status === "game_over") {
                 console.log("GAME FINISHED:", gameState);
                 if (gameState.rightPoints == 10)
@@ -58,7 +67,11 @@ export const GameCanvas = (state: GameState, mode: string) => {
                 return;
             }
             await updateGameState();
-            requestAnimationFrame(loop);
+            const path = window.location.pathname;
+            if (path.endsWith("/local_game")) {
+                requestAnimationFrame(loop);
+            }
+            else return;
         };
 
         loop();
@@ -66,7 +79,6 @@ export const GameCanvas = (state: GameState, mode: string) => {
         const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {
             const paddle = gameState.paddles[player];
             if (!paddle) return;
-
             const speed = paddle.speed ?? 10;
             const newY = direction === "up" ? paddle.y - speed : paddle.y + speed;
 
@@ -78,7 +90,6 @@ export const GameCanvas = (state: GameState, mode: string) => {
                 }
             };
         };
-
         const moveAndUpdate = async (player: "left" | "right", direction: "up" | "down") => {
             try {
                 const response = await movePaddle(player, direction);
@@ -89,35 +100,31 @@ export const GameCanvas = (state: GameState, mode: string) => {
                 console.error("Error al mover la pala:", error);
             }
         };
-        useKeyPress({
-            "ArrowUp": () => moveAndUpdate("right", "up"),
-            "ArrowDown": () => moveAndUpdate("right", "down"),
-            "w": () => moveAndUpdate("left", "up"),
-            "s": () => moveAndUpdate("left", "down"),
-        });
-
+        //*ONLINE
     } else if (mode === "online") {
-        const id = localStorage.getItem("id");
-        console.log("State", gameState);
-        const updateGameState = (newState: GameState) => {
-            gameState = { ...gameState, ...newState };
-            console.log("Nuevo estado del juego:", gameState);
-            renderGame(gameState);
-        }
-        const socket = gameSocket(updateGameState, Number(id));
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowUp" || event.key === "w") {
-                console.log("PULSADO");
-                socket.sendMove("up",  Number(id));
-            }
-            else if (event.key === "ArrowDown" || event.key === "s") {
-                socket.sendMove("down", Number(id));
-            }
-        })
-        const renderGame = (state: GameState) => {
+        // const id = localStorage.getItem("id");
+        //console.log("State", gameState);
+        const updateGameState = (newState: any) => {
+            const { gameState: receivedGameState, player1Name, player2Name } = newState;
+            gameState = { ...gameState, ...receivedGameState };
+            renderGame(player1Name, player2Name);
+          };
+          
+        fetchUserData((user) => {
+            const socket = gameSocket(updateGameState, user.id, user.username);
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "ArrowUp" || event.key === "w") {
+                    socket.sendMove("up", user.id);
+                } else if (event.key === "ArrowDown" || event.key === "s") {
+                    socket.sendMove("down", user.id);
+                }
+            });
+        });
+        const renderGame = (player1Name: string, player2Name: string) => {
             draw();
-            console.log("Renderizando juego con estado:", state);
-        }
+            scoreElement.innerHTML = `<span>Jugador 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span>: Jugador 2 ${player2Name}</span>`;
+          };
+          
     }
     return canvas;
 };

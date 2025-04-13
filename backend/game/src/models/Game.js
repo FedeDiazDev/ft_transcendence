@@ -5,10 +5,10 @@ import { Ball } from "./Ball.js";
 export class Game {
 	constructor(player1Id, player2Id) {
 		this.status = GameStatus.WAITING;
-		this.ball = new Ball(400, 200);
+		this.ball = new Ball(600, 300);
 		this.paddles = {
-			left: new Paddle("left", 20, 150, player1Id),
-			right: new Paddle("right", 770, 150, player2Id),
+			left: new Paddle("left", 0, 225, player1Id),
+			right: new Paddle("right", 1185, 225, player2Id),
 		};
 		this.points = 10;
 		this.leftPoints = 0;
@@ -33,21 +33,20 @@ export class Game {
 			this.resetBall();
 			this.checkScore("right");
 		}
-		else if (this.ball.x + this.ball.width >= 800) {
+		else if (this.ball.x + this.ball.width >= 1200) {
 			this.resetBall();
 			this.checkScore("left");
 		}
-		if (this.ball.y <= 0 || this.ball.y + this.ball.height >= 400) {
+		if (this.ball.y <= 0 || this.ball.y + this.ball.height >= 600) {
 			this.ball.vy *= -1;
 		}
 	}
 
 	resetBall() {
-		this.ball.x = 400;
-		this.ball.y = 200;
-		if (this.status === GameStatus.PLAYING) {
-			this.ball.vx *= -1;
-			this.ball.vy = Math.random() > 0.5 ? 10 : -10;
+		this.ball.x = 600;
+		this.ball.y = 300;
+		if (this.status === GameStatus.PLAYING) {			
+			this.ball.vy = Math.random() > 0.5 ? 5 : -5;
 		}
 		else
 		{
