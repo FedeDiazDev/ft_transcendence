@@ -11,7 +11,6 @@ export const getUserData = async (): Promise<any> => {
                 "Authorization": `Bearer ${token}`
             }
         });
-
         const data = await response.json();
         console.log(data);
         return data;

@@ -1,6 +1,6 @@
 import postRegister from "./components/register.js"
 import { postProfile, getUser } from './components/profile.js'
-import { getFriends } from "./components/firends.js";
+import { getFriends } from "./components/friends.js";
 
 const registerOpts = {
 	schema: {

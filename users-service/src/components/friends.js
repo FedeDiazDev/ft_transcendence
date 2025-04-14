@@ -6,10 +6,21 @@ dotenv.config();
 //TODO: verificar jwt
 export async function getFriends(request, reply) {
     const db = request.server.db;
-    const userId = request.query.userId;
     if (!userId) {
         return reply.status(400).send({ error: "Falta el userId" });
     }
+    const authHeader = request.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        reply.status(401).send({ error: "Token no proporcionado" })
+    }
+    const token = authHeader.split(' ')[1];
+    let payload;
+    try {
+        payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        return reply.status(401).send({ error: "Token inválido o expirado" });
+    }
+    const userId = payload.userId;
     try {
         const query = db.prepare(`
             SELECT users.id, users.username
@@ -30,3 +41,5 @@ export async function addFriend(request, reply) { }
 
 export async function deleteFiend(request, friend) { }
 
+
+export async function searchFriendByName(request, friend) { }

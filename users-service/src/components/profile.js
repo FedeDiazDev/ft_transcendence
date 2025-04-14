@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-dotenv.config(); 
+dotenv.config();
 
 export async function postProfile(request, reply) {
 
@@ -37,7 +37,7 @@ export async function getUser(request, reply) {
     const token = authHeader.split(' ')[1];
     console.log("TOKEN", token);
     let payload;
-    try {        
+    try {
         payload = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
         return reply.status(401).send({ error: "Token inválido o expirado" });
