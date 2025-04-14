@@ -1,5 +1,6 @@
 import postRegister from "./components/register.js"
 import { postProfile, getUser } from './components/profile.js'
+import { getFriends } from "./components/firends.js";
 
 const registerOpts = {
 	schema: {
@@ -29,4 +30,5 @@ export default function routes(fastify) {
 	fastify.post("/api/users/register", registerOpts, postRegister);
 	fastify.post("/api/users/profile", profileOpts, postProfile);
 	fastify.get("/api/users/getUser", getUser);
+	fastify.get("/api/users/getFriends", getFriends);
 }
