@@ -26,7 +26,7 @@ function clickOnButtonLogin(button : HTMLButtonElement, names : string[], errorD
 
 async function fetchLogin(sendData : {user : string, password : string}, errorDiv : HTMLDivElement){
 	try{
-		const response = await fetch ("https://localhost:8080/api/auth/login", {
+		const response = await fetch ("https://transcendence.fr:8080/api/auth/login", {
 			method: "POST",
 			headers: {"Content-type" : "application/json; charset=UTF-8"},
 			body: JSON.stringify(sendData),
