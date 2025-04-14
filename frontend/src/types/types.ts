@@ -25,3 +25,8 @@ export interface GameState {
     leftPoints: number;
     rightPoints: number;
 }
+
+export interface FriendI{
+    name : string,
+    userId : number
+}

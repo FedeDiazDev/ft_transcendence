@@ -9,7 +9,7 @@ import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
 
-const routes: Record<string, () => HTMLElement> = {
+const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
   "/login": Login,
   "/signup": Signup,
@@ -25,7 +25,7 @@ const routes: Record<string, () => HTMLElement> = {
 
 export const render = () => {
   const app = document.getElementById("app");
-  if (!app) return;  
+  if (!app) return;
   app.innerHTML = "";
 
   const path = window.location.pathname;
@@ -56,33 +56,39 @@ export const render = () => {
       return div;
     }
     return Home;
-  });  
-  app.appendChild(component());
+  });
+  const result = component();
+  if (result instanceof Promise) {
+    result.then(resolvedComponent => {
+      app.appendChild(resolvedComponent);
+    });
+  } else {
+    app.appendChild(result);
+  }
 };
 
 window.addEventListener("popstate", render);
 document.addEventListener("DOMContentLoaded", render);
 
-export const authToken = () =>{
-	const token = localStorage.getItem("authToken");
-	console.log(token);
-	if (!token || token === ""){
-		return false;
-	}
-	else{
-		return true;
-	}
+export const authToken = () => {
+  const token = localStorage.getItem("authToken");
+  console.log(token);
+  if (!token || token === "") {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
 
 export const navigateTo = (path: string) => {
-	if (path != "/loghome" && path != "/login" && path != "/signup")
-	{
-		if (!authToken())
-			window.history.pushState({}, "", "/loghome");
-		else
-			window.history.pushState({}, "", path);
-	}
-	else
-		window.history.pushState({}, "", path);
-	render();
+  if (path != "/loghome" && path != "/login" && path != "/signup") {
+    if (!authToken())
+      window.history.pushState({}, "", "/loghome");
+    else
+      window.history.pushState({}, "", path);
+  }
+  else
+    window.history.pushState({}, "", path);
+  render();
 };

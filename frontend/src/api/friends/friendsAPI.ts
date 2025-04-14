@@ -1,17 +1,17 @@
-import { API_URLS } from "../apiConfig";
+import { API_URLS } from "../apiConfig.js";
 
 export const getFriendsList = async (): Promise<any> => {
-    try{
+    try {
         const token = localStorage.getItem("authToken");
-        const response = await fetch(`${API_URLS.profile}/getFriends}`, {
+        const response = await fetch(`${API_URLS.profile}/getFriends`, {
             method: 'GET',
             headers: {
                 "Authorization": `Bearer ${token}`
             }
         });
         const data = await response.json();
-        return data;
-    }catch (error){
+        return data.friends;
+    } catch (error) {
         console.error("Fetch error: ", error);
     }
 }
