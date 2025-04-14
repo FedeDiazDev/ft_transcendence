@@ -17,7 +17,6 @@ export async function getFriends(request, reply) {
     } catch (err) {
         return reply.status(401).send({ error: "Token inválido o expirado" });
     }
-    console.log("PAYYYLOAD", payload);
     const username = payload.username;
     if (!username) {
         return reply.status(400).send({ error: "Falta el username" });
@@ -36,11 +35,37 @@ export async function getFriends(request, reply) {
     }
 }
 
+export async function getUsers(request, friend) {
+    const db = request.server.db;
+    const query = db.prepare("SELECT username FROM users");
+    try {
+        const users = query.all();
+        reply.status(200).send({ message: "Lista de usuarios", users });
+    } catch (err) {
+        reply.status(500).send({ error: "Error al obtener los usuarios" });
+    }
+}
 
 export async function addFriend(request, reply) { }
 
 
-export async function deleteFiend(request, friend) { }
+export async function deleteFiend(request, reply) { }
 
 
-export async function searchFriendByName(request, friend) { }
+export async function searchUsersByName(request, reply) {
+    const db = request.server.db;
+    console.log("PARAMS", request.params);
+    const searchText = request.params.text;
+    if (!searchText || searchText.trim() === "") {
+        return reply.status(400).send({ error: "Texto de búsqueda vacío" });
+    }
+    try {
+        const query = db.prepare("SELECT id, username FROM users WHERE username LIKE ?");
+        const results = query.all(`%${searchText}%`);
+        reply.status(200).send({ results })
+    } catch (error) {
+        reply.status(500).send({ error: "Error en la búsqueda" });
+    }
+
+}
+

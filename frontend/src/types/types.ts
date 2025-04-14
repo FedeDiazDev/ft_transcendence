@@ -30,3 +30,9 @@ export interface FriendI{
     name : string,
     userId : number
 }
+
+export interface UserI{
+    username : string,
+    id : number
+}
+

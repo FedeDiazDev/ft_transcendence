@@ -15,3 +15,22 @@ export const getFriendsList = async (): Promise<any> => {
         console.error("Fetch error: ", error);
     }
 }
+
+export const getUserByName = async (text: string): Promise<any> => {
+    try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(`${API_URLS.profile}/searchUsers/${encodeURIComponent(text)}`, {
+            method: 'GET',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) throw new Error("Error en la búsqueda");
+
+        const data = await response.json();
+        return data.results;
+    } catch (error) {
+        console.error("Fetch error: ", error);
+    }
+};
