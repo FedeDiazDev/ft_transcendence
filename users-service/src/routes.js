@@ -1,6 +1,6 @@
 import postRegister from "./components/register.js"
 import { postProfile, getUser } from './components/profile.js'
-import { getFriends, searchUsersByName } from "./components/friends.js";
+import { addFriend, deleteFiend, getFriends, searchUsersByName } from "./components/friends.js";
 
 const registerOpts = {
 	schema: {
@@ -32,4 +32,6 @@ export default function routes(fastify) {
 	fastify.get("/api/users/getUser", getUser);
 	fastify.get("/api/users/getFriends", getFriends);
 	fastify.get("/api/users/searchUsers/:text", searchUsersByName);
+	fastify.post("/api/users/addFriend", addFriend);
+	fastify.delete("/api/users/deleteFriend/:friendId", deleteFiend);
 }
