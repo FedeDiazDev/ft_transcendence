@@ -14,7 +14,6 @@ services:
       - frontend
       - auth-service
       - users-service
-      # - game-service
     networks:
       - transcendence-network
 
@@ -63,14 +62,33 @@ services:
 
 
   # Other services here
-
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:8.18.0
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    networks:
+      - transcendence-network
+  
+  kibana:
+    container_name: kibana
+    image: kibana:8.18.0
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    network:
+      - transcendence-network
 
 volumes:
   front-spa:
   auth-db:
   game-data-db:
   users-db:
-  
+  elasticsearch:
 
 networks:
   transcendence-network:
