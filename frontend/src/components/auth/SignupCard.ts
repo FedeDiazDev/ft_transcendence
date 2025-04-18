@@ -2,7 +2,7 @@ import { navigateTo } from "../../router.js";
 
 async function registerInUserDatabase(username : string){
 	try{
-		const response = await fetch ("https://transcendence.fr:8080/api/users/register", {
+		const response = await fetch ("https://localhost:8080/api/users/register", {
 			method: "POST",
 			headers: {"Content-type" : "application/json; charset=UTF-8"},
 			body: JSON.stringify({ "username" : username })
@@ -73,7 +73,7 @@ function clickOnButtonSignup(button : HTMLButtonElement, names : string[], error
 
 async function fetchSignup(sendData : { username : string, email : string, password : string, confirmPassword : string}, errorDiv : HTMLDivElement){
 	try{
-		const response = await fetch ("https://transcendence.fr:8080/api/auth/signup", {
+		const response = await fetch ("https://localhost:8080/api/auth/signup", {
 			method: "POST",
 			headers: {"Content-type" : "application/json; charset=UTF-8"},
 			body: JSON.stringify(sendData),
