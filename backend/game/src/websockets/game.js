@@ -48,7 +48,6 @@ function startGameLoop() {
 async function gameLogic(fastify, opts) {
 	fastify.register(async function (fastify) {
 		fastify.get('/api/game/online_game', { websocket: true }, (socket, req) => {
-
 			socket.on('message', message => {
 				const data = JSON.parse(message);
 				if (data.action === "join_game") {
@@ -84,7 +83,6 @@ async function gameLogic(fastify, opts) {
 						};
 						player.socket.send(JSON.stringify(gameData));
 					});
-
 					startGameLoop();
 				}
 			})
