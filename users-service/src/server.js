@@ -37,7 +37,7 @@ function serverError(err) {
 //and the setErrorHandler is no running yet
 async function startServer(){
 	try{
-		await fastify.register(cors);
+		await fastify.register(cors, { origin: '*' });
 		await fastify.register(routes);
 		await fastify.register(dbConnector);
 		await fastify.register(friendsStatus);

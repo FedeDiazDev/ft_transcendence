@@ -1,3 +1,5 @@
+import { fetchUserData } from "../../hooks/fetchUserData.js";
+import { statusSocket } from "../../sockets/statusSocket.js"
 //
 // Possible Parse Errors in Front and backend
 //	Password and confirmPassword does not match
@@ -93,6 +95,9 @@ async function fetchSignup(sendData : { username : string, email : string, passw
 		handleResponse(data, errorDiv, sendData.username);
 		const token = data.token;
 		localStorage.setItem("authToken", token);
+		fetchUserData((user) => {
+			statusSocket(user.id, "login");
+		})
 	} catch(error){
 		console.error("Fetch error:", error);
 	}

@@ -1,6 +1,6 @@
 import { FriendList } from "../components/friends/FiendsList.js";
 import { SearchBar } from "../components/common/SearchBar.js";
-import { getUserByName } from "../api/friends/friendsAPI.js"; 
+import { getUserByName } from "../api/friends/friendsAPI.js";
 import { UserI } from "../types/types.js";
 import { addFriend } from "../api/profile/profileAPI.js";
 
