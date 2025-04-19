@@ -10,7 +10,7 @@ async function fetchProfile(container: HTMLDivElement) {
     const decodedPayload = atob(payload);
     const jsonPayload = JSON.parse(decodedPayload);
     try {
-        const response = await fetch("https://transcendence.fr:8080/api/users/profile", {
+        const response = await fetch("https://" + window.location.hostname + ":8080/api/users/profile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
