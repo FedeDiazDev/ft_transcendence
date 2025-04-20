@@ -8,6 +8,8 @@ import { StatsView } from "./pages/stats.js";
 import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
+import { fetchUserData } from "./hooks/fetchUserData.js";
+import { statusSocket } from "./sockets/statusSocket.js";
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -70,17 +72,22 @@ export const render = () => {
 window.addEventListener("popstate", render);
 document.addEventListener("DOMContentLoaded", render);
 
+let hasLoggedIn = false;
+
 export const authToken = () => {
   const token = localStorage.getItem("authToken");
-  console.log(token);
   if (!token || token === "") {
     return false;
-  }
-  else {
+  } else {
+    if (!hasLoggedIn) {
+      fetchUserData((user) => {
+        statusSocket(user.id, user.username, "login");
+      });
+      hasLoggedIn = true;
+    }
     return true;
   }
 }
-
 export const navigateTo = (path: string) => {
   if (path != "/loghome" && path != "/login" && path != "/signup") {
     if (!authToken())

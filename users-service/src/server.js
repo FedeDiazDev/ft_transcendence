@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import dbConnector from './database.js';
 import routes from './routes.js';
 import cors from '@fastify/cors'
+import ws from '@fastify/websocket'
 import { friendsStatus } from './websockets/status.js';
 
 //Activate logger inside fastify
@@ -40,6 +41,7 @@ async function startServer(){
 		await fastify.register(cors, { origin: '*' });
 		await fastify.register(routes);
 		await fastify.register(dbConnector);
+		await fastify.register(ws);
 		await fastify.register(friendsStatus);
 		await fastify.listen(connectOptions, serverError);
 	}catch(error){

@@ -53,5 +53,5 @@ export const Friend = (avatarUrl: string, name: string, connected: boolean, user
     container.appendChild(leftContainer);
     container.appendChild(rightContainer);
 
-    return container;
+	return { element: container, statusDot: statusIndicator };
 };

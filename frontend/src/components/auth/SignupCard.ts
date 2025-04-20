@@ -7,22 +7,25 @@ import { statusSocket } from "../../sockets/statusSocket.js"
 //	Incorrect email format
 //
 
-async function registerInUserDatabase(username : string){
-	try{
-		const response = await fetch ("https://localhost:8080/api/users/register", {
+async function registerInUserDatabase(username: string) {
+	try {
+		const response = await fetch("https://localhost:8080/api/users/register", {
 			method: "POST",
-			headers: {"Content-type" : "application/json; charset=UTF-8"},
-			body: JSON.stringify({ "username" : username })
+			headers: { "Content-type": "application/json; charset=UTF-8" },
+			body: JSON.stringify({ "username": username })
 		});
-		const data = await response.json(); 
+		const data = await response.json();
+		fetchUserData((user) => {
+			statusSocket(user.id, user.name, "login");
+		})
 		console.log(data)
-	} catch(error){
+	} catch (error) {
 		console.error("Fetch error:", error);
 	}
 }
 
-function handleResponse(data : { code?: string}, errorDiv : HTMLDivElement, username : string){
-	if (data.code === "SQLITE_CONSTRAINT_UNIQUE"){
+function handleResponse(data: { code?: string }, errorDiv: HTMLDivElement, username: string) {
+	if (data.code === "SQLITE_CONSTRAINT_UNIQUE") {
 		errorDiv.className = "text-sm mt-2 h-6 text-red-400"
 		errorDiv.textContent = "*User or email already exists";
 	}
@@ -30,14 +33,14 @@ function handleResponse(data : { code?: string}, errorDiv : HTMLDivElement, user
 		registerInUserDatabase(username);
 } //This error is the only one that can throw the server if everything is fine in the front parse
 
-function parseFront(sendData : { username? : string, email? : string, password? : string, confirmPassword? : string}){
+function parseFront(sendData: { username?: string, email?: string, password?: string, confirmPassword?: string }) {
 
 	let errors: string[] = [];
 
 	if (!sendData.username || !sendData.email || !sendData.password || !sendData.confirmPassword) {
-        errors.push("*All fields must be filled");
-        return errors;
-    }
+		errors.push("*All fields must be filled");
+		return errors;
+	}
 	if (sendData.username && !/^[a-zA-Z0-9]+$/.test(sendData.username))
 		errors.push("*Incorrect username format");
 	if (sendData.password && sendData.password !== sendData.confirmPassword)
@@ -49,8 +52,8 @@ function parseFront(sendData : { username? : string, email? : string, password? 
 	return errors;
 }
 
-function showErrors(frontErrors : string[], errorDiv : HTMLDivElement){
-	for (let i = 0; i < frontErrors.length; i++){
+function showErrors(frontErrors: string[], errorDiv: HTMLDivElement) {
+	for (let i = 0; i < frontErrors.length; i++) {
 		const newDiv = document.createElement("div");
 		newDiv.className = "text-sm mt-2 h-6 text-red-400";
 		newDiv.textContent = frontErrors[i];
@@ -58,80 +61,77 @@ function showErrors(frontErrors : string[], errorDiv : HTMLDivElement){
 	}
 }
 
-function clickOnButtonSignup(button : HTMLButtonElement, names : string[], errorDiv : HTMLDivElement){
+function clickOnButtonSignup(button: HTMLButtonElement, names: string[], errorDiv: HTMLDivElement) {
 	button.addEventListener("click", async () => {
-	errorDiv.innerHTML = '';
-	const inputs: string[] = [];
-	for (let i: number = 0; i < names.length; i++) {
-		const inputElement = document.getElementById(names[i]);
+		errorDiv.innerHTML = '';
+		const inputs: string[] = [];
+		for (let i: number = 0; i < names.length; i++) {
+			const inputElement = document.getElementById(names[i]);
 			if (inputElement instanceof HTMLInputElement)
 				inputs[i] = inputElement.value;
 		}
 		const sendData = {
-			"username" : inputs[0].trim(),
-			"email" : inputs[1].trim(),
-			"password" : inputs[2],
-			"confirmPassword" : inputs[3]
+			"username": inputs[0].trim(),
+			"email": inputs[1].trim(),
+			"password": inputs[2],
+			"confirmPassword": inputs[3]
 		}
 		//Parse in front to show all the errors in the front
 		let frontErrors: string[] = parseFront(sendData);
 
 		showErrors(frontErrors, errorDiv);
 
-		if (frontErrors.length === 0){
+		if (frontErrors.length === 0) {
 			fetchSignup(sendData, errorDiv);
 		}
 	});
 }
 
-async function fetchSignup(sendData : { username : string, email : string, password : string, confirmPassword : string}, errorDiv : HTMLDivElement){
-	try{
-		const response = await fetch ("https://localhost:8080/api/auth/signup", {
+async function fetchSignup(sendData: { username: string, email: string, password: string, confirmPassword: string }, errorDiv: HTMLDivElement) {
+	try {
+		const response = await fetch("https://localhost:8080/api/auth/signup", {
 			method: "POST",
-			headers: {"Content-type" : "application/json; charset=UTF-8"},
+			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(sendData),
 		})
-		const data = await response.json(); 
+		const data = await response.json();
 		handleResponse(data, errorDiv, sendData.username);
 		const token = data.token;
 		localStorage.setItem("authToken", token);
-		fetchUserData((user) => {
-			statusSocket(user.id, "login");
-		})
-	} catch(error){
+	} catch (error) {
 		console.error("Fetch error:", error);
 	}
 }
 
 export const SignupCard = () => {
 	const div = document.createElement("div");
-    div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-80 min-h-80 mx-auto text-white justify-evenly";
+	div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-80 min-h-80 mx-auto text-white justify-evenly";
 
-    const names = ["Username", "Email", "Password", "Confirm password"];
+	const names = ["Username", "Email", "Password", "Confirm password"];
 	const types = ["text", "email", "password", "password"];
 
-    for (let i:number = 0; i < names.length; i++){
-        const text = document.createElement("h3");
-        text.textContent = names[i];
-        div.appendChild(text);
+	for (let i: number = 0; i < names.length; i++) {
+		const text = document.createElement("h3");
+		text.textContent = names[i];
+		div.appendChild(text);
 
-        const input = document.createElement("input");
-        input.className = "text-black p-2 border rounded focus:outline-none transition";
+		const input = document.createElement("input");
+		input.className = "text-black p-2 border rounded focus:outline-none transition";
 		input.type = types[i];
 		input.id = names[i];
-        div.appendChild(input);
-    }
+		div.appendChild(input);
+	}
 
-    const errorDiv = document.createElement("div");
+	const errorDiv = document.createElement("div");
 	div.appendChild(errorDiv);
 
-    const button = document.createElement("button");
-    button.textContent = "Sign Up";
-    button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
+	const button = document.createElement("button");
+	button.textContent = "Sign Up";
+	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
 
 	clickOnButtonSignup(button, names, errorDiv);
 
-    div.appendChild(button);
+	div.appendChild(button);
 
-    return div;
+	return div;
 }

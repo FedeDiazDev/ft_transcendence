@@ -12,9 +12,12 @@ export const Friend = async () => {
     const resultsContainer = document.createElement("div");
     resultsContainer.className = "w-full";
 
+    const friendsWrapper = document.createElement("div"); // Nuevo contenedor
+    let friendsComponent = await FriendList(); // Mantén la referencia
+    friendsWrapper.appendChild(friendsComponent);
+
     const searchBar = SearchBar(async (text: string) => {
         const result = await getUserByName(text);
-
         resultsContainer.innerHTML = "";
 
         if (!result || result.length === 0) {
@@ -30,16 +33,19 @@ export const Friend = async () => {
             userRow.className = "flex items-center justify-between p-1 hover:bg-gray-600 hover:text-white rounded";
 
             const userEl = document.createElement("span");
-            userEl.textContent = `👤 ${user.username}`;            
+            userEl.textContent = `👤 ${user.username}`;
 
             const addButton = document.createElement("button");
-            addButton.textContent = "➕";            
+            addButton.textContent = "➕";
             addButton.title = "Agregar como amigo";
             addButton.className = "text-green-400 hover:text-green-300 transition";
-            addButton.addEventListener("click", () => {
-              console.log(`Agregar a ${user.username} (id: ${user.id})`);
-              // TODO: Aquí puedes hacer la llamada para enviar solicitud de amistad
-              addFriend(user.id);
+            addButton.addEventListener("click", async () => {
+                console.log(`Agregar a ${user.username} (id: ${user.id})`);
+                await addFriend(user.id);
+                const updated = await FriendList();
+                friendsWrapper.innerHTML = "";
+                friendsWrapper.appendChild(updated);
+
             });
 
             userRow.appendChild(userEl);
@@ -48,11 +54,9 @@ export const Friend = async () => {
         });
     });
 
-    const friendsComponent = await FriendList();
-
     div.appendChild(searchBar);
     div.appendChild(resultsContainer);
-    div.appendChild(friendsComponent);
+    div.appendChild(friendsWrapper);
 
     return div;
 };
