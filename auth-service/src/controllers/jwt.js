@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-dotenv.config(); // Carga las variables en process.env
+dotenv.config();
 
 export default function createWebToken(user, email){
 	const payload = {

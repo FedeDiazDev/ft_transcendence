@@ -1,5 +1,6 @@
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 import { statusSocket } from "../../sockets/statusSocket.js";
+import { navigateTo } from "../../router.js";
 
 function clickOnButtonLogin(button: HTMLButtonElement, names: string[], errorDiv: HTMLDivElement) {
 	button.addEventListener("click", async () => {
@@ -10,6 +11,7 @@ function clickOnButtonLogin(button: HTMLButtonElement, names: string[], errorDiv
 			if (inputElement instanceof HTMLInputElement)
 				inputs[i] = inputElement.value;
 		}
+
 		const sendData = {
 			"user": inputs[0].trim(),
 			"password": inputs[1]
@@ -26,26 +28,26 @@ function clickOnButtonLogin(button: HTMLButtonElement, names: string[], errorDiv
 
 async function fetchLogin(sendData: { user: string, password: string }, errorDiv: HTMLDivElement) {
 	try {
-		const response = await fetch("https://localhost:8080/api/auth/login", {
+		const response = await fetch("https://" + window.location.hostname + ":8080/api/auth/login", {
 			method: "POST",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(sendData),
 		})
 		const data = await response.json();
-		console.log(data);
+
 		if (data.statusCode) {
 			errorDiv.className = "text-sm mt-2 h-6 text-red-400";
 			errorDiv.textContent = data.message;
 		}
 		else {
-			const token = data.token;
-			localStorage.setItem("authToken", token);
-			errorDiv.className = "text-sm mt-2 h-6 text-green-400";
-			errorDiv.textContent = "Login complete";
+			localStorage.setItem("username", data.username);
+			localStorage.setItem("email", data.email);
 			fetchUserData((user) => {
 				statusSocket(user.id, user.username, "login");
 			})
+			navigateTo("/twofalogin");
 		}
+
 	} catch (error) {
 		console.error("Fetch error:", error);
 	}
@@ -68,8 +70,9 @@ export const LoginCard = () => {
 			input.type = "text";
 		input.className = "text-black p-2 border rounded focus:outline-none transition";
 		input.id = names[i];
-		div.appendChild(input);
-	}
+        div.appendChild(input);
+    }
+
 	const errorDiv = document.createElement("div");
 	div.appendChild(errorDiv);
 

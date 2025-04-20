@@ -10,11 +10,15 @@ import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
 import { fetchUserData } from "./hooks/fetchUserData.js";
 import { statusSocket } from "./sockets/statusSocket.js";
+import { QRCode } from "./pages/qrcode.js"
+import { TwoFALogin } from "./pages/twofalogin.js"
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
   "/login": Login,
   "/signup": Signup,
+  "/qrcode" : QRCode,
+  "/twofalogin" : TwoFALogin,
   "/profile": Profile,
   "/stats": StatsView,
   "/friends": Friend,
@@ -89,13 +93,36 @@ export const authToken = () => {
   }
 }
 export const navigateTo = (path: string) => {
-  if (path != "/loghome" && path != "/login" && path != "/signup") {
-    if (!authToken())
-      window.history.pushState({}, "", "/loghome");
-    else
-      window.history.pushState({}, "", path);
-  }
-  else
-    window.history.pushState({}, "", path);
-  render();
+
+	const publicRoutes = ["/loghome", "/login", "/signup"];
+	const twoFARoutes = ["/qrcode", "/twofalogin"];
+
+	const username = localStorage.getItem("username");
+	const token = authToken(); 
+
+	if (publicRoutes.includes(path)) {
+		window.history.pushState({}, "", path);
+		render();
+		return;
+	}
+
+	if (twoFARoutes.includes(path)) {
+		if (username && !token) {
+			window.history.pushState({}, "", path);
+			render();
+			return;
+		} else {
+			window.history.pushState({}, "", "/loghome");
+			render();
+			return;
+		}
+	}
+
+	if (token) {
+		window.history.pushState({}, "", path);
+		render();
+	} else {
+		window.history.pushState({}, "", "/loghome");
+		render();
+	}
 };

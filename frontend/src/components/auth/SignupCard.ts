@@ -1,15 +1,10 @@
+import { navigateTo } from "../../router.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 import { statusSocket } from "../../sockets/statusSocket.js"
-//
-// Possible Parse Errors in Front and backend
-//	Password and confirmPassword does not match
-//	Incorrect password format
-//	Incorrect email format
-//
 
-async function registerInUserDatabase(username: string) {
-	try {
-		const response = await fetch("https://localhost:8080/api/users/register", {
+async function registerInUserDatabase(username : string){
+	try{
+		const response = await fetch ("https://" + window.location.hostname + ":8080/api/users/register", {
 			method: "POST",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify({ "username": username })
@@ -24,16 +19,7 @@ async function registerInUserDatabase(username: string) {
 	}
 }
 
-function handleResponse(data: { code?: string }, errorDiv: HTMLDivElement, username: string) {
-	if (data.code === "SQLITE_CONSTRAINT_UNIQUE") {
-		errorDiv.className = "text-sm mt-2 h-6 text-red-400"
-		errorDiv.textContent = "*User or email already exists";
-	}
-	else
-		registerInUserDatabase(username);
-} //This error is the only one that can throw the server if everything is fine in the front parse
-
-function parseFront(sendData: { username?: string, email?: string, password?: string, confirmPassword?: string }) {
+function parseFront(sendData : { username? : string, email? : string, password? : string, confirmPassword? : string}){
 
 	let errors: string[] = [];
 
@@ -76,7 +62,10 @@ function clickOnButtonSignup(button: HTMLButtonElement, names: string[], errorDi
 			"password": inputs[2],
 			"confirmPassword": inputs[3]
 		}
-		//Parse in front to show all the errors in the front
+
+		localStorage.setItem("username", inputs[0].trim());
+		localStorage.setItem("email", inputs[1].trim());
+
 		let frontErrors: string[] = parseFront(sendData);
 
 		showErrors(frontErrors, errorDiv);
@@ -87,18 +76,24 @@ function clickOnButtonSignup(button: HTMLButtonElement, names: string[], errorDi
 	});
 }
 
-async function fetchSignup(sendData: { username: string, email: string, password: string, confirmPassword: string }, errorDiv: HTMLDivElement) {
-	try {
-		const response = await fetch("https://localhost:8080/api/auth/signup", {
+async function fetchSignup(sendData : { username : string, email : string, password : string, confirmPassword : string}, errorDiv : HTMLDivElement){
+	try{
+		const response = await fetch ("https://" + window.location.hostname + ":8080/api/auth/signup", {
 			method: "POST",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(sendData),
 		})
-		const data = await response.json();
-		handleResponse(data, errorDiv, sendData.username);
-		const token = data.token;
-		localStorage.setItem("authToken", token);
-	} catch (error) {
+		if (response.status !== 200)
+		{
+			errorDiv.className = "text-sm mt-2 h-6 text-red-400"
+			errorDiv.textContent = "*User or email already exists";
+			return;
+		}
+		const data = await response.json(); 
+		localStorage.setItem("QRCode", data.QR);
+		registerInUserDatabase(sendData.username);
+		navigateTo("/qrcode");
+	} catch(error){
 		console.error("Fetch error:", error);
 	}
 }
