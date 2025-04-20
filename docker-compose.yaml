@@ -16,6 +16,11 @@ services:
       - users-service
     networks:
       - transcendence-network
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
 
   frontend:
     container_name: frontend-spa
@@ -38,6 +43,11 @@ services:
       - auth-db:/data/
     networks:
       - transcendence-network
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
 
   game-service:
     container_name: game-service
@@ -48,6 +58,12 @@ services:
       - game-data-db:/data    # SQLite
     networks:
       - transcendence-network
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
+
   users-service:
     container_name: users-service
     build:
@@ -58,12 +74,17 @@ services:
     networks:
       - transcendence-network
     env_file:
-      - .env 
+      - .env
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
 
   # Other services here
   elasticsearch:
     container_name: elasticsearch
-    image: bitnami/elasticsearch:8.18.0
+    image: elasticsearch:8.18.0
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data
       - ./monitoring/elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -72,6 +93,8 @@ services:
       - http.host=0.0.0.0
       - transport.host=0.0.0.0
       - xpack.security.enabled=false
+    ports:
+      - 9200:9200
     networks:
       - transcendence-network
     healthcheck:
@@ -80,7 +103,6 @@ services:
       timeout: 10s
       retries: 5
     mem_limit: 1gb
-
   
   logstash:
     container_name: logstash
@@ -88,11 +110,11 @@ services:
     volumes:
       - ./monitoring/elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./monitoring/elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
-    # environment:
-      # - LS_JAVA_OPTS=-Xms256m -Xmx256m
     depends_on:
       elasticsearch:
         condition: service_healthy
+    ports:
+      - 12201:12201/udp
     networks:
       - transcendence-network
 
@@ -112,6 +134,11 @@ services:
       - "5601:5601"
     networks:
       - transcendence-network
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
 
 volumes:
   front-spa:
