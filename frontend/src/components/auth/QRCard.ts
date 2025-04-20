@@ -51,7 +51,7 @@ function clickVerify(button : HTMLButtonElement, input : HTMLInputElement, div :
 
 async function fetchVerify(verifyInput : string)
 {
-	const response = await fetch ("https://transcendence.fr:8080/api/auth/verify", {
+	const response = await fetch ("https://" + window.location.hostname + ":8080/api/auth/verify", {
 		method: "POST",
 		headers: {"Content-type" : "application/json; charset=UTF-8"},
 		body: JSON.stringify({ 
