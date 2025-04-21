@@ -1,25 +1,20 @@
 import { navigateTo } from "../../router.js";
-import { fetchUserData } from "../../hooks/fetchUserData.js";
-import { statusSocket } from "../../sockets/statusSocket.js"
 
-async function registerInUserDatabase(username : string){
-	try{
-		const response = await fetch ("https://" + window.location.hostname + ":8080/api/users/register", {
+async function registerInUserDatabase(username: string) {
+	try {
+		const response = await fetch("https://" + window.location.hostname + ":8080/api/users/register", {
 			method: "POST",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify({ "username": username })
 		});
-		const data = await response.json();
-		fetchUserData((user) => {
-			statusSocket(user.id, user.name, "login");
-		})
+		const data = await response.json();					
 		console.log(data)
 	} catch (error) {
 		console.error("Fetch error:", error);
 	}
 }
 
-function parseFront(sendData : { username? : string, email? : string, password? : string, confirmPassword? : string}){
+function parseFront(sendData: { username?: string, email?: string, password?: string, confirmPassword?: string }) {
 
 	let errors: string[] = [];
 
@@ -76,24 +71,23 @@ function clickOnButtonSignup(button: HTMLButtonElement, names: string[], errorDi
 	});
 }
 
-async function fetchSignup(sendData : { username : string, email : string, password : string, confirmPassword : string}, errorDiv : HTMLDivElement){
-	try{
-		const response = await fetch ("https://" + window.location.hostname + ":8080/api/auth/signup", {
+async function fetchSignup(sendData: { username: string, email: string, password: string, confirmPassword: string }, errorDiv: HTMLDivElement) {
+	try {
+		const response = await fetch("https://" + window.location.hostname + ":8080/api/auth/signup", {
 			method: "POST",
 			headers: { "Content-type": "application/json; charset=UTF-8" },
 			body: JSON.stringify(sendData),
 		})
-		if (response.status !== 200)
-		{
+		if (response.status !== 200) {
 			errorDiv.className = "text-sm mt-2 h-6 text-red-400"
 			errorDiv.textContent = "*User or email already exists";
 			return;
 		}
-		const data = await response.json(); 
+		const data = await response.json();
 		localStorage.setItem("QRCode", data.QR);
 		registerInUserDatabase(sendData.username);
 		navigateTo("/qrcode");
-	} catch(error){
+	} catch (error) {
 		console.error("Fetch error:", error);
 	}
 }

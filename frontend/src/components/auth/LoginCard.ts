@@ -1,5 +1,3 @@
-import { fetchUserData } from "../../hooks/fetchUserData.js";
-import { statusSocket } from "../../sockets/statusSocket.js";
 import { navigateTo } from "../../router.js";
 
 function clickOnButtonLogin(button: HTMLButtonElement, names: string[], errorDiv: HTMLDivElement) {
@@ -42,9 +40,6 @@ async function fetchLogin(sendData: { user: string, password: string }, errorDiv
 		else {
 			localStorage.setItem("username", data.username);
 			localStorage.setItem("email", data.email);
-			fetchUserData((user) => {
-				statusSocket(user.id, user.username, "login");
-			})
 			navigateTo("/twofalogin");
 		}
 

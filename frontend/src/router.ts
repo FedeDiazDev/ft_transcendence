@@ -17,8 +17,8 @@ const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
   "/login": Login,
   "/signup": Signup,
-  "/qrcode" : QRCode,
-  "/twofalogin" : TwoFALogin,
+  "/qrcode": QRCode,
+  "/twofalogin": TwoFALogin,
   "/profile": Profile,
   "/stats": StatsView,
   "/friends": Friend,
@@ -74,7 +74,10 @@ export const render = () => {
 };
 
 window.addEventListener("popstate", render);
-document.addEventListener("DOMContentLoaded", render);
+document.addEventListener("DOMContentLoaded", () => {
+  render();
+  authToken();
+});
 
 let hasLoggedIn = false;
 
@@ -94,35 +97,35 @@ export const authToken = () => {
 }
 export const navigateTo = (path: string) => {
 
-	const publicRoutes = ["/loghome", "/login", "/signup"];
-	const twoFARoutes = ["/qrcode", "/twofalogin"];
+  const publicRoutes = ["/loghome", "/login", "/signup"];
+  const twoFARoutes = ["/qrcode", "/twofalogin"];
 
-	const username = localStorage.getItem("username");
-	const token = authToken(); 
+  const username = localStorage.getItem("username");
+  const token = authToken();
 
-	if (publicRoutes.includes(path)) {
-		window.history.pushState({}, "", path);
-		render();
-		return;
-	}
+  if (publicRoutes.includes(path)) {
+    window.history.pushState({}, "", path);
+    render();
+    return;
+  }
 
-	if (twoFARoutes.includes(path)) {
-		if (username && !token) {
-			window.history.pushState({}, "", path);
-			render();
-			return;
-		} else {
-			window.history.pushState({}, "", "/loghome");
-			render();
-			return;
-		}
-	}
+  if (twoFARoutes.includes(path)) {
+    if (username && !token) {
+      window.history.pushState({}, "", path);
+      render();
+      return;
+    } else {
+      window.history.pushState({}, "", "/loghome");
+      render();
+      return;
+    }
+  }
 
-	if (token) {
-		window.history.pushState({}, "", path);
-		render();
-	} else {
-		window.history.pushState({}, "", "/loghome");
-		render();
-	}
+  if (token) {
+    window.history.pushState({}, "", path);
+    render();
+  } else {
+    window.history.pushState({}, "", "/loghome");
+    render();
+  }
 };

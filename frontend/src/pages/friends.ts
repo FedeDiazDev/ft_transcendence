@@ -12,8 +12,8 @@ export const Friend = async () => {
     const resultsContainer = document.createElement("div");
     resultsContainer.className = "w-full";
 
-    const friendsWrapper = document.createElement("div"); // Nuevo contenedor
-    let friendsComponent = await FriendList(); // Mantén la referencia
+    const friendsWrapper = document.createElement("div");
+    let friendsComponent = await FriendList();
     friendsWrapper.appendChild(friendsComponent);
 
     const searchBar = SearchBar(async (text: string) => {

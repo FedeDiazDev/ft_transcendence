@@ -7,7 +7,7 @@ export const statusSocket = (
 	onOnlineUsersReceived?: (users: any[]) => void
 ) => {
 	const connectSocket = () => {
-		socket = new WebSocket("wss://localhost:8080/api/users/onlineStatus");
+		socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/users/onlineStatus");
 
 		socket.onopen = () => {
 			if (id) {
