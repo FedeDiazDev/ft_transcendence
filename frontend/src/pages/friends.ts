@@ -4,18 +4,18 @@ import { getUserByName } from "../api/friends/friendsAPI.js";
 import { UserI } from "../types/types.js";
 import { addFriend } from "../api/profile/profileAPI.js";
 
+
 export const Friend = async () => {
     const div = document.createElement("div");
+    div.innerHTML = "";
     div.className = "flex flex-col gap-6 items-center w-full";
     div.innerHTML = `<p class="text-center font-bold text-2xl">Mis amigos</p>`;
 
     const resultsContainer = document.createElement("div");
     resultsContainer.className = "w-full";
 
-    const friendsWrapper = document.createElement("div");
-    let friendsComponent = await FriendList();
-    friendsWrapper.appendChild(friendsComponent);
-
+    console.log("HOLA\n");
+    const friendsComponent = await FriendList();
     const searchBar = SearchBar(async (text: string) => {
         const result = await getUserByName(text);
         resultsContainer.innerHTML = "";
@@ -42,12 +42,7 @@ export const Friend = async () => {
             addButton.addEventListener("click", async () => {
                 console.log(`Agregar a ${user.username} (id: ${user.id})`);
                 await addFriend(user.id);
-                const updated = await FriendList();
-                friendsWrapper.innerHTML = "";
-                friendsWrapper.appendChild(updated);
-
-            });
-
+              });
             userRow.appendChild(userEl);
             userRow.appendChild(addButton);
             resultsContainer.appendChild(userRow);
@@ -56,7 +51,7 @@ export const Friend = async () => {
 
     div.appendChild(searchBar);
     div.appendChild(resultsContainer);
-    div.appendChild(friendsWrapper);
+    div.appendChild(friendsComponent);
 
     return div;
 };

@@ -25,8 +25,9 @@ export async function friendsStatus(fastify, opts) {
                         });
                     }
                 }
-
+                console.log("ACtION", action);
                 if (action === 'getOnlineUsers') {
+                    console.log("USEEEEEERE ONLINE");
                     const onlineUsers = queue.map(({ id, username }) => ({ id, username }));
                     console.log("ACTION: ", onlineUsers);
                     socket.send(JSON.stringify({ action: 'onlineUsers', users: onlineUsers }));
@@ -34,6 +35,7 @@ export async function friendsStatus(fastify, opts) {
             });
 
             socket.on('close', () => {
+                console.log("WebSocket cerrado");
                 queue = queue.filter(player => player.id !== playerId);
                 const onlineUsers = queue.map(({ id, username }) => ({ id, username }));
                 console.log("CLOSE: ", onlineUsers);

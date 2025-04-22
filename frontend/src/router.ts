@@ -61,8 +61,9 @@ export const render = () => {
       div.innerHTML = "<h2>404 - Página no encontrada</h2>";
       return div;
     }
-    return Home;
+    return Home();
   });
+
   const result = component();
   if (result instanceof Promise) {
     result.then(resolvedComponent => {
@@ -76,7 +77,7 @@ export const render = () => {
 window.addEventListener("popstate", render);
 document.addEventListener("DOMContentLoaded", () => {
   render();
-  authToken();
+  //authToken();
 });
 
 let hasLoggedIn = false;
