@@ -30,7 +30,7 @@ function serverError(err) {
 
 async function startServer(){
 	try {
-		await fastify.register(cors);
+		await fastify.register(cors, { origin: '*' });
 		await fastify.register(routes);		
 		await fastify.register(ws);
 		await fastify.register(matchmakingSockets);
