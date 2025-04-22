@@ -8,15 +8,17 @@ import { StatsView } from "./pages/stats.js";
 import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
+import { fetchUserData } from "./hooks/fetchUserData.js";
+import { statusSocket } from "./sockets/statusSocket.js";
 import { QRCode } from "./pages/qrcode.js"
 import { TwoFALogin } from "./pages/twofalogin.js"
 
-const routes: Record<string, () => HTMLElement> = {
+const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
   "/login": Login,
   "/signup": Signup,
-  "/qrcode" : QRCode,
-  "/twofalogin" : TwoFALogin,
+  "/qrcode": QRCode,
+  "/twofalogin": TwoFALogin,
   "/profile": Profile,
   "/stats": StatsView,
   "/friends": Friend,
@@ -29,7 +31,7 @@ const routes: Record<string, () => HTMLElement> = {
 
 export const render = () => {
   const app = document.getElementById("app");
-  if (!app) return;  
+  if (!app) return;
   app.innerHTML = "";
 
   const path = window.location.pathname;
@@ -59,55 +61,72 @@ export const render = () => {
       div.innerHTML = "<h2>404 - Página no encontrada</h2>";
       return div;
     }
-    return Home;
-  });  
-  app.appendChild(component());
+    return Home();
+  });
+
+  const result = component();
+  if (result instanceof Promise) {
+    result.then(resolvedComponent => {
+      app.appendChild(resolvedComponent);
+    });
+  } else {
+    app.appendChild(result);
+  }
 };
 
 window.addEventListener("popstate", render);
-document.addEventListener("DOMContentLoaded", render);
+document.addEventListener("DOMContentLoaded", () => {
+  render();
+  //authToken();
+});
 
-export const authToken = () =>{
-	const token = localStorage.getItem("authToken");
-	console.log(token);
-	if (!token || token === ""){
-		return false;
-	}
-	else
-		return true;
+let hasLoggedIn = false;
+
+export const authToken = () => {
+  const token = localStorage.getItem("authToken");
+  if (!token || token === "") {
+    return false;
+  } else {
+    if (!hasLoggedIn) {
+      fetchUserData((user) => {
+        statusSocket(user.id, user.username, "login");
+      });
+      hasLoggedIn = true;
+    }
+    return true;
+  }
 }
-
 export const navigateTo = (path: string) => {
 
-	const publicRoutes = ["/loghome", "/login", "/signup"];
-	const twoFARoutes = ["/qrcode", "/twofalogin"];
+  const publicRoutes = ["/loghome", "/login", "/signup"];
+  const twoFARoutes = ["/qrcode", "/twofalogin"];
 
-	const username = localStorage.getItem("username");
-	const token = authToken(); 
+  const username = localStorage.getItem("username");
+  const token = authToken();
 
-	if (publicRoutes.includes(path)) {
-		window.history.pushState({}, "", path);
-		render();
-		return;
-	}
+  if (publicRoutes.includes(path)) {
+    window.history.pushState({}, "", path);
+    render();
+    return;
+  }
 
-	if (twoFARoutes.includes(path)) {
-		if (username && !token) {
-			window.history.pushState({}, "", path);
-			render();
-			return;
-		} else {
-			window.history.pushState({}, "", "/loghome");
-			render();
-			return;
-		}
-	}
+  if (twoFARoutes.includes(path)) {
+    if (username && !token) {
+      window.history.pushState({}, "", path);
+      render();
+      return;
+    } else {
+      window.history.pushState({}, "", "/loghome");
+      render();
+      return;
+    }
+  }
 
-	if (token) {
-		window.history.pushState({}, "", path);
-		render();
-	} else {
-		window.history.pushState({}, "", "/loghome");
-		render();
-	}
+  if (token) {
+    window.history.pushState({}, "", path);
+    render();
+  } else {
+    window.history.pushState({}, "", "/loghome");
+    render();
+  }
 };

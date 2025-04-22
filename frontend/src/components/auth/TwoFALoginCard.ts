@@ -1,4 +1,6 @@
+import { fetchUserData } from "../../hooks/fetchUserData.js";
 import { navigateTo } from "../../router.js";
+import { statusSocket } from "../../sockets/statusSocket.js";
 
 function formatCard(div : HTMLDivElement)
 {
@@ -55,6 +57,9 @@ async function fetchVerify(verifyInput : string)
 	if (data.message === "Verified OTP Code")
 	{
 		localStorage.setItem("authToken", data.token);
+		fetchUserData((user) => {
+			statusSocket(user.id, user.name, "login");
+		});
 		localStorage.removeItem("QRCode");
 		navigateTo("/");
 		return true;
