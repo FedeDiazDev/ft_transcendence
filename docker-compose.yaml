@@ -21,6 +21,7 @@ services:
       options:
         gelf-address: "udp://localhost:12201"
         tag: "transcendence"
+    profiles: ["app"]
 
   frontend:
     container_name: frontend-spa
@@ -31,6 +32,7 @@ services:
       - front-spa:/usr/src/app/
     networks:
       - transcendence-network
+    profiles: ["app"]
 
   auth-service:
     container_name: auth-service
@@ -48,6 +50,7 @@ services:
       options:
         gelf-address: "udp://localhost:12201"
         tag: "transcendence"
+    profiles: ["app"]
 
   game-service:
     container_name: game-service
@@ -63,6 +66,7 @@ services:
       options:
         gelf-address: "udp://localhost:12201"
         tag: "transcendence"
+    profiles: ["app"]
 
   users-service:
     container_name: users-service
@@ -80,6 +84,7 @@ services:
       options:
         gelf-address: "udp://localhost:12201"
         tag: "transcendence"
+    profiles: ["app"]
 
   # Other services here
   elasticsearch:
@@ -103,6 +108,7 @@ services:
       timeout: 10s
       retries: 5
     mem_limit: 1gb
+    profiles: ["monitoring"]
   
   logstash:
     container_name: logstash
@@ -117,10 +123,10 @@ services:
       - 12201:12201/udp
     networks:
       - transcendence-network
+    profiles: ["monitoring"]
 
 # Generate keys: docker exec -it kibana /bin/bash /usr/share/kibana/bin/kibana-encryption-keys generate
 # docker-compose restart kibana
-
   kibana:
     container_name: kibana
     image: kibana:8.18.0
@@ -139,6 +145,7 @@ services:
       options:
         gelf-address: "udp://localhost:12201"
         tag: "transcendence"
+    profiles: ["monitoring"]
 
 volumes:
   front-spa:
