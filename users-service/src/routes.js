@@ -1,5 +1,5 @@
 import postRegister from "./components/register.js"
-import { postProfile, getUser } from './components/profile.js'
+import { getUser, updateProfileText, updateAvatar } from './components/profile.js'
 import { addFriend, deleteFiend, getFriends, searchUsersByName } from "./components/friends.js";
 
 const registerOpts = {
@@ -14,22 +14,11 @@ const registerOpts = {
   }
 }
 
-const profileOpts = {
-	schema: {
-	  body: {
-		type: "object",
-		properties: {
-			user: { type: "string", minLength : 1},
-		},
-		required: ["user"],
-	  }
-	}
-  };
-
 export default function routes(fastify) {
 	fastify.post("/api/users/register", registerOpts, postRegister);
-	fastify.post("/api/users/profile", profileOpts, postProfile);
 	fastify.get("/api/users/getUser", getUser);
+	fastify.post("/api/users/updateProfileText", updateProfileText);
+	fastify.post('/api/users/updateAvatar', updateAvatar);
 	fastify.get("/api/users/getFriends", getFriends);
 	fastify.get("/api/users/searchUsers/:text", searchUsersByName);
 	fastify.post("/api/users/addFriend", addFriend);
