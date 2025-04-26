@@ -1,5 +1,23 @@
 import { navigateTo } from "../../router.js";
 
+declare const google: any;
+
+async function loadGoogleScript() {
+  if (document.getElementById('gsi-client')) {
+    return;
+  }
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.id = 'gsi-client';
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
 export const LogHomeCard = () => {
     const div = document.createElement("div");
     div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-64 min-h-80 mx-auto text-white justify-evenly";
@@ -18,12 +36,30 @@ export const LogHomeCard = () => {
         navigateTo("/signup");
     });
 
-    const googleButton = document.createElement("button");
-    googleButton.textContent = "Sign In with Google";
-    googleButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
-
     div.appendChild(loginButton);
     div.appendChild(signupButton);
-    div.appendChild(googleButton);
-    return div;
+
+	loadGoogleScript()
+	.then(() => {
+		google.accounts.id.initialize({
+			client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
+			callback: (response : any) => {
+				console.log('Google login response:', response);
+				navigateTo("/");
+			}
+		});
+
+		const googleDiv = document.createElement("div");
+
+		google.accounts.id.renderButton(googleDiv, {
+			theme: "outline",
+			size: "large",
+		});
+		div.appendChild(googleDiv);
+	})
+	.catch((error) => {
+		console.error("Error Loading Google script: ", error);
+	});
+
+	return div;
 }

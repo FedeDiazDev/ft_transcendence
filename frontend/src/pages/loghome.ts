@@ -9,7 +9,9 @@ export const LogHome = () => {
     logo.textContent = "🏓 Pong";
     logo.className = "text-4xl font-bold mb-3";
 
+	const card = LogHomeCard();
+
     div.appendChild(logo);
-    div.appendChild(LogHomeCard());
+    div.appendChild(card);
     return div;
 };
