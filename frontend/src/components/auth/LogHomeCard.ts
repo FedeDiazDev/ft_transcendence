@@ -2,6 +2,23 @@ import { navigateTo } from "../../router.js";
 
 declare const google: any;
 
+async function googleCallback(response : any)
+{
+	console.log("Response: ", response);
+	try{
+		const newResponse = await fetch ("https://" + window.location.hostname + ":8080/api/auth/google-register", {
+			method : "POST",
+			headers: {"Content-type" : "application/json; charshet=UTF-8"},
+			body: JSON.stringify({ "credentials" : response})
+		});
+		const data = await newResponse.json();
+		navigateTo("/");
+	}
+	catch(error){
+		console.error("Fetch error: ", error);
+	}
+}
+
 async function loadGoogleScript() {
   if (document.getElementById('gsi-client')) {
     return;
@@ -43,10 +60,7 @@ export const LogHomeCard = () => {
 	.then(() => {
 		google.accounts.id.initialize({
 			client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
-			callback: (response : any) => {
-				console.log('Google login response:', response);
-				navigateTo("/");
-			}
+			callback: googleCallback
 		});
 
 		const googleDiv = document.createElement("div");

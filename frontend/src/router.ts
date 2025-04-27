@@ -69,7 +69,6 @@ document.addEventListener("DOMContentLoaded", render);
 
 export const authToken = () =>{
 	const token = localStorage.getItem("authToken");
-	console.log(token);
 	if (!token || token === ""){
 		return false;
 	}
