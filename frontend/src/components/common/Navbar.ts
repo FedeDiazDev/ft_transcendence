@@ -26,7 +26,7 @@ export const Navbar = () => {
       a.className = "px-3 py-2 rounded-lg hover:bg-gray-700 transition";
       a.addEventListener("click", (e) => {
         e.preventDefault();
-		navigateTo(path);
+		    navigateTo(path);
       });
       menu.appendChild(a);
     });
