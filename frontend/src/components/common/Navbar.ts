@@ -16,7 +16,6 @@ export const Navbar = () => {
       { text: "Inicio", path: "/" },
       { text: "Perfil", path: "/profile" },
       { text: "Amigos", path: "/friends" },
-      { text: "Estadísticas", path: "/stats" },
       { text: "Log", path: "/loghome" },
     ];
   
