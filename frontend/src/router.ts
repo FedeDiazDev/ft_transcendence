@@ -116,7 +116,9 @@ export const navigateTo = (path: string) => {
     window.history.pushState({}, "", path);
     render();
   } else {
-    alert("Sign up or log in please");
+    if (path !== "/") {
+      alert("Sign up or log in please");
+    }
     window.history.pushState({}, "", "/loghome");
     render();
   }
