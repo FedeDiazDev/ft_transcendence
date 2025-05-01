@@ -5,6 +5,10 @@ import { navigateTo } from "./router.js";
 document.addEventListener("DOMContentLoaded", () => {
   const app = document.getElementById("app");
 
+	window.addEventListener("load", () => {
+		navigateTo(window.location.pathname);
+	});
+
 	window.addEventListener("popstate", () => {
 		navigateTo(window.location.pathname);
 	});

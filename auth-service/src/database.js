@@ -13,8 +13,8 @@ function dbConnector(fastify) {
         id INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        salt TEXT NOT NULL,
+        password TEXT,
+        salt TEXT,
 		qrSecret TEXT
       );
     `);

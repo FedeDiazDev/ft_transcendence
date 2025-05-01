@@ -86,40 +86,40 @@ export const authToken = () => {
     return true;
   }
 }
+
+
 export const navigateTo = (path: string) => {
 
-  const publicRoutes = ["/loghome", "/login", "/signup"];
-  const twoFARoutes = ["/qrcode", "/twofalogin"];
+	const publicRoutes = ["/loghome", "/login", "/signup"];
+	const twoFARoutes = ["/qrcode", "/twofalogin"];
 
-  const username = localStorage.getItem("username");
-  const token = authToken();
+	const username = localStorage.getItem("username");
+	const token = authToken(); 
 
-  if (publicRoutes.includes(path)) {
-    window.history.pushState({}, "", path);
-    render();
-    return;
-  }
+	if (publicRoutes.includes(path)) {
+		window.history.pushState({}, "", path);
+		render();
+		return;
+	}
 
-  if (twoFARoutes.includes(path)) {
-    if (username && !token) {
-      window.history.pushState({}, "", path);
-      render();
-      return;
-    } else {
-      window.history.pushState({}, "", "/loghome");
-      render();
-      return;
-    }
-  }
+	if (twoFARoutes.includes(path)) {
+		if (username && !token) {
+			window.history.pushState({}, "", path);
+			render();
+			return;
+		} else {
+			window.history.pushState({}, "", "/loghome");
+			render();
+			return;
+		}
+	}
 
-  if (token) {
-    window.history.pushState({}, "", path);
-    render();
-  } else {
-    if (path !== "/") {
-      alert("Sign up or log in please");
-    }
-    window.history.pushState({}, "", "/loghome");
-    render();
-  }
+	if (token) {
+		window.history.pushState({}, "", path);
+		render();
+	} else {
+		console.log("entra");
+		window.history.pushState({}, "", "/loghome");
+		render();
+	}
 };
