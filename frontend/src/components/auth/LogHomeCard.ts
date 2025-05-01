@@ -40,45 +40,66 @@ async function loadGoogleScript() {
   });
 }
 
-export const LogHomeCard = () => {
+export const LogHomeCard = async (): Promise<HTMLElement> => {
     const div = document.createElement("div");
     div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-64 min-h-80 mx-auto text-white justify-evenly";
 
-    const loginButton = document.createElement("button");
-    loginButton.textContent = "Login";
-    loginButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
-    loginButton.addEventListener("click", () => {
-        navigateTo("/login");
-    });
-    
-    const signupButton = document.createElement("button");
-    signupButton.textContent = "Sign Up";
-    signupButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
-    signupButton.addEventListener("click", () => {
-        navigateTo("/signup");
-    });
+    const token = localStorage.getItem("authToken");
 
-    div.appendChild(loginButton);
-    div.appendChild(signupButton);
+    if (token) {
+      // User is logged in, show Logout button
+      const logoutButton = document.createElement("button");
+      logoutButton.textContent = "Logout";
+      logoutButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
+      logoutButton.onclick = () => {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("username");
+        localStorage.removeItem("email");
+        navigateTo("/loghome");
+      };
+      div.appendChild(logoutButton);
+    } else {
+      // User is not logged in, show Login and SignUp buttons
+      const loginButton = document.createElement("button");
+      loginButton.textContent = "Login";
+      loginButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
+      loginButton.addEventListener("click", () => {
+          navigateTo("/login");
+      });
+      
+      const signupButton = document.createElement("button");
+      signupButton.textContent = "Sign Up";
+      signupButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
+      signupButton.addEventListener("click", () => {
+          navigateTo("/signup");
+      });
+  
+      const googleButton = document.createElement("button");
+      googleButton.textContent = "Sign In with Google";
+      googleButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
 
-	loadGoogleScript()
-	.then(() => {
-		google.accounts.id.initialize({
-			client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
-			callback: googleCallback
-		});
+      div.appendChild(loginButton);
+      div.appendChild(signupButton);
 
-		const googleDiv = document.createElement("div");
+      loadGoogleScript()
+      .then(() => {
+        google.accounts.id.initialize({
+          client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
+          callback: googleCallback
+        });
 
-		google.accounts.id.renderButton(googleDiv, {
-			theme: "outline",
-			size: "large",
-		});
-		div.appendChild(googleDiv);
-	})
-	.catch((error) => {
-		console.error("Error Loading Google script: ", error);
-	});
+        const googleDiv = document.createElement("div");
 
-	return div;
+        google.accounts.id.renderButton(googleDiv, {
+          theme: "outline",
+          size: "large",
+        });
+        div.appendChild(googleDiv);
+      })
+      .catch((error) => {
+        console.error("Error Loading Google script: ", error);
+      });
+    }
+
+    return div;  // Mueve esta línea fuera del bloque 'else'
 }

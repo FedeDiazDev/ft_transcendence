@@ -2,6 +2,8 @@ import Fastify from 'fastify';
 import dbConnector from './database.js';
 import routes from './routes.js';
 import cors from '@fastify/cors'
+import ws from '@fastify/websocket'
+import { friendsStatus } from './websockets/status.js';
 
 //Activate logger inside fastify
 const opts = {
@@ -36,10 +38,22 @@ function serverError(err) {
 //and the setErrorHandler is no running yet
 async function startServer(){
 	try{
-		await fastify.register(cors);
+		await fastify.register(cors, {
+			origin: '*',
+			methods: ['GET', 'POST', 'PUT', 'DELETE'],
+			allowedHeaders: ['Content-Type', 'Authorization'],
+			credentials: true
+		  });
+
+		// content type parser for multipart/form-data. tells Fastify to accept the multipart/form-data content type without trying to parse it itself, since we'll handle that with formidable in our route handler.
+		fastify.addContentTypeParser('multipart/form-data', (request, payload, done) => {
+			// We'll use formidable to parse in our route handler
+			done(null);
+		});
 		await fastify.register(routes);
 		await fastify.register(dbConnector);
-
+		await fastify.register(ws);
+		await fastify.register(friendsStatus);
 		await fastify.listen(connectOptions, serverError);
 	}catch(error){
 		fastify.log.error(error);

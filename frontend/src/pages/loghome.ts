@@ -1,6 +1,6 @@
 import { LogHomeCard } from "../components/auth/LogHomeCard.js"
 
-export const LogHome = () => {
+export const LogHome = async () => {
     const div = document.createElement("div");
     div.className="flex flex-col items-center justify-center";
 
@@ -9,9 +9,9 @@ export const LogHome = () => {
     logo.textContent = "🏓 Pong";
     logo.className = "text-4xl font-bold mb-3";
 
-	const card = LogHomeCard();
+	const card = await LogHomeCard();
 
     div.appendChild(logo);
-    div.appendChild(card);
+	div.appendChild(card);
     return div;
 };
