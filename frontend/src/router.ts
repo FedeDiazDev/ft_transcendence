@@ -106,6 +106,7 @@ export const navigateTo = (path: string) => {
 		window.history.pushState({}, "", path);
 		render();
 	} else {
+		console.log("entra");
 		window.history.pushState({}, "", "/loghome");
 		render();
 	}

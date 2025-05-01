@@ -3,6 +3,19 @@ import createWebToken from "./jwt.js";
 
 const client = new OAuth2Client("169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com");
 
+function generateUniqueUsername(baseName, db) {
+	let username = baseName;
+	let suffix = 1;
+
+	const checkUser = db.prepare("SELECT 1 FROM users WHERE username = ?");
+	while (checkUser.get(username)) {
+		username = `${baseName}${suffix}`;
+		suffix++;
+	}
+
+	return username;
+}
+
 export default async function googleRegister(request, reply) {
 
 	const db = request.server.db;
@@ -16,16 +29,23 @@ export default async function googleRegister(request, reply) {
 	const email = payload.email;
 	const name = payload.name;
 
-	const checkUser = db.prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-	const existing = checkUser.get(name, email);
+	const checkUser = db.prepare("SELECT * FROM users WHERE email = ?");
+	const existing = checkUser.get(email);
 
-	const userToken = createWebToken(name, email);
-	if (existing)
-		reply.status(200).send({message : "Logged in", username : name, email : payload.email, token : userToken});
+	let userToken;
+
+	if (existing){
+		userToken = createWebToken(existing.username, existing.email);
+		reply.status(200).send({message : "Logged in", username : existing.username, email : existing.email, token : userToken});
+	}
 	else
 	{
+		const uniqueUsername = generateUniqueUsername(name, db);
+
+		userToken = createWebToken(uniqueUsername, email);
+
 		const query = db.prepare("INSERT INTO users (username, email) VALUES (?, ?)");
-		query.run(name, email);
-		reply.status(200).send({message : "Sign up", username : name, email : payload.email, token : userToken});
+		query.run(uniqueUsername, email);
+		reply.status(200).send({message : "Sign up", username : uniqueUsername, email : payload.email, token : userToken});
 	}
 }

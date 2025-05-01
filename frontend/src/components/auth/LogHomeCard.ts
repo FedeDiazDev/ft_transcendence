@@ -8,10 +8,15 @@ async function googleCallback(response : any)
 	try{
 		const newResponse = await fetch ("https://" + window.location.hostname + ":8080/api/auth/google-register", {
 			method : "POST",
-			headers: {"Content-type" : "application/json; charshet=UTF-8"},
+			headers: {"Content-type" : "application/json; charset=UTF-8"},
 			body: JSON.stringify({ "credentials" : response})
 		});
 		const data = await newResponse.json();
+
+		localStorage.setItem("username", data.username);
+		localStorage.setItem("email", data.email);
+		localStorage.setItem("authToken", data.token);
+
 		navigateTo("/");
 	}
 	catch(error){
