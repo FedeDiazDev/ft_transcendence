@@ -40,6 +40,18 @@ services:
     networks:
       - transcendence-network
 
+  stats-service:
+    container_name: stats-service
+    build:
+      context: ./stats-service
+      dockerfile: Dockerfile
+    env_file:
+      - .env 
+    volumes:
+      - stats-db:/data/
+    networks:
+      - transcendence-network
+
   game-service:
     container_name: game-service
     build:
@@ -70,7 +82,7 @@ volumes:
   auth-db:
   game-data-db:
   users-db:
-  
+  stats-db:
 
 networks:
   transcendence-network:
