@@ -102,6 +102,20 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
         };
         //*ONLINE
     } else if (mode === "online") {
+        const pressedKeys = useKeyPress();
+        const onlineLoop = (socket : any, userId : number) => {
+            const loop = () => {
+                if (pressedKeys.w || pressedKeys.ArrowUp) {
+                    socket.sendMove("up", userId);
+                }
+                if (pressedKeys.s || pressedKeys.ArrowDown) {
+                    socket.sendMove("down", userId);
+                }
+                draw();
+                requestAnimationFrame(loop);
+            };
+            loop();
+        };
         // const id = localStorage.getItem("id");
         //console.log("State", gameState);
         const updateGameState = (newState: any) => {
@@ -112,13 +126,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
           
         fetchUserData((user) => {
             const socket = gameSocket(updateGameState, user.id, user.username);
-            document.addEventListener("keydown", (event) => {
-                if (event.key === "ArrowUp" || event.key === "w") {
-                    socket.sendMove("up", user.id);
-                } else if (event.key === "ArrowDown" || event.key === "s") {
-                    socket.sendMove("down", user.id);
-                }
-            });
+            onlineLoop(socket, user.id)
         });
         const renderGame = (player1Name: string, player2Name: string) => {
             draw();
