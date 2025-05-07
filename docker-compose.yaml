@@ -14,6 +14,7 @@ services:
       - frontend
       - auth-service
       - users-service
+      - kibana
     networks:
       - transcendence-network
     logging:
@@ -98,8 +99,9 @@ services:
       - http.host=0.0.0.0
       - transport.host=0.0.0.0
       - xpack.security.enabled=false
-    ports:
-      - 9200:9200
+    # ports:
+    
+      # - 9200:9200
     networks:
       - transcendence-network
     healthcheck:
