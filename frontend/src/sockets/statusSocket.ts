@@ -6,11 +6,19 @@ export const statusSocket = (
 	action: "login" | "getOnlineUsers",
 	onOnlineUsersReceived?: (users: any[]) => void
 ) => {
+	let interval: number | null = null;
 	const connectSocket = () => {
+
 		socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/users/onlineStatus");
 
 		socket.onopen = () => {
 			console.log("✅ WebSocket conectado");
+			interval = setInterval(() => {
+				if (socket && socket.readyState === WebSocket.OPEN) {
+					socket.send(JSON.stringify({ action: "ping" }));
+				}
+			}, 30000);
+
 			if (id) {
 				socket!.send(JSON.stringify({ id, username, action: "login" }));
 			}
@@ -32,6 +40,10 @@ export const statusSocket = (
 		};
 
 		socket.onclose = (event) => {
+			if (interval) {
+				clearInterval(interval);
+			}
+			
 			console.log(
 				event.wasClean
 					? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`

@@ -4,6 +4,7 @@ import { Ball } from "./Ball.js";
 
 export class Game {
 	constructor(player1Id, player2Id) {
+		this.date = new Date();
 		this.status = GameStatus.WAITING;
 		this.ball = new Ball(600, 300);
 		this.paddles = {

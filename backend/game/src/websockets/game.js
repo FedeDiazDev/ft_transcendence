@@ -7,14 +7,44 @@ let gameLoopRunning = false;
 function startGameLoop() {
 	if (gameLoopRunning) return;
 	gameLoopRunning = true;
+	let gameResultSent = false;
 
-	const interval = setInterval(() => {
+	const interval = setInterval(async () => {
 		game.update();
 		if (game.leftPoints === 10 || game.rightPoints === 10) {
+			if (gameResultSent) return;
+			gameResultSent = true;
 			const winnerId = game.leftPoints === 10
 				? game.paddles.left.playerId
 				: game.paddles.right.playerId;
+			const looserPoints = game.leftPoints === 10? game.rightPoints : game.leftPoints;
 			const winnerName = players.find(p => p.id === winnerId)?.name || "Desconocido";
+			const looserName = players.find(p => p.id !== winnerId)?.name || "Desconocido";
+
+			//POST result to stats-service
+			console.log("game over game is: ", game);//game.date
+			console.log("game over game.date is: ", game.date);
+			console.log("game over winnerId is: ", winnerId);
+			console.log("game over winnername is: ", winnerName);
+			console.log("game over looserName is: ", looserName);
+			console.log("game over looserPoints is: ", looserPoints);
+			const response = await fetch("http://stats-service:3000/api/stats/game", {
+				method: 'POST',
+				headers: {
+				  'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+				  winner_username: winnerName,
+				  looser_username: looserName,
+				  looser_points: looserPoints,
+				  game_date: game.date
+				})
+			  });
+			if (!response.ok) {
+				console.error('Error sending game data to stats-service:', response.statusText);
+			}
+			console.log('Game data sent to stats-service successfully');
+			console.log("response from stats container is : ", response);
 			players.forEach(player => {
 				player.socket.send(JSON.stringify({
 					type: "game_over",
@@ -50,12 +80,14 @@ async function gameLogic(fastify, opts) {
 		fastify.get('/api/game/online_game', { websocket: true }, (socket, req) => {
 			socket.on('message', message => {
 				const data = JSON.parse(message);
+				console.log("data received in socket: ", data);
 				if (data.action === "join_game") {
 					const playerId = data.id;
 					const playerName = data.name;
 					players.push({ id: playerId, name: playerName, socket });
 					if (players.length === 2) {
 						game = new Game(players[0].id, players[1].id);
+						console.log("game created: ", game);
 						game.start();
 						players.forEach(player => {
 							const gameData = {

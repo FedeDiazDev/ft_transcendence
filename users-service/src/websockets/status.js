@@ -32,8 +32,10 @@ export async function friendsStatus(fastify, opts) {
                     console.log("ACTION: ", onlineUsers);
                     socket.send(JSON.stringify({ action: 'onlineUsers', users: onlineUsers }));
                 }
-            });
+                if (action === "ping")
+                    socket.send(JSON.stringify({ action: 'pong'}));
 
+            });            
             socket.on('close', () => {
                 console.log("WebSocket cerrado");
                 queue = queue.filter(player => player.id !== playerId);

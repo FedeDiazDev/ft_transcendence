@@ -46,6 +46,18 @@ services:
       - auth-db:/data/
     networks:
       - transcendence-network
+
+  stats-service:
+    container_name: stats-service
+    build:
+      context: ./stats-service
+      dockerfile: Dockerfile
+    env_file:
+      - .env 
+    volumes:
+      - stats-db:/data/
+    networks:
+      - transcendence-network
     logging:
       driver: gelf
       options:
@@ -100,7 +112,6 @@ services:
       - transport.host=0.0.0.0
       - xpack.security.enabled=false
     # ports:
-    
       # - 9200:9200
     networks:
       - transcendence-network
@@ -154,6 +165,7 @@ volumes:
   auth-db:
   game-data-db:
   users-db:
+  stats-db:
   elasticsearch:
   logstash:
   kibana:
