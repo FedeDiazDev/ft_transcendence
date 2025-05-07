@@ -82,13 +82,12 @@ services:
     ports:
       - "5672:5672" # AMQP protocol
       - "15672:15672" # Management UI
-    environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
       - transcendence-network
+    env_file:
+      - .env
 
 volumes:
   front-spa:
