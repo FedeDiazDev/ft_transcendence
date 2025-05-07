@@ -13,8 +13,10 @@ services:
     depends_on:
       - frontend
       - auth-service
+      - game-service
       - users-service
-      # - game-service
+      - stats-service
+      - rabbitmq
     networks:
       - transcendence-network
 
@@ -61,6 +63,7 @@ services:
       - game-data-db:/data    # SQLite
     networks:
       - transcendence-network
+
   users-service:
     container_name: users-service
     build:
@@ -71,11 +74,21 @@ services:
     networks:
       - transcendence-network
     env_file:
-      - .env 
-
-
-  # Other services here
-
+      - .env
+  
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.13.7-management
+    ports:
+      - "5672:5672" # AMQP protocol
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - transcendence-network
 
 volumes:
   front-spa:
@@ -83,6 +96,7 @@ volumes:
   game-data-db:
   users-db:
   stats-db:
+  rabbitmq-data:
 
 networks:
   transcendence-network:
