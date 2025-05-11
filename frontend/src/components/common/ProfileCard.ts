@@ -1,5 +1,98 @@
 import { getUserData } from "../../api/profile/profileAPI.js";
 import { Input } from "./Input.js";
+import { getUserStats } from "../../api/stats/statsAPI.js";
+
+async function fetchStats(container: HTMLDivElement) {
+    try {
+        const stats = await getUserStats();
+        if (!stats) {
+            console.error("No stats data received");
+            return;
+        }
+
+        // Create stats section
+        const statsSection = document.createElement("div");
+        statsSection.className = "mt-6 border-t pt-4";
+        
+        const statsTitle = document.createElement("h2");
+        statsTitle.textContent = "Game History";
+        statsTitle.className = "text-gray-300 text-lg text-center w-full mb-4";
+        statsSection.appendChild(statsTitle);
+
+        // Create stats display
+        const statsGrid = document.createElement("div");
+        statsGrid.className = "grid grid-cols-2 gap-4";
+
+        const totalGames = (stats.wins || 0) + (stats.losses || 0);
+        const winRate = totalGames > 0 ? Math.round((stats.wins / totalGames) * 100) : 0;
+
+        const winsCard = createStatCard(  "Games Won", `${stats.wins || 0} (${winRate}%)`, "text-green-500");
+        const lossesCard = createStatCard("Games Lost", stats.losses || 0, "text-red-500");
+        statsGrid.appendChild(winsCard);
+        statsGrid.appendChild(lossesCard);        
+        statsSection.appendChild(statsGrid);
+
+        // games history section
+        if (stats.recentGames && stats.recentGames.length > 0) {
+            const recentGamesSection = document.createElement("div");
+            recentGamesSection.className = "mt-4";
+            
+            const gamesList = document.createElement("ul");
+            gamesList.className = "divide-y";
+            
+            stats.recentGames.forEach((game: any) => {
+                const gameItem = document.createElement("li");
+                gameItem.className = "py-2";
+                
+                const isWinner = game.winner_username === stats.username;
+                const result = isWinner ? "Won" : "Lost";
+                const resultClass = isWinner ? "text-green-500" : "text-red-500";
+                
+                gameItem.innerHTML = `
+                    <span class="${resultClass} font-medium">${result}</span>
+                    <span class="ml-2">${isWinner ? game.winner_points : game.looser_points} - ${isWinner ? game.looser_points : game.winner_points}</span>
+                    <span class="ml-2 text-sm text-gray-500">vs ${isWinner ? game.looser_username : game.winner_username}</span>
+                    <span class="ml-2 text-xs text-gray-400">${new Date(game.game_date).toLocaleString()}</span>
+                `;
+                
+                gamesList.appendChild(gameItem);
+            });
+            
+            recentGamesSection.appendChild(gamesList);
+            statsSection.appendChild(recentGamesSection);
+        }
+        
+        container.appendChild(statsSection);
+        
+    } catch (error) {
+        console.error("Error fetching stats:", error);
+        
+        // Show error message in the container
+        const errorMsg = document.createElement("div");
+        errorMsg.className = "mt-4 p-3 bg-red-100 text-red-700 rounded";
+        errorMsg.textContent = "Unable to load game statistics.";
+        container.appendChild(errorMsg);
+    }
+}
+
+// Helper function to create stat cards
+function createStatCard(label: string, value: number | string, valueColorClass: string) {
+    const card = document.createElement("div");
+    card.className = "bg-gray-50 p-3 rounded shadow-sm";
+    
+    const labelElement = document.createElement("div");
+    labelElement.className = "text-sm text-gray-600";
+    labelElement.textContent = label;
+    
+    const valueElement = document.createElement("div");
+    valueElement.className = `text-xl font-bold ${valueColorClass}`;
+    valueElement.textContent = value.toString();
+    
+    card.appendChild(labelElement);
+    card.appendChild(valueElement);
+    
+    return card;
+}
 
 
 function convertBlobToBase64(data: any, avatarImage: HTMLImageElement) {
@@ -25,7 +118,6 @@ async function fetchProfile(container: HTMLDivElement) {
         const fields = [
             { name: "Username", input: Input("text", data.user.username || "", "Username", false) },
             { name: "Presentacion", input: Input("text", data.user.presentacion || "", "Presentacion", false) },
-            //{ name: "Avatar", input: Input("text", data.user.avatar_blob || "", "Avatar", false) },
         ];
 
         const profileHeader = document.getElementById("profile-header");
@@ -225,8 +317,13 @@ async function fetchProfile(container: HTMLDivElement) {
 export const ProfileView = () => {
     const container = document.createElement("div");
     container.className = "flex flex-col gap-4 p-4 border";
-
-    fetchProfile(container);
+    // Use an immediately-invoked async function to avoid race condition between fetchProfile and fetchStats
+    // and to ensure that the container is populated with data before being returned
+    (async () => {
+        await fetchProfile(container);
+        await fetchStats(container);
+    })();
+    
     return container;
 };
 
