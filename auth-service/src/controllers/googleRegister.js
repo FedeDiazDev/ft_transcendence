@@ -1,5 +1,6 @@
 import { OAuth2Client } from "google-auth-library";
 import createWebToken from "./jwt.js";
+import publishUserRegisteredEvent from "./publishQueue.js"
 
 const client = new OAuth2Client("169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com");
 
@@ -46,6 +47,7 @@ export default async function googleRegister(request, reply) {
 
 		const query = db.prepare("INSERT INTO users (username, email) VALUES (?, ?)");
 		query.run(uniqueUsername, email);
+		publishUserRegisteredEvent(uniqueUsername);
 		reply.status(200).send({message : "Sign up", username : uniqueUsername, email : payload.email, token : userToken});
 	}
 }
