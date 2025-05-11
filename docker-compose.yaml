@@ -39,6 +39,9 @@ services:
       - .env 
     volumes:
       - auth-db:/data/
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - transcendence-network
 
@@ -51,6 +54,9 @@ services:
       - .env 
     volumes:
       - stats-db:/data/
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - transcendence-network
 
@@ -61,6 +67,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - game-data-db:/data    # SQLite
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - transcendence-network
 
@@ -71,6 +80,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - users-db:/data/
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - transcendence-network
     env_file:
@@ -80,14 +92,20 @@ services:
     container_name: rabbitmq
     image: rabbitmq:3.13.7-management
     ports:
-      - "5672:5672" # AMQP protocol
-      - "15672:15672" # Management UI
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
       - transcendence-network
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"] 
+      interval: 10s 
+      retries: 5
+      start_period: 30s
+      timeout: 5s
 
 volumes:
   front-spa:

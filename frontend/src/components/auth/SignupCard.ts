@@ -1,19 +1,5 @@
 import { navigateTo } from "../../router.js";
 
-async function registerInUserDatabase(username: string) {
-	try {
-		const response = await fetch("https://" + window.location.hostname + ":8080/api/users/register", {
-			method: "POST",
-			headers: { "Content-type": "application/json; charset=UTF-8" },
-			body: JSON.stringify({ "username": username })
-		});
-		const data = await response.json();					
-		console.log(data)
-	} catch (error) {
-		console.error("Fetch error:", error);
-	}
-}
-
 function parseFront(sendData: { username?: string, email?: string, password?: string, confirmPassword?: string }) {
 
 	let errors: string[] = [];
@@ -85,7 +71,6 @@ async function fetchSignup(sendData: { username: string, email: string, password
 		}
 		const data = await response.json();
 		localStorage.setItem("QRCode", data.QR);
-		registerInUserDatabase(sendData.username);
 		navigateTo("/qrcode");
 	} catch (error) {
 		console.error("Fetch error:", error);
