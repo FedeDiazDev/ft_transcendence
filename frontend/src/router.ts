@@ -70,19 +70,14 @@ document.addEventListener("DOMContentLoaded", () => {
   //authToken();
 });
 
-let hasLoggedIn = false;
-
 export const authToken = () => {
   const token = localStorage.getItem("authToken");
   if (!token || token === "") {
     return false;
   } else {
-    if (!hasLoggedIn) {
-      fetchUserData((user) => {
-        statusSocket(user.id, user.username, "login");
-      });
-      hasLoggedIn = true;
-    }
+    fetchUserData((user) => {
+      statusSocket(user.id, user.username, "login");
+    });
     return true;
   }
 }
