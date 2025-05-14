@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import createQR from "./createQR.js";
+import publishUserRegisteredEvent from "./publishQueue.js"
 
 function confirmPassword(password, confirmPassword){	
 	if (password != confirmPassword){
@@ -28,7 +29,7 @@ export default async function postSignup(request, reply){
 
 	if (existing) {
 		const error = new Error("Username or email already in use");
-		error.statusCode = 409; // Conflict
+		error.statusCode = 409;
 		throw error;
 	}
 
@@ -43,5 +44,6 @@ export default async function postSignup(request, reply){
 	const queryQr = db.prepare("UPDATE users SET qrSecret = ? WHERE username = ?");
 	queryQr.run(data.sr.base32, request.body.username);
 
+	publishUserRegisteredEvent(request.body.username);
 	reply.send({ message: "Generate QR", QR: data.qr});
 }

@@ -1,4 +1,3 @@
-import postRegister from "./components/register.js"
 import { getUser, updateProfileText, updateAvatar } from './components/profile.js'
 import { addFriend, deleteFiend, getFriends, searchUsersByName } from "./components/friends.js";
 
@@ -15,7 +14,6 @@ const registerOpts = {
 }
 
 export default function routes(fastify) {
-	fastify.post("/api/users/register", registerOpts, postRegister);
 	fastify.get("/api/users/getUser", getUser);
 	fastify.post("/api/users/updateProfileText", updateProfileText);
 	fastify.post('/api/users/updateAvatar', updateAvatar);
