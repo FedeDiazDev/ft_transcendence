@@ -67,7 +67,7 @@ export const render = () => {
 window.addEventListener("popstate", render);
 document.addEventListener("DOMContentLoaded", () => {
   render();
-  //authToken();
+  authToken();
 });
 
 export const authToken = () => {
