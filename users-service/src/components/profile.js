@@ -23,6 +23,18 @@ function validateAuthorizationHeader(request) {
     }
 }
 
+// Function to validate PNG signature
+async function validatePNGSignature(filePath) {
+    try {
+        const buffer = await fs.promises.readFile(filePath, { length: 8 });
+        const pngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+        return pngSignature.every((byte, i) => buffer[i] === byte);
+    } catch (error) {
+        console.error("Error validating PNG signature:", error);
+        return false;
+    }
+}
+
 export async function getUser(request, reply) {
     let payload;
     try {
@@ -95,8 +107,7 @@ export async function updateAvatar(request, reply) {
         allowEmptyFiles: false,
         uploadDir: '/tmp', // Use a directory that's definitely writable
         filter: function(part) {
-            console.log("Received part:", part.name, part.mimetype);
-            return true;
+            return part.mimetype === 'image/png';
         }
     });
     
@@ -125,13 +136,23 @@ export async function updateAvatar(request, reply) {
         
         // Formidable v3 sometimes returns an array even with multiples:false
         const avatarFile = Array.isArray(files.avatar) ? files.avatar[0] : files.avatar;        
-        // Read file content as buffer
         const filePath = avatarFile.filepath || avatarFile.path || 
                 (avatarFile[0] && (avatarFile[0].filepath || avatarFile[0].path));
+        
         if (!filePath) {
             console.error("File path is undefined!", avatarFile);
             return reply.code(400).send({ message: "Invalid file upload - no file path" });
         }
+
+        // Validate PNG signature
+        const isValidPNG = await validatePNGSignature(filePath);
+        if (!isValidPNG) {
+            // Clean up invalid file
+            await fs.promises.unlink(filePath);
+            return reply.code(400).send({ message: "Invalid PNG file format" });
+        }
+
+        // Read file content as buffer
         const buffer = await fs.promises.readFile(filePath);
         
         // Update database with the avatar
@@ -146,7 +167,7 @@ export async function updateAvatar(request, reply) {
         }
         
         // Clean up temp file
-        await fs.promises.unlink(avatarFile.filepath);        
+        await fs.promises.unlink(filePath);        
         if (!response || response.changes === 0) {
             return reply.code(404).send({ message: "User not found" });
         }        

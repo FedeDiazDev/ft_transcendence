@@ -106,6 +106,14 @@ function convertBlobToBase64(data: any, avatarImage: HTMLImageElement) {
     avatarImage.src = `data:image/png;base64,${base64String}`;
 }
 
+// Function to validate PNG file signature
+async function isPNG(file: File): Promise<boolean> {
+    const PNG_SIGNATURE = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+    const bytes = await file.slice(0, 8).arrayBuffer();
+    const uint8Array = new Uint8Array(bytes);
+    return PNG_SIGNATURE.every((byte, i) => uint8Array[i] === byte);
+}
+
 async function fetchProfile(container: HTMLDivElement) {
     try {
 
@@ -167,6 +175,15 @@ async function fetchProfile(container: HTMLDivElement) {
                     document.body.removeChild(fileInput);
                     return;
                 }
+
+                // Validate actual PNG signature
+                const isValidPNG = await isPNG(file);
+                if (!isValidPNG) {
+                    alert("Invalid PNG file. Please select a valid PNG image.");
+                    document.body.removeChild(fileInput);
+                    return;
+                }
+
                 if (file.size > 5 * 1024 * 1024) {
                     alert("File is too large. Maximum size is 5MB.");
                     document.body.removeChild(fileInput);
