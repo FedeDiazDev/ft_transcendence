@@ -71,14 +71,14 @@ function clickOnButtonSignup(button: HTMLButtonElement, names: string[], errorDi
 			"confirmPassword": inputs[3]
 		}
 
-		localStorage.setItem("username", inputs[0].trim());
-		localStorage.setItem("email", inputs[1].trim());
 
 		let frontErrors: string[] = parseFront(sendData);
 
 		showErrors(frontErrors, errorDiv);
 
 		if (frontErrors.length === 0) {
+			localStorage.setItem("username", inputs[0].trim());
+			localStorage.setItem("email", inputs[1].trim());
 			fetchSignup(sendData, errorDiv);
 		}
 	});
