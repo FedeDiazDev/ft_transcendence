@@ -72,6 +72,8 @@ services:
         condition: service_healthy
     networks:
       - transcendence-network
+    env_file:
+      - .env 
 
   users-service:
     container_name: users-service

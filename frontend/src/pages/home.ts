@@ -7,7 +7,7 @@ export const Home = () => {
   const cards = [
     { title: "🔥", description: "Local", path: '/local_game' },
     { title: "🚀", description: "Online", path: '/online_game' },
-    { title: "🎮", description: "Torneo", path: '/create_tournament' },
+    { title: "🎮", description: "Torneo", path: '/tournament' },
   ];
 
   cards.forEach(({ title, description, path }) => {
