@@ -25,17 +25,11 @@ export const Tournament = () => {
 	joinTitle.textContent = "🔗 Unirse a Torneo";
 	joinTitle.className = "text-xl font-semibold";
 
-	const tournamentIdInput = document.createElement("input");
-	tournamentIdInput.type = "text";
-	tournamentIdInput.placeholder = "ID del torneo";
-	tournamentIdInput.className = "p-2 bg-gray-800 text-white border border-gray-600 rounded-lg";
-
 	const joinButton = document.createElement("button");
 	joinButton.textContent = "Unirse";
 	joinButton.className = "p-2 bg-green-500 rounded-lg hover:bg-green-600 transition cursor-pointer";
 
-	joinSection.appendChild(joinTitle);
-	joinSection.appendChild(tournamentIdInput);
+	joinSection.appendChild(joinTitle);	
 	joinSection.appendChild(joinButton);
 	container.appendChild(createSection);
 	container.appendChild(joinSection);
@@ -50,7 +44,7 @@ export const Tournament = () => {
 
 	joinButton.addEventListener("click", () => {
 		// const tournamentId = tournamentIdInput.value.trim();
-		navigateTo(`/tournament/waiting_room`);
+		navigateTo(`/tournament/join`);
 		// if (tournamentId) {
 			// navigateTo(`/tournament/join?id=${encodeURIComponent(tournamentId)}`);
 		// }

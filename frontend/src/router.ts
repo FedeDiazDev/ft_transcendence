@@ -12,6 +12,7 @@ import { fetchUserData } from "./hooks/fetchUserData.js";
 import { statusSocket } from "./sockets/statusSocket.js";
 import { QRCode } from "./pages/qrcode.js"
 import { TwoFALogin } from "./pages/twofalogin.js"
+import { JoinTournament } from "./pages/join_tournament.js"
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -24,7 +25,8 @@ const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/local_game": () => Game("local"),
   "/online_game": Online,
   "/tournament": Tournament,
-  "/tournament/create": CreateTournament, 
+  "/tournament/create": CreateTournament,
+  "/tournament/join": JoinTournament, 
   "/tournament/waiting_room": Online,
   "/": Home,
 };

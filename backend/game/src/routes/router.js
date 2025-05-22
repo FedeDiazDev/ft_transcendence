@@ -1,5 +1,5 @@
 import { createGame, movePaddle, startGame, getGameInfo, moveBall } from "../controllers/gameController.js";
-import { createTournament } from "../controllers/tournamentController.js"
+import { createTournament, listOpenTournaments, addPlayerToTournament } from "../controllers/tournamentController.js"
 
 async function routes (fastify, opts)
 {
@@ -13,7 +13,10 @@ async function routes (fastify, opts)
 	fastify.post("/api/game/movePaddle", movePaddle);
 	fastify.post("/api/game/moveBall", moveBall);
 
+	//*Tournaments
 	fastify.post("/api/game/tournament/create", createTournament);
+	fastify.post("/api/game/tournament/addPlayer", addPlayerToTournament);;
+	fastify.get("/api/game/tournament/open", listOpenTournaments);
 }
 	
 export default routes;

@@ -4,15 +4,15 @@ import dotenv from "dotenv";
 dotenv.config();
 
 function validateAuthorizationHeader(request) {
-    const authHeader = request.headers['authorization'];    
+    const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         const error = new Error("Token no proporcionado");
         error.statusCode = 401;
         throw error;
     }
-    const token = authHeader.split(' ')[1];     
+    const token = authHeader.split(' ')[1];
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET);        
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
         return payload;
     } catch (err) {
         const error = new Error("Token inválido o expirado");
@@ -21,7 +21,9 @@ function validateAuthorizationHeader(request) {
     }
 }
 
-
+//? Si pasa x tiempo sin que el torneo se inice, se cierra cambiando el status?
+//? Código o listado y unirse
+//?
 export async function createTournament(request, reply) {
     const { name, players } = request.body;
     if (!name || !players) {
@@ -29,7 +31,7 @@ export async function createTournament(request, reply) {
     }
     let payload;
     try {
-        payload = validateAuthorizationHeader(request);        
+        payload = validateAuthorizationHeader(request);
     } catch (error) {
         return reply.status(401).send({ error: error.message });
     }
@@ -37,7 +39,7 @@ export async function createTournament(request, reply) {
     try {
 
         const query = db.prepare("INSERT INTO tournaments(name, status,number_players, created_at) VALUES(?, ?, ?, ?)");
-       const info = query.run(name, "open", players, new Date().toISOString());
+        const info = query.run(name, "open", players, new Date().toISOString());
         const tournament = {
             id: info.lastInsertRowid,
             name,
@@ -49,4 +51,46 @@ export async function createTournament(request, reply) {
     } catch (error) {
         return reply.status(500).send({ error: "Error al crear el torneo" });
     }
-}   
+}
+
+export async function listOpenTournaments(request, reply) {
+    let payload;
+
+    try {
+        payload = validateAuthorizationHeader(request);
+    } catch (error) {
+        return reply.status(401).send({ error: message });
+    }
+    const db = request.server.db;
+    try {
+        const query = db.prepare("SELECT * FROM tournaments WHERE status= ?");
+        const tournaments = query.all("open");        
+        reply.status(200).send({ message: "Lista de torneos", tournaments});
+    } catch (error) {
+        return reply.status(500).send({ error: "Error al mostrar listado de torneos abiertos" });
+    }
+}
+
+
+export async function addPlayerToTournament(request, reply) {
+    const { tournamentId } = request.body;
+    if (!tournamentId) {
+        return reply.status(400).send({ error: "Faltan datos" });
+    }
+    let payload;
+
+    try {
+        payload = validateAuthorizationHeader(request);
+    } catch (error) {
+        return reply.status(401).send({ error: error.message });
+    }
+    const db = request.server.db;
+    try {
+        const userId = payload.id;
+        const query = db.prepare("INSERT INTO tournament_players(tournament_id, user_id) VALUES (?, ?)")
+        query.run(tournamentId, userId);
+        return reply.status(200).send({ message: "Jugador añadido al torneo" });
+    } catch (error) {
+        return reply.status(500).send({ error: "Error al añadir jugador al torneo" });
+    }
+}
