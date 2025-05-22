@@ -3,6 +3,26 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+
+function getUsername(request, reply) {
+    const authHeader = request.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return reply.status(401).send({ error: "Token no proporcionado" })
+    }
+    const token = authHeader.split(' ')[1];
+    let payload;
+    try {
+        payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        return reply.status(401).send({ error: "Token inválido o expirado" });
+    }
+    const username = payload.username;
+    if (!username) {
+        return reply.status(400).send({ error: "Falta el username" });
+    }
+    return username;
+}
+
 function validateAuthorizationHeader(request) {
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -73,22 +93,18 @@ export async function listOpenTournaments(request, reply) {
 
 
 export async function addPlayerToTournament(request, reply) {
+    const db = request.server.db;
+    const username = getUsername(request, reply);
+    if (!username) {
+        return reply.status(400).send({ error: "Falta el username" });
+    }
     const { tournamentId } = request.body;
     if (!tournamentId) {
         return reply.status(400).send({ error: "Faltan datos" });
-    }
-    let payload;
-
-    try {
-        payload = validateAuthorizationHeader(request);
-    } catch (error) {
-        return reply.status(401).send({ error: error.message });
-    }
-    const db = request.server.db;
-    try {
-        const userId = payload.id;
-        const query = db.prepare("INSERT INTO tournament_players(tournament_id, user_id) VALUES (?, ?)")
-        query.run(tournamentId, userId);
+    }    
+    try {                
+        const query = db.prepare("INSERT INTO tournament_players (tournament_id, username) VALUES (?, ?)")        
+        query.run(tournamentId, username);
         return reply.status(200).send({ message: "Jugador añadido al torneo" });
     } catch (error) {
         return reply.status(500).send({ error: "Error al añadir jugador al torneo" });

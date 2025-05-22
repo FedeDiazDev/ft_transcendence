@@ -30,7 +30,7 @@ export const registerPlayer = async (tournamentId : number) => {
 
     try {
         const token = localStorage.getItem("authToken");
-        const response = await fetch(`${API_URLS.game}/tournnament/addPlayer`, {
+        const response = await fetch(`${API_URLS.game}/tournament/addPlayer`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export const registerPlayer = async (tournamentId : number) => {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
         const data = await response.json();
-        if (!data || !data.tournamentState) {
+        if (!data) {
             throw new Error("Respuesta inválida del servidor");
         }
         return data;

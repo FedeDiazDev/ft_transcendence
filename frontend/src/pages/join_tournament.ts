@@ -1,4 +1,4 @@
-import { openTournaments } from "../api/game/tournamentAPI.js";
+import { openTournaments, registerPlayer } from "../api/game/tournamentAPI.js";
 
 export const JoinTournament = () => {
 	const container = document.createElement("div");
@@ -43,8 +43,13 @@ export const JoinTournament = () => {
 				joinButton.textContent = "Unirse";
 				joinButton.className =
 					"mt-4 px-4 py-2 bg-green-600 rounded hover:bg-green-700";
-				joinButton.addEventListener("click", () => {
-					console.log(`Unirse al torneo con ID: ${tournament.id}`);					
+				joinButton.addEventListener("click", async () => {
+                    const response = await registerPlayer(tournament.id);
+                    if (response.error){
+                        console.error(response.error);
+                    }
+					console.log(`Unirse al torneo con ID: ${tournament.id}`);
+                    console.log("Unido al torneo correctamente");
 				});
 
 				tournamentCard.appendChild(name);
