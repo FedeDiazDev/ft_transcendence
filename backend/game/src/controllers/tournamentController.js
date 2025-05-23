@@ -84,8 +84,8 @@ export async function listOpenTournaments(request, reply) {
     const db = request.server.db;
     try {
         const query = db.prepare("SELECT * FROM tournaments WHERE status= ?");
-        const tournaments = query.all("open");        
-        reply.status(200).send({ message: "Lista de torneos", tournaments});
+        const tournaments = query.all("open");
+        reply.status(200).send({ message: "Lista de torneos", tournaments });
     } catch (error) {
         return reply.status(500).send({ error: "Error al mostrar listado de torneos abiertos" });
     }
@@ -98,15 +98,41 @@ export async function addPlayerToTournament(request, reply) {
     if (!username) {
         return reply.status(400).send({ error: "Falta el username" });
     }
+
     const { tournamentId } = request.body;
     if (!tournamentId) {
         return reply.status(400).send({ error: "Faltan datos" });
-    }    
-    try {                
-        const query = db.prepare("INSERT INTO tournament_players (tournament_id, username) VALUES (?, ?)")        
-        query.run(tournamentId, username);
+    }
+
+    try {
+        const insertTransaction = db.transaction(() => {
+            const countQuery = db.prepare("SELECT COUNT(*) as count FROM tournament_players WHERE tournament_id = ?");
+            const { count } = countQuery.get(tournamentId);
+
+            const totalQuery = db.prepare("SELECT number_players FROM tournaments WHERE id = ?");
+            const result = totalQuery.get(tournamentId);
+
+            if (!result) {
+                throw new Error("Torneo no encontrado");
+            }
+
+            if (count >= result.number_players) {
+                throw new Error("El torneo está lleno");
+            }
+
+            const insertQuery = db.prepare("INSERT INTO tournament_players (tournament_id, username) VALUES (?, ?)");
+            insertQuery.run(tournamentId, username);
+        });
+
+        insertTransaction();
+
         return reply.status(200).send({ message: "Jugador añadido al torneo" });
     } catch (error) {
+        if (error.message === "El torneo está lleno") {
+            return reply.status(409).send({ error: error.message });
+        } else if (error.message === "Torneo no encontrado") {
+            return reply.status(404).send({ error: error.message });
+        }
         return reply.status(500).send({ error: "Error al añadir jugador al torneo" });
     }
 }
