@@ -1,6 +1,6 @@
 import { Home } from "./pages/home.js";
 import { Friend } from "./pages/friends.js";
-import { Profile } from "./pages/profile.js";
+import { Profile, FriendProfile } from "./pages/profile.js";
 import { LogHome } from "./pages/loghome.js";
 import { Login } from "./pages/login.js";
 import { Signup } from "./pages/signup.js";
@@ -35,13 +35,12 @@ export const render = () => {
   const path = window.location.pathname;
   const pathParts = path.split("/");
 
-  //TODO: en un futuro hacer que Profile reciba el id del usuario que queremos ver
+  //navigates to a user´s friend profile (the logged user profile is at url /profile while the friend profile is at url /profile/id)
   if (pathParts[1] === "profile" && pathParts.length === 3) {
     app.innerHTML = "";
     const id = pathParts[2];
     const div = document.createElement("div");
-    div.innerHTML = `<h2>📊 Perfil del usuario ${id}</h2>`;
-    div.appendChild(Profile());
+    div.appendChild(FriendProfile(id));
     app.appendChild(div);
     return;
   }

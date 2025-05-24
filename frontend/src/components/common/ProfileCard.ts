@@ -1,6 +1,6 @@
-import { getUserData } from "../../api/profile/profileAPI.js";
+import { getUserData, getFriendData } from "../../api/profile/profileAPI.js";
 import { Input } from "./Input.js";
-import { getUserStats } from "../../api/stats/statsAPI.js";
+import { getUserStats, getFriendStats } from "../../api/stats/statsAPI.js";
 
 async function fetchStats(container: HTMLDivElement) {
     try {
@@ -95,7 +95,7 @@ function createStatCard(label: string, value: number | string, valueColorClass: 
 }
 
 
-function convertBlobToBase64(data: any, avatarImage: HTMLImageElement) {
+export function convertBlobToBase64(data: any, avatarImage: HTMLImageElement) {
     const uint8Array = new Uint8Array(data);
     let binaryString = '';
     uint8Array.forEach(byte => {
@@ -344,4 +344,141 @@ export const ProfileView = () => {
     return container;
 };
 
+async function fetchFriendProfile(container: HTMLDivElement, id: string) {
+    try {
 
+        const FriendData = await getFriendData(Number(id));
+        if (!FriendData) {
+            console.error("No friend data received");
+            return;
+        }
+        // Create field wrappers with labels + inputs
+        const fields = [
+            { name: "Username", input: Input("text", FriendData.user.username || "", "Username", false) },
+            { name: "Presentacion", input: Input("text", FriendData.user.presentacion || "", "Presentacion", false) },
+        ];
+
+        const profileHeader = document.getElementById("profile-header");
+
+        const avatarWrapper = document.createElement("div");
+        avatarWrapper.className = "flex items-center gap-2 mb-4";
+        const avatarImage = document.createElement("img");
+        if (FriendData.user.avatar_blob) {
+            // The avatar_blob from SQLite is received as an object  { type: "Buffer", FriendData: (2146) […] }, must be converted
+            // to a Uint8Array and then to Base64 string to be used as a FriendData URL in the img tag src attribute
+            convertBlobToBase64(FriendData.user.avatar_blob.data, avatarImage);
+        } else {
+            avatarImage.src = "";
+        }
+        avatarImage.alt = "Avatar";
+        avatarImage.className = "w-24 h-24 rounded-full";
+        avatarWrapper.appendChild(avatarImage);
+
+        if (profileHeader) {
+            profileHeader.appendChild(avatarWrapper);
+        }
+        // Add each field with label to container
+        fields.forEach((field) => {
+            const fieldWrapper = document.createElement("div");
+            fieldWrapper.className = "flex items-center mb-2";
+
+            const label = document.createElement("label");
+            label.textContent = field.name + ": ";
+            label.className = "w-24 font-medium text-gray-600";
+
+            fieldWrapper.appendChild(label);
+            fieldWrapper.appendChild(field.input);
+
+            container.appendChild(fieldWrapper);
+        });
+    } catch (error) {
+        console.error("Fetch error:", error);
+    }
+}
+
+
+async function fetchFriendStats(container: HTMLDivElement, id: string) {
+    try {
+        const stats = await getFriendStats(Number(id));
+        if (!stats) {
+            console.error("No friend stats received");
+            return;
+        }
+
+        // Create stats section
+        const statsSection = document.createElement("div");
+        statsSection.className = "mt-6 border-t pt-4";
+        
+        const statsTitle = document.createElement("h2");
+        statsTitle.textContent = "Game History";
+        statsTitle.className = "text-gray-300 text-lg text-center w-full mb-4";
+        statsSection.appendChild(statsTitle);
+
+        // Create stats display
+        const statsGrid = document.createElement("div");
+        statsGrid.className = "grid grid-cols-2 gap-4";
+
+        const totalGames = (stats.wins || 0) + (stats.losses || 0);
+        const winRate = totalGames > 0 ? Math.round((stats.wins / totalGames) * 100) : 0;
+
+        const winsCard = createStatCard(  "Games Won", `${stats.wins || 0} (${winRate}%)`, "text-green-500");
+        const lossesCard = createStatCard("Games Lost", stats.losses || 0, "text-red-500");
+        statsGrid.appendChild(winsCard);
+        statsGrid.appendChild(lossesCard);        
+        statsSection.appendChild(statsGrid);
+
+        // games history section
+        if (stats.recentGames && stats.recentGames.length > 0) {
+            const recentGamesSection = document.createElement("div");
+            recentGamesSection.className = "mt-4";
+            
+            const gamesList = document.createElement("ul");
+            gamesList.className = "divide-y";
+            
+            stats.recentGames.forEach((game: any) => {
+                const gameItem = document.createElement("li");
+                gameItem.className = "py-2";
+                
+                const isWinner = game.winner_username === stats.username;
+                const result = isWinner ? "Won" : "Lost";
+                const resultClass = isWinner ? "text-green-500" : "text-red-500";
+                
+                gameItem.innerHTML = `
+                    <span class="${resultClass} font-medium">${result}</span>
+                    <span class="ml-2">${isWinner ? game.winner_points : game.looser_points} - ${isWinner ? game.looser_points : game.winner_points}</span>
+                    <span class="ml-2 text-sm text-gray-500">vs ${isWinner ? game.looser_username : game.winner_username}</span>
+                    <span class="ml-2 text-xs text-gray-400">${new Date(game.game_date).toLocaleString()}</span>
+                `;
+                
+                gamesList.appendChild(gameItem);
+            });
+            
+            recentGamesSection.appendChild(gamesList);
+            statsSection.appendChild(recentGamesSection);
+        }
+        
+        container.appendChild(statsSection);
+        
+    } catch (error) {
+        console.error("Error fetching stats:", error);
+        
+        // Show error message in the container
+        const errorMsg = document.createElement("div");
+        errorMsg.className = "mt-4 p-3 bg-red-100 text-red-700 rounded";
+        errorMsg.textContent = "Unable to load game statistics.";
+        container.appendChild(errorMsg);
+    }
+}
+
+export const FriendProfileView = (id: string) => {
+    const container = document.createElement("div");
+    container.className = "flex flex-col gap-4 p-4 border";
+    // Use an immediately-invoked async function to avoid race condition between fetchProfile and fetchStats
+    // and to ensure that the container is populated with data before being returned
+    (async () => {
+        await fetchFriendProfile(container, id);
+        await fetchFriendStats(container, id);
+    })();
+    
+    return container;
+};

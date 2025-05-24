@@ -16,6 +16,18 @@ export const getUserData = async (): Promise<any> => {
     }
 }
 
+export const getFriendData = async (id: number): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.profile}/getUserById/${id}`, {
+            method: 'GET'
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Fetch error:", error);
+    }
+}
+
 export const addFriend = async (friendId: number): Promise<any> => {
     try {
         const token = localStorage.getItem("authToken");
