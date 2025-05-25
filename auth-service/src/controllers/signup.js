@@ -22,6 +22,8 @@ function hashPassword(password){
 
 export default async function postSignup(request, reply){
 
+	console.log("esta entrando!!")
+
 	const db = request.server.db;
 
 	const checkUser = db.prepare("SELECT * FROM users WHERE username = ? OR email = ?");

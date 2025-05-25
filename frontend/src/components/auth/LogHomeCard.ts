@@ -74,31 +74,22 @@ export const LogHomeCard = async (): Promise<HTMLElement> => {
           navigateTo("/signup");
       });
   
-      const googleButton = document.createElement("button");
-      googleButton.textContent = "Sign In with Google";
-      googleButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
-
       div.appendChild(loginButton);
       div.appendChild(signupButton);
 
-      loadGoogleScript()
-      .then(() => {
-        google.accounts.id.initialize({
-          client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
-          callback: googleCallback
-        });
-
-        const googleDiv = document.createElement("div");
-
-        google.accounts.id.renderButton(googleDiv, {
-          theme: "outline",
-          size: "large",
-        });
-        div.appendChild(googleDiv);
-      })
-      .catch((error) => {
-        console.error("Error Loading Google script: ", error);
+      await loadGoogleScript();
+      google.accounts.id.initialize({
+        client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
+        callback: googleCallback
       });
+
+      const googleDiv = document.createElement("div");
+
+      google.accounts.id.renderButton(googleDiv, {
+        theme: "outline",
+        size: "large",
+      });
+      div.appendChild(googleDiv);
     }
 
     return div;  // Mueve esta línea fuera del bloque 'else'

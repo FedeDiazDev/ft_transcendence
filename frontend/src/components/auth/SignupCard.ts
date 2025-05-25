@@ -2,8 +2,8 @@ import { navigateTo } from "../../router.js";
 
 function parseUsername(username: string, errors: string[])
 {
-	if (!/^[a-zA-Z0-9]+$/.test(username)) 
-		errors.push("*Username must contain only letters and numbers")
+	if (/[^a-zA-Z0-9\s.,@!#$%&*()\-_=+]/.test(username))
+		errors.push("*Username contains forbidden characters")
 	if (username.length > 20)
 		errors.push("*Username must be below 20 characters")
 }
