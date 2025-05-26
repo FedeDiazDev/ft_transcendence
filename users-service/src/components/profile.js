@@ -63,6 +63,27 @@ export async function getUser(request, reply) {
     reply.status(200).send({ message: "Usuario encontrado", user: response });
 }
 
+export async function getUserById(request, reply) {
+    const id = request.params.id;
+    const db = request.server.db;
+    const query = db.prepare("SELECT * FROM users WHERE id = ?");
+    let response;
+    try {
+        response = query.get(id);
+    } catch (error) {
+        const dbError = new Error("Error al consultar la base de datos");
+        dbError.statusCode = 500;
+        throw dbError;
+    }
+
+    if (!response) {
+        const error = new Error("Usuario no existe");
+        error.statusCode = 400;
+        throw error;
+    }
+    reply.status(200).send({ message: "Usuario encontrado", user: response });
+}
+
 export async function updateProfileText(request, reply) {
     let payload;
     try {

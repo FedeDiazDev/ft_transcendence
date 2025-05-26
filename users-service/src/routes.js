@@ -1,4 +1,4 @@
-import { getUser, updateProfileText, updateAvatar } from './components/profile.js'
+import { getUser, updateProfileText, updateAvatar, getUserById } from './components/profile.js'
 import { addFriend, deleteFiend, getFriends, searchUsersByName } from "./components/friends.js";
 
 const registerOpts = {
@@ -15,6 +15,7 @@ const registerOpts = {
 
 export default function routes(fastify) {
 	fastify.get("/api/users/getUser", getUser);
+	fastify.get("/api/users/getUserById/:id", getUserById);
 	fastify.post("/api/users/updateProfileText", updateProfileText);
 	fastify.post('/api/users/updateAvatar', updateAvatar);
 	fastify.get("/api/users/getFriends", getFriends);

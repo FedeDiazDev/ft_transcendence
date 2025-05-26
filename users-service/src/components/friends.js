@@ -30,7 +30,7 @@ export async function getFriends(request, reply) {
     }
     try {
         const query = db.prepare(`
-            SELECT users.id, users.username
+            SELECT users.id, users.username, users.avatar_blob
             FROM friends
             JOIN users ON friends.friend_id = users.id
             WHERE friends.user_id = (SELECT id FROM users WHERE username = ?)
