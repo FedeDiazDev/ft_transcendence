@@ -5,6 +5,7 @@ import ws from '@fastify/websocket'
 import matchmakingSockets from './websockets/matchmaking.js';
 import gameLogic from './websockets/game.js';
 import dbConnector from './database.js';
+import tournamentLogic from './websockets/tournament.js';
 
 
 const opts = {
@@ -38,6 +39,7 @@ async function startServer(){
 		await fastify.register(ws);
 		await fastify.register(matchmakingSockets);
 		await fastify.register(gameLogic);
+		await fastify.register(tournamentLogic);
 		await fastify.listen(connectOptions, serverError);
 	}catch(error){
 		fastify.log.error(error);

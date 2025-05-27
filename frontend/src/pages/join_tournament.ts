@@ -1,5 +1,6 @@
 import { openTournaments, registerPlayer } from "../api/game/tournamentAPI.js";
-
+import { fetchUserData } from "../hooks/fetchUserData.js";
+import { joinSocket } from "../sockets/tournamentSocket.js"
 export const JoinTournament = () => {
 	const container = document.createElement("div");
 	container.className =
@@ -49,6 +50,9 @@ export const JoinTournament = () => {
                         console.error(response.error);
                     }
 					console.log(`Unirse al torneo con ID: ${tournament.id}`);
+					fetchUserData((user) => {
+						joinSocket(user.username, "join", tournament.id);
+					})
                     console.log("Unido al torneo correctamente");
 				});
 

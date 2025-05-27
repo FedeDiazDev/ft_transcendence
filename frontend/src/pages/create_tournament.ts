@@ -1,5 +1,7 @@
 import { navigateTo } from "../router.js";
 import { createTournament } from "../api/game/tournamentAPI.js"
+import { joinSocket } from "../sockets/tournamentSocket.js";
+import { fetchUserData } from "../hooks/fetchUserData.js";
 
 export const CreateTournament = () => {
 	const container = document.createElement("div");
@@ -57,12 +59,17 @@ export const CreateTournament = () => {
 		try {
 
 			const response = await createTournament(name, number_participants);
-			if (response.error){
+			if (response.error) {
 				console.error(response.error);
 				return;
 			}
+			console.log(response);
 			console.log("Torneo creado correctamente");
-		}catch(error){
+			fetchUserData((user) => {
+				joinSocket(user.username, "create", response.tournamentState.id, number_participants);
+				
+			})
+		} catch (error) {
 			console.error("Error creating tournnament");
 		}
 		// try {
