@@ -51,8 +51,7 @@ async function tournamentLogic(fastify, opts) {
                     console.log("TORNEOS", tournaments);
                     tournament.matches.forEach((pair, index) => {
                         const matchId = `match_${index}_${Date.now()}`;
-                        const [player1, player2] = pair;
-
+                        const [player1, player2] = pair;                        
                         const data = JSON.stringify({
                             action: "start_match",
                             matchId,

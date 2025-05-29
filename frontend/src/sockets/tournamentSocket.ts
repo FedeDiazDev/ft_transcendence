@@ -10,6 +10,14 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
         }
     };
 
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log("DATA: ", event.data);
+        if (data === "start_match"){
+            console.log("Tu ponente será: ", data.opponent)
+        }
+    }
+
     socket.onerror = () => {
         console.error("[error] en WebSocket joinSocket");
     };
