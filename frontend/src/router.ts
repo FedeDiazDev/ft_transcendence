@@ -11,6 +11,7 @@ import { fetchUserData } from "./hooks/fetchUserData.js";
 import { statusSocket } from "./sockets/statusSocket.js";
 import { QRCode } from "./pages/qrcode.js"
 import { TwoFALogin } from "./pages/twofalogin.js"
+import "./interceptFetch.js"
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,

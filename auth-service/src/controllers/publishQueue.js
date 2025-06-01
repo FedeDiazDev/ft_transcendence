@@ -1,5 +1,4 @@
 import amqp from "amqplib";
-import dotenv from "dotenv";
 
 export default async function publishUserRegisteredEvent(username) {
 
@@ -7,7 +6,7 @@ export default async function publishUserRegisteredEvent(username) {
 	const RABBITMQ_PASS = process.env.RABBITMQ_DEFAULT_PASS;
 	const RABBITMQ_HOST = 'rabbitmq';
 
-    const connection = await amqp.connect(`amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@${RABBITMQ_HOST}`);
+  const connection = await amqp.connect(`amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@${RABBITMQ_HOST}`);
 	const channel = await connection.createChannel();
 	const queue = "user.registered";
 
