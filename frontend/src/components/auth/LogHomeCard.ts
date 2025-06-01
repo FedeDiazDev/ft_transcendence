@@ -15,7 +15,7 @@ async function googleCallback(response : any)
 
 		localStorage.setItem("username", data.username);
 		localStorage.setItem("email", data.email);
-		localStorage.setItem("authToken", data.token);
+		localStorage.setItem("authToken", data.token.accessToken);
 
 		navigateTo("/");
 	}
