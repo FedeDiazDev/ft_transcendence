@@ -34,15 +34,15 @@ async function tournamentLogic(fastify, opts) {
                 }
                 else if (data.action === "join") {
                     console.warn("JOOOIN");
-                    if (!tournaments[tournamentId]){
+                    if (!tournaments[tournamentId]) {
                         console.error("No se ha encontrado dicho torneo");
-                        return ;
+                        return;
                     }
                     const tournament = tournaments[tournamentId];
                     tournament.players.push({ username: data.username, tournamentId: data.tournamentId, socket });
                     if (tournament.players.length < tournament.number_players) {
                         console.log(`Jugadores: ${tournament.players.length}/${tournament.number_players}`)
-                        return ;
+                        return;
                     }
                     console.log("Empezando emparejamientos...");
                     shuffle(tournament.players);
@@ -50,19 +50,26 @@ async function tournamentLogic(fastify, opts) {
                     tournament.matches = pairPlayers(tournament.players);
                     console.log("TORNEOS", tournaments);
                     tournament.matches.forEach((pair, index) => {
+                        const gameState = {
+                            roomId: matchId,
+                            player1: player1.username,
+                            player2: player2.username,
+                            ball: { x: 0, y: 0, speedX: 1, speedY: 1 },
+                            score: { [player1.username]: 0, [player2.username]: 0 }
+                        };
                         const matchId = `match_${index}_${Date.now()}`;
-                        const [player1, player2] = pair;                        
-                        const data = JSON.stringify({
+                        const [player1, player2] = pair;
+                        player1.socket.send(JSON.stringify({
                             action: "start_match",
                             matchId,
-                            opponent: player2.username
-                        });
-                        player1.socket.send(data);
-
+                            opponent: player2.username,
+                            gameState
+                        }));
                         player2.socket.send(JSON.stringify({
                             action: "start_match",
                             matchId,
-                            opponent: player1.username
+                            opponent: player1.username,
+                            gameState
                         }));
                     });
                 }
