@@ -21,6 +21,7 @@ async function tournamentLogic(fastify, opts) {
         fastify.get('/api/game/tournament_logic', { websocket: true }, (socket, req) => {
             socket.on('message', message => {
                 const data = JSON.parse(message);
+                console.log("Data: ", data)
                 const tournamentId = data.tournamentId;
                 if (data.action === "create_tournament") {
                     if (!tournaments[tournamentId]) {
@@ -43,22 +44,44 @@ async function tournamentLogic(fastify, opts) {
                     if (tournament.players.length < tournament.number_players) {
                         console.log(`Jugadores: ${tournament.players.length}/${tournament.number_players}`)
                         return;
-                    }
+                    }                    
                     console.log("Empezando emparejamientos...");
                     shuffle(tournament.players);
                     //console.log(players);
                     tournament.matches = pairPlayers(tournament.players);
                     console.log("TORNEOS", tournaments);
                     tournament.matches.forEach((pair, index) => {
-                        const gameState = {
-                            roomId: matchId,
-                            player1: player1.username,
-                            player2: player2.username,
-                            ball: { x: 0, y: 0, speedX: 1, speedY: 1 },
-                            score: { [player1.username]: 0, [player2.username]: 0 }
-                        };
                         const matchId = `match_${index}_${Date.now()}`;
                         const [player1, player2] = pair;
+                        const gameState = {
+                            roomId: matchId,
+                            status: "playing",
+                            ball: { x: 0, y: 0 },
+                            paddles: {
+                                left: {
+                                    player: "left",
+                                    playerId: 1,
+                                    x: 10,
+                                    y: 100,
+                                    width: 10,
+                                    height: 100,
+                                    speed: 5
+                                },
+                                right: {
+                                    player: "right",
+                                    playerId: 2,
+                                    x: 780,
+                                    y: 100,
+                                    width: 10,
+                                    height: 100,
+                                    speed: 5
+                                }
+                            },
+                            points: 0,
+                            leftPoints: 0,
+                            rightPoints: 0
+                        };
+                        
                         player1.socket.send(JSON.stringify({
                             action: "start_match",
                             matchId,
