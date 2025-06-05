@@ -116,8 +116,6 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
             };
             loop();
         };
-        // const id = localStorage.getItem("id");
-        //console.log("State", gameState);
         const updateGameState = (newState: any) => {
             const { gameState: receivedGameState, player1Name, player2Name } = newState;
             gameState = { ...gameState, ...receivedGameState };

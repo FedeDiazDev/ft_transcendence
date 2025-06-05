@@ -80,18 +80,19 @@ async function tournamentLogic(fastify, opts) {
                             points: 0,
                             leftPoints: 0,
                             rightPoints: 0
-                        };
-                        
+                        };                      
                         player1.socket.send(JSON.stringify({
                             action: "start_match",
                             matchId,
                             opponent: player2.username,
+                            players: [player1.username, player2.username],
                             gameState
                         }));
                         player2.socket.send(JSON.stringify({
                             action: "start_match",
                             matchId,
                             opponent: player1.username,
+                            players: [player1.username, player2.username],
                             gameState
                         }));
                     });
