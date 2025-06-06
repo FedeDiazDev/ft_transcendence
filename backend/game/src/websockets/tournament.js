@@ -44,58 +44,63 @@ async function tournamentLogic(fastify, opts) {
                     if (tournament.players.length < tournament.number_players) {
                         console.log(`Jugadores: ${tournament.players.length}/${tournament.number_players}`)
                         return;
-                    }                    
+                    }
                     console.log("Empezando emparejamientos...");
                     shuffle(tournament.players);
                     //console.log(players);
                     tournament.matches = pairPlayers(tournament.players);
                     console.log("TORNEOS", tournaments);
                     tournament.matches.forEach((pair, index) => {
-                        const matchId = `match_${index}_${Date.now()}`;
+                        const matchId = `match_${index}_${player1.username}_vs_${player2.username}_${Date.now()}`;
                         const [player1, player2] = pair;
-                        const gameState = {
+
+                        // Crea un nuevo gameState para esta pareja
+                        const gameState = JSON.parse(JSON.stringify({
                             roomId: matchId,
                             status: "playing",
-                            ball: { x: 0, y: 0 },
+                            ball: { x: 600, y: 300 },
                             paddles: {
                                 left: {
                                     player: "left",
-                                    playerId: 1,
-                                    x: 10,
-                                    y: 100,
-                                    width: 10,
-                                    height: 100,
-                                    speed: 5
+                                    playerId: player1.id,
+                                    x: 0,
+                                    y: 225,
+                                    width: 15,
+                                    height: 150,
+                                    speed: 15
                                 },
                                 right: {
                                     player: "right",
-                                    playerId: 2,
-                                    x: 780,
-                                    y: 100,
-                                    width: 10,
-                                    height: 100,
-                                    speed: 5
+                                    playerId: player2.id,
+                                    x: 1185,
+                                    y: 225,
+                                    width: 15,
+                                    height: 150,
+                                    speed: 15
                                 }
                             },
                             points: 0,
                             leftPoints: 0,
                             rightPoints: 0
-                        };                      
-                        player1.socket.send(JSON.stringify({
+                        }));
+
+                        const payload = {
                             action: "start_match",
                             matchId,
                             opponent: player2.username,
                             players: [player1.username, player2.username],
                             gameState
-                        }));
-                        player2.socket.send(JSON.stringify({
-                            action: "start_match",
-                            matchId,
+                        };                        
+                        player1.socket.send(JSON.stringify(payload));
+
+                        const payload2 = {
+                            ...payload,
                             opponent: player1.username,
-                            players: [player1.username, player2.username],
-                            gameState
-                        }));
+                        };
+
+                        player2.socket.send(JSON.stringify(payload2));
                     });
+
                 }
             })
         })

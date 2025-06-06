@@ -99,6 +99,8 @@ async function gameLogic(fastify, opts) {
 						});
 					}
 				}
+				//!AAAAAAAAAAAAAAAAAAAAA
+				//TODO: arrreglar multipls partidas				
 				else if (data.action === "move_paddle") {
 					//console.log(data);
 					if (!game) return;

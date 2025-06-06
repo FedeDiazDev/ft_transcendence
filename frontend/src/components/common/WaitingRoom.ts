@@ -30,7 +30,7 @@ export const WaitingRoom = () => {
             container.className = "flex flex-col items-center justify-center bg-gray-900 text-white";
             score.innerHTML = '0 - 0';
             container.appendChild(score);
-            container.appendChild(GameCanvas(gameState, "online", score));
+            container.appendChild(GameCanvas(gameState, "online", score, Date.now().toString()));
         }, user.id);
     });
 

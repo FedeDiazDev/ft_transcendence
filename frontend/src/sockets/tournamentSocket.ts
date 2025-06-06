@@ -7,7 +7,11 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
         if (action === "create") {
             socket.send(JSON.stringify({ action: "create_tournament", username: username, number_players: nb_players, tournamentId: tournamentId }))
         } else if (action === "join") {
-            socket.send(JSON.stringify({ action: "join", username: username, tournamentId: tournamentId }))
+            fetchUserData((user) => {
+                console.log("ID:", user.id);
+            socket.send(JSON.stringify({ action: "join", username: username, tournamentId: tournamentId, userId: user.id }));
+
+            })
         }
     };
 
@@ -29,7 +33,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     const score = document.createElement("p");
                     score.innerText = "0 - 0";
                     container.appendChild(score);
-                    container.appendChild(GameCanvas(data.gameState, "online", score));
+                    container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId));
                 } else {
                     console.log("Este match no es para mí, lo ignoro");
                 }

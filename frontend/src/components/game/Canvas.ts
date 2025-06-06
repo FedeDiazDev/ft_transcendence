@@ -5,7 +5,7 @@ import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement: any) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId : string) => {
 
     // Llamamos a la función para obtener los datos
     const canvas = document.createElement("canvas");
@@ -123,7 +123,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
           };
           
         fetchUserData((user) => {
-            const socket = gameSocket(updateGameState, user.id, user.username);
+            const socket = gameSocket(updateGameState, user.id, user.username, roomId);
             onlineLoop(socket, user.id)
         });
         const renderGame = (player1Name: string, player2Name: string) => {
