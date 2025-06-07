@@ -1,127 +1,139 @@
 import { Game } from "../models/Game.js";
 
-let players = [];
-let game = null;
-let gameLoopRunning = false;
+const games = new Map(); // roomId -> { players: [], game, gameLoopRunning }
 
-function startGameLoop() {
-	if (gameLoopRunning) return;
-	gameLoopRunning = true;
+function startGameLoop(roomId) {
+	const room = games.get(roomId);
+	if (!room || room.gameLoopRunning) return;
+
+	room.gameLoopRunning = true;
 	let gameResultSent = false;
 
 	const interval = setInterval(async () => {
+		const { game, players } = room;
 		game.update();
+
 		if (game.leftPoints === 10 || game.rightPoints === 10) {
 			if (gameResultSent) return;
 			gameResultSent = true;
-			const winnerId = game.leftPoints === 10
-				? game.paddles.left.playerId
-				: game.paddles.right.playerId;
-			const looserPoints = game.leftPoints === 10? game.rightPoints : game.leftPoints;
+
+			const winnerId = game.leftPoints === 10 ? game.paddles.left.playerId : game.paddles.right.playerId;
+			const looserPoints = game.leftPoints === 10 ? game.rightPoints : game.leftPoints;
 			const winnerName = players.find(p => p.id === winnerId)?.name || "Desconocido";
 			const looserName = players.find(p => p.id !== winnerId)?.name || "Desconocido";
 
-			//POST result to stats-service
-			console.log("game over game is: ", game);//game.date
-			console.log("game over game.date is: ", game.date);
-			console.log("game over winnerId is: ", winnerId);
-			console.log("game over winnername is: ", winnerName);
-			console.log("game over looserName is: ", looserName);
-			console.log("game over looserPoints is: ", looserPoints);
-			const response = await fetch("http://stats-service:3000/api/stats/game", {
-				method: 'POST',
-				headers: {
-				  'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-				  winner_username: winnerName,
-				  looser_username: looserName,
-				  looser_points: looserPoints,
-				  game_date: game.date
-				})
-			  });
-			if (!response.ok) {
-				console.error('Error sending game data to stats-service:', response.statusText);
+			try {
+				const response = await fetch("http://stats-service:3000/api/stats/game", {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						winner_username: winnerName,
+						looser_username: looserName,
+						looser_points: looserPoints,
+						game_date: game.date
+					})
+				});
+
+				if (!response.ok) {
+					console.error('Error sending game data to stats-service:', response.statusText);
+				} else {
+					console.log('Game data sent to stats-service successfully');
+				}
+			} catch (err) {
+				console.error("Failed to send game data:", err);
 			}
-			console.log('Game data sent to stats-service successfully');
-			console.log("response from stats container is : ", response);
+
 			players.forEach(player => {
 				player.socket.send(JSON.stringify({
 					type: "game_over",
 					gameState: game,
-					winner: winnerName
+					winner: winnerName,
+					roomId
 				}));
 				player.socket.close();
 			});
 
-			// Reset
 			clearInterval(interval);
-			players = [];
-			game = null;
-			gameLoopRunning = false;
+			games.delete(roomId);
 			return;
 		}
 
 		players.forEach(player => {
-			const gameData = {
+			player.socket.send(JSON.stringify({
 				gameState: game,
 				player1Name: players[0].name,
-				player2Name: players[1].name
-			};
-			player.socket.send(JSON.stringify(gameData));
+				player2Name: players[1].name,
+				roomId
+			}));
 		});
 	}, 1000 / 60);
 }
-
-
 
 async function gameLogic(fastify, opts) {
 	fastify.register(async function (fastify) {
 		fastify.get('/api/game/online_game', { websocket: true }, (socket, req) => {
 			socket.on('message', message => {
 				const data = JSON.parse(message);
-				console.log("data received in socket: ", data);
-				if (data.action === "join_game") {
-					const playerId = data.id;
-					const playerName = data.name;
-					players.push({ id: playerId, name: playerName, socket });
-					if (players.length === 2) {
-						game = new Game(players[0].id, players[1].id);
-						console.log("game created: ", game);
-						game.start();
-						players.forEach(player => {
-							const gameData = {
-								gameState: game,
-								player1Name: players[0].name,
-								player2Name: players[1].name
-							};
-							player.socket.send(JSON.stringify(gameData));
+				console.log("Data received:", data);
+
+				const { action, id, name, roomId, direction } = data;
+
+				if (action === "join_game") {
+					if (!games.has(roomId)) {
+						games.set(roomId, {
+							players: [],
+							game: null,
+							gameLoopRunning: false
 						});
 					}
-				}
-				//!AAAAAAAAAAAAAAAAAAAAA
-				//TODO: arrreglar multipls partidas				
-				else if (data.action === "move_paddle") {
-					//console.log(data);
-					if (!game) return;
-					if (data.id === game.paddles.left.playerId) {
-						game.movePaddle('left', data.direction);
-					} else if (data.id === game.paddles.right.playerId) {
-						game.movePaddle('right', data.direction);
+
+					const room = games.get(roomId);
+					room.players.push({ id, name, socket });
+
+					if (room.players.length === 2) {
+						room.game = new Game(room.players[0].id, room.players[1].id);
+						console.log("Game started in room:", roomId);
+						room.game.start();
+
+						room.players.forEach(player => {
+							player.socket.send(JSON.stringify({
+								gameState: room.game,
+								player1Name: room.players[0].name,
+								player2Name: room.players[1].name,
+								roomId
+							}));
+						});
+
+						startGameLoop(roomId);
 					}
+				}
+
+				else if (action === "move_paddle") {
+					const room = games.get(roomId);
+					if (!room || !room.game) return;
+
+					const { game, players } = room;
+
+					if (id === game.paddles.left.playerId) {
+						game.movePaddle('left', direction);
+					} else if (id === game.paddles.right.playerId) {
+						game.movePaddle('right', direction);
+					}
+
 					players.forEach(player => {
-						const gameData = {
+						player.socket.send(JSON.stringify({
 							gameState: game,
 							player1Name: players[0].name,
-							player2Name: players[1].name
-						};
-						player.socket.send(JSON.stringify(gameData));
+							player2Name: players[1].name,
+							roomId
+						}));
 					});
-					startGameLoop();
+
+					startGameLoop(roomId);
 				}
-			})
-		})
-	})
+			});
+		});
+	});
 }
 
 export default gameLogic;

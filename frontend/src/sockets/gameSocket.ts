@@ -1,12 +1,21 @@
-export const gameSocket = (updateGameState: any, id: number, name: string, roomId : string) => {
-	let socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/online_game");
-	socket.onopen = function (e) {
-		//alert("[open] Conexión establecida.");
-		socket.send(JSON.stringify({ id: id, name: name, roomId: roomId, status: "ready", action: "join_game" }));
-	}
+export const gameSocket = (updateGameState: any, id: number, name: string, roomId: string) => {
+	const socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/online_game");
+
+	socket.onopen = () => {
+		socket.send(JSON.stringify({
+			id,
+			name,
+			roomId: roomId,
+			status: "ready",
+			action: "join_game"
+		}));
+	};
+
 	socket.onmessage = (event) => {
 		const data = JSON.parse(event.data);
-		//console.log(data);
+
+		if (data.roomId && data.roomId !== roomId) return;
+
 		if (data.type === "game_over") {
 			console.log("Partida terminada, ganador:", data.winner);
 			alert(`¡Fin del juego! Ganador: ${data.winner}`);
@@ -15,21 +24,27 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 		if (data.gameState) {
 			updateGameState(data);
 		}
-	}
-	socket.onclose = function (event) {
+	};
+
+	socket.onclose = (event) => {
 		console.log(event.wasClean
 			? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`
 			: '[close] La conexión se cayó en gameSocket');
 	};
 
-	socket.onerror = function (error) {
+	socket.onerror = () => {
 		alert(`[error]`);
-	}
+	};
+
 	return {
 		sendMove: (direction: "up" | "down", id: number) => {
-			socket.send(JSON.stringify({ action: "move_paddle", direction, id: id }));
+			socket.send(JSON.stringify({
+				action: "move_paddle",
+				direction,
+				id,
+				roomId
+			}));
 		},
 		close: () => socket.close()
 	};
-
-}
+};

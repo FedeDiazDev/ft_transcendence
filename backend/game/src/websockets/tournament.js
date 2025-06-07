@@ -51,8 +51,8 @@ async function tournamentLogic(fastify, opts) {
                     tournament.matches = pairPlayers(tournament.players);
                     console.log("TORNEOS", tournaments);
                     tournament.matches.forEach((pair, index) => {
-                        const matchId = `match_${index}_${player1.username}_vs_${player2.username}_${Date.now()}`;
                         const [player1, player2] = pair;
+                        const matchId = `match_${index}_${player1.username}_vs_${player2.username}_${Date.now()}`;
 
                         // Crea un nuevo gameState para esta pareja
                         const gameState = JSON.parse(JSON.stringify({

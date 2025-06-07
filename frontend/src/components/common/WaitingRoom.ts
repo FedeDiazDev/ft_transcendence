@@ -23,14 +23,14 @@ export const WaitingRoom = () => {
     container.appendChild(text);
 
     fetchUserData((user) => {
-        const matchmakingSocket = createMatchmakingSocket((gameState) => {
+        const matchmakingSocket = createMatchmakingSocket((gameState, roomId) => {
             const score = document.createElement("p");
             matchmakingSocket.close();
             container.innerHTML = "";
             container.className = "flex flex-col items-center justify-center bg-gray-900 text-white";
             score.innerHTML = '0 - 0';
             container.appendChild(score);
-            container.appendChild(GameCanvas(gameState, "online", score, Date.now().toString()));
+            container.appendChild(GameCanvas(gameState, "online", score, roomId));
         }, user.id);
     });
 

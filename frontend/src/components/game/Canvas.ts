@@ -106,10 +106,10 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         const onlineLoop = (socket : any, userId : number) => {
             const loop = () => {
                 if (pressedKeys.w || pressedKeys.ArrowUp) {
-                    socket.sendMove("up", userId);
+                    socket.sendMove("up", userId, roomId);
                 }
                 if (pressedKeys.s || pressedKeys.ArrowDown) {
-                    socket.sendMove("down", userId);
+                    socket.sendMove("down", userId, roomId);
                 }
                 draw();
                 requestAnimationFrame(loop);
