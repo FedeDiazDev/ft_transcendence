@@ -1,4 +1,5 @@
 import createWebTokenNoRefresh from "./jwtNoRefresh.js";
+import jwt from "jsonwebtoken";
 
 export default async function refreshToken(request, reply) {
 	const refreshToken = request.cookies?.refreshToken;
@@ -15,6 +16,5 @@ export default async function refreshToken(request, reply) {
 	}
 
 	const accessToken = createWebTokenNoRefresh(payload.username, payload.email);
-
-	return reply.status(200).send({ accessToken });
+	return reply.status(200).send(accessToken);
 }

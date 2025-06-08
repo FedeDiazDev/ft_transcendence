@@ -9,9 +9,6 @@ export async function getUserStats() {
 
         const response = await fetch("https://" + window.location.hostname + ":8080/api/stats/user", {
             method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
         });
 
         if (!response.ok) {
