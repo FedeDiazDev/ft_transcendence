@@ -43,6 +43,19 @@ function startGameLoop(roomId) {
 				console.error("Failed to send game data:", err);
 			}
 
+			const tournamentInfo = room.tournamentInfo;
+			console.log("ROOOOM: ")
+			console.log(room);
+			if (tournamentInfo && tournamentInfo.socket) {
+				console.log("INFOOOODELTORNEO")
+				tournamentInfo.socket.send(JSON.stringify({
+					action: "report_winner",
+					tournamentId: tournamentInfo.tournamentId,
+					round: tournamentInfo.round,
+					winner: winnerName
+				}));
+			}
+			
 			players.forEach(player => {
 				player.socket.send(JSON.stringify({
 					type: "game_over",
@@ -57,7 +70,6 @@ function startGameLoop(roomId) {
 			games.delete(roomId);
 			return;
 		}
-
 		players.forEach(player => {
 			player.socket.send(JSON.stringify({
 				gameState: game,
@@ -83,7 +95,8 @@ async function gameLogic(fastify, opts) {
 						games.set(roomId, {
 							players: [],
 							game: null,
-							gameLoopRunning: false
+							gameLoopRunning: false,
+							tournamentInfo: data.tournamentInfo || null,							
 						});
 					}
 

@@ -1,4 +1,4 @@
-export const gameSocket = (updateGameState: any, id: number, name: string, roomId: string) => {
+export const gameSocket = (updateGameState: any, id: number, name: string, roomId: string, tournamentInfo : any) => {
 	const socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/online_game");
 
 	socket.onopen = () => {
@@ -7,7 +7,8 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 			name,
 			roomId: roomId,
 			status: "ready",
-			action: "join_game"
+			action: "join_game",
+			tournamentInfo: tournamentInfo ?? undefined
 		}));
 	};
 

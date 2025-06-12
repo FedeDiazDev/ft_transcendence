@@ -29,9 +29,9 @@ async function tournamentLogic(fastify, opts) {
                             number_players: data.number_players,
                             players: [],
                             matches: [],
-                            round: 1,                    // ✅ NUEVO
-                            winners: [],                 // ✅ NUEVO
-                            status: "waiting"            // ✅ NUEVO
+                            round: 1,        
+                            winners: [],     
+                            status: "waiting"
                         };
                     }
                     return;
@@ -43,8 +43,7 @@ async function tournamentLogic(fastify, opts) {
 
                     tournament.players.push({ username: data.username, socket });
                     if (tournament.players.length < tournament.number_players) return;
-
-                    // ✅ Comienza torneo: ronda 1
+                    
                     shuffle(tournament.players);
                     tournament.matches = pairPlayers(tournament.players);
                     tournament.status = "playing";
@@ -80,9 +79,11 @@ async function tournamentLogic(fastify, opts) {
                     });
                     return;
                 }
-
-                // ✅ NUEVA LÓGICA: cuando se recibe un ganador
-                if (data.action === "report_winner") {
+                
+                if (data.action === "report_winner" || data.action === "tournament_match_finished") {
+                    console.log("                                                      ")
+                    console.log("ENTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                    console.log("                                                      ")
                     const tournament = tournaments[tournamentId];
                     if (!tournament || tournament.status === "finished") return;
 
@@ -97,8 +98,7 @@ async function tournamentLogic(fastify, opts) {
                     tournament.winners.push(winner);
                     const expectedWinners = tournament.number_players / Math.pow(2, tournament.round);
 
-                    if (tournament.winners.length === expectedWinners) {
-                        // ✅ Comenzar siguiente ronda o terminar torneo
+                    if (tournament.winners.length === expectedWinners) {                        
                         if (expectedWinners === 1) {
                             tournament.status = "finished";
                             const champion = tournament.winners[0];
@@ -111,8 +111,7 @@ async function tournamentLogic(fastify, opts) {
                             });
                             return;
                         }
-
-                        // ✅ Siguiente ronda
+                        
                         tournament.round += 1;
                         tournament.players = tournament.players.filter(p =>
                             tournament.winners.includes(p.username)
@@ -141,14 +140,21 @@ async function tournamentLogic(fastify, opts) {
                             const payload = {
                                 action: "start_match",
                                 matchId,
-                                round: tournament.round,
-                                tournamentId,
+								opponent: player2.username,
                                 players: [player1.username, player2.username],
-                                gameState
+                                gameState,
+                                tournamentInfo: {
+                                    tournamentId: tournamentId,
+                                    round: tournament.round,                                    
+                                }
                             };
-
+                            const payload2 = {
+                                ...payload,
+                                opponent: player1.username
+                            };
+                            
                             player1.socket.send(JSON.stringify({ ...payload, opponent: player2.username }));
-                            player2.socket.send(JSON.stringify({ ...payload, opponent: player1.username }));
+                            player2.socket.send(JSON.stringify({ ...payload2, opponent: player1.username }));
                         });
                     }
                 }
