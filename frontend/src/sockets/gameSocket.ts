@@ -2,13 +2,15 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 	const socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/online_game");
 
 	socket.onopen = () => {
+		console.log("Enviando gameSocket con tournamentInfo:", tournamentInfo);
+
 		socket.send(JSON.stringify({
 			id,
 			name,
 			roomId: roomId,
 			status: "ready",
 			action: "join_game",
-			tournamentInfo: tournamentInfo ?? undefined
+			tournamentInfo: tournamentInfo
 		}));
 	};
 

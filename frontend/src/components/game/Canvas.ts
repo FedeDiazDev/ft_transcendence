@@ -123,6 +123,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
           };
           
         fetchUserData((user) => {
+            console.log("Enviando join_game con tournamentInfo:", tournamentInfo);
             const socket = gameSocket(updateGameState, user.id, user.username, roomId, tournamentInfo);
             onlineLoop(socket, user.id)
         });

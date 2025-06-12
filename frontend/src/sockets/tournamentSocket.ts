@@ -9,7 +9,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
         } else if (action === "join") {
             fetchUserData((user) => {
                 console.log("ID:", user.id);
-            socket.send(JSON.stringify({ action: "join", username: username, tournamentId: tournamentId, userId: user.id }));
+                socket.send(JSON.stringify({ action: "join", username: username, tournamentId: tournamentId, userId: user.id }));
 
             })
         }
@@ -18,14 +18,20 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         console.log("DATA: ", data);
-    
+
         switch (data.action) {
             case "start_match":
+                if (!data.tournamentInfo && data.tournamentId && data.round) {
+                    data.tournamentInfo = {
+                        tournamentId: data.tournamentId,
+                        round: data.round,
+                    };
+                }
                 fetchUserData((user) => {
                     if (data.players.includes(user.username)) {
                         container.innerHTML = "";
                         container.className = "flex flex-col items-center justify-center h-screen bg-gray-900 text-white";
-    
+
                         const score = document.createElement("p");
                         score.innerText = "0 - 0";
                         container.appendChild(score);
@@ -33,38 +39,38 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     }
                 });
                 break;
-    
+
             case "tournament_match_finished":
                 container.innerHTML = "";
                 const waitMsg = document.createElement("p");
                 waitMsg.innerText = "Esperando siguiente ronda...";
                 container.appendChild(waitMsg);
                 break;
-    
+
             case "tournament_ended":
                 container.innerHTML = "";
                 const resultMsg = document.createElement("h2");
                 resultMsg.innerText = data.message || "¡El torneo ha terminado!";
                 container.appendChild(resultMsg);
                 break;
-    
+
             case "waiting_players":
                 container.innerHTML = "";
                 const waiting = document.createElement("p");
                 waiting.innerText = `Jugadores unidos: ${data.joined}/${data.required}`;
                 container.appendChild(waiting);
                 break;
-    
+
             // case "game_over":
             //     // opcional
             //     break;
-    
+
             default:
                 console.warn("Acción no reconocida:", data.action);
                 break;
         }
     };
-    
+
 
     socket.onerror = () => {
         console.error("[error] en WebSocket joinSocket");

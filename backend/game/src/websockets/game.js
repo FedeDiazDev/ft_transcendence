@@ -1,6 +1,6 @@
 import { Game } from "../models/Game.js";
 
-const games = new Map(); // roomId -> { players: [], game, gameLoopRunning }
+const games = new Map();
 
 function startGameLoop(roomId) {
 	const room = games.get(roomId);
@@ -55,7 +55,7 @@ function startGameLoop(roomId) {
 					winner: winnerName
 				}));
 			}
-			
+
 			players.forEach(player => {
 				player.socket.send(JSON.stringify({
 					type: "game_over",
@@ -91,18 +91,24 @@ async function gameLogic(fastify, opts) {
 				const { action, id, name, roomId, direction } = data;
 
 				if (action === "join_game") {
+					console.log("Mensaje recibido en game-service:", data);
 					if (!games.has(roomId)) {
+						const tournamentInfo = data.tournamentInfo || null;
+						if (tournamentInfo) {
+							tournamentInfo.socket = socket;
+						}
+						console.log("Guardando room con tournamentInfo:", tournamentInfo);
 						games.set(roomId, {
 							players: [],
 							game: null,
 							gameLoopRunning: false,
-							tournamentInfo: data.tournamentInfo || null,							
+							tournamentInfo: tournamentInfo,
 						});
-					}
+						console.log("Room guardado:", games.get(roomId));
 
+					}
 					const room = games.get(roomId);
 					room.players.push({ id, name, socket });
-
 					if (room.players.length === 2) {
 						room.game = new Game(room.players[0].id, room.players[1].id);
 						console.log("Game started in room:", roomId);
