@@ -1,5 +1,4 @@
 function shuffle(array) {
-
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
@@ -17,94 +16,145 @@ function pairPlayers(players) {
 
 async function tournamentLogic(fastify, opts) {
     const tournaments = {};
+
     fastify.register(async function (fastify) {
         fastify.get('/api/game/tournament_logic', { websocket: true }, (socket, req) => {
             socket.on('message', message => {
                 const data = JSON.parse(message);
-                console.log("Data: ", data)
                 const tournamentId = data.tournamentId;
+
                 if (data.action === "create_tournament") {
                     if (!tournaments[tournamentId]) {
                         tournaments[tournamentId] = {
                             number_players: data.number_players,
                             players: [],
-                            matches: []
+                            matches: [],
+                            round: 1,                    // ✅ NUEVO
+                            winners: [],                 // ✅ NUEVO
+                            status: "waiting"            // ✅ NUEVO
                         };
                     }
-                    console.log("TORNEOS", tournaments);
+                    return;
                 }
-                else if (data.action === "join") {
-                    console.warn("JOOOIN");
-                    if (!tournaments[tournamentId]) {
-                        console.error("No se ha encontrado dicho torneo");
-                        return;
-                    }
+
+                if (data.action === "join") {
                     const tournament = tournaments[tournamentId];
-                    tournament.players.push({ username: data.username, tournamentId: data.tournamentId, socket });
-                    if (tournament.players.length < tournament.number_players) {
-                        console.log(`Jugadores: ${tournament.players.length}/${tournament.number_players}`)
-                        return;
-                    }
-                    console.log("Empezando emparejamientos...");
+                    if (!tournament) return;
+
+                    tournament.players.push({ username: data.username, socket });
+                    if (tournament.players.length < tournament.number_players) return;
+
+                    // ✅ Comienza torneo: ronda 1
                     shuffle(tournament.players);
-                    //console.log(players);
                     tournament.matches = pairPlayers(tournament.players);
-                    console.log("TORNEOS", tournaments);
+                    tournament.status = "playing";
+
                     tournament.matches.forEach((pair, index) => {
                         const [player1, player2] = pair;
                         const matchId = `match_${index}_${player1.username}_vs_${player2.username}_${Date.now()}`;
 
-                        // Crea un nuevo gameState para esta pareja
-                        const gameState = JSON.parse(JSON.stringify({
+                        const gameState = {
                             roomId: matchId,
                             status: "playing",
                             ball: { x: 600, y: 300 },
                             paddles: {
-                                left: {
-                                    player: "left",
-                                    playerId: player1.id,
-                                    x: 0,
-                                    y: 225,
-                                    width: 15,
-                                    height: 150,
-                                    speed: 15
-                                },
-                                right: {
-                                    player: "right",
-                                    playerId: player2.id,
-                                    x: 1185,
-                                    y: 225,
-                                    width: 15,
-                                    height: 150,
-                                    speed: 15
-                                }
+                                left: { player: "left", x: 0, y: 225, width: 15, height: 150, speed: 15 },
+                                right: { player: "right", x: 1185, y: 225, width: 15, height: 150, speed: 15 }
                             },
                             points: 0,
                             leftPoints: 0,
                             rightPoints: 0
-                        }));
+                        };
 
                         const payload = {
                             action: "start_match",
                             matchId,
-                            opponent: player2.username,
+                            round: 1,
+                            tournamentId,
                             players: [player1.username, player2.username],
                             gameState
-                        };                        
-                        player1.socket.send(JSON.stringify(payload));
-
-                        const payload2 = {
-                            ...payload,
-                            opponent: player1.username,
                         };
 
-                        player2.socket.send(JSON.stringify(payload2));
+                        player1.socket.send(JSON.stringify({ ...payload, opponent: player2.username }));
+                        player2.socket.send(JSON.stringify({ ...payload, opponent: player1.username }));
                     });
-
+                    return;
                 }
-            })
-        })
-    })
+
+                // ✅ NUEVA LÓGICA: cuando se recibe un ganador
+                if (data.action === "report_winner") {
+                    const tournament = tournaments[tournamentId];
+                    if (!tournament || tournament.status === "finished") return;
+
+                    const round = data.round;
+                    const winner = data.winner;
+
+                    if (round !== tournament.round) {
+                        console.warn(`Ganador de ronda antigua ignorado`);
+                        return;
+                    }
+
+                    tournament.winners.push(winner);
+                    const expectedWinners = tournament.number_players / Math.pow(2, tournament.round);
+
+                    if (tournament.winners.length === expectedWinners) {
+                        // ✅ Comenzar siguiente ronda o terminar torneo
+                        if (expectedWinners === 1) {
+                            tournament.status = "finished";
+                            const champion = tournament.winners[0];
+                            tournament.players.forEach(p => {
+                                p.socket.send(JSON.stringify({
+                                    action: "tournament_winner",
+                                    winner: champion,
+                                    tournamentId
+                                }));
+                            });
+                            return;
+                        }
+
+                        // ✅ Siguiente ronda
+                        tournament.round += 1;
+                        tournament.players = tournament.players.filter(p =>
+                            tournament.winners.includes(p.username)
+                        );
+                        tournament.winners = [];
+                        shuffle(tournament.players);
+                        tournament.matches = pairPlayers(tournament.players);
+
+                        tournament.matches.forEach((pair, index) => {
+                            const [player1, player2] = pair;
+                            const matchId = `match_${index}_${player1.username}_vs_${player2.username}_${Date.now()}`;
+
+                            const gameState = {
+                                roomId: matchId,
+                                status: "playing",
+                                ball: { x: 600, y: 300 },
+                                paddles: {
+                                    left: { player: "left", x: 0, y: 225, width: 15, height: 150, speed: 15 },
+                                    right: { player: "right", x: 1185, y: 225, width: 15, height: 150, speed: 15 }
+                                },
+                                points: 0,
+                                leftPoints: 0,
+                                rightPoints: 0
+                            };
+
+                            const payload = {
+                                action: "start_match",
+                                matchId,
+                                round: tournament.round,
+                                tournamentId,
+                                players: [player1.username, player2.username],
+                                gameState
+                            };
+
+                            player1.socket.send(JSON.stringify({ ...payload, opponent: player2.username }));
+                            player2.socket.send(JSON.stringify({ ...payload, opponent: player1.username }));
+                        });
+                    }
+                }
+            });
+        });
+    });
 }
 
 export default tournamentLogic;
