@@ -8,8 +8,8 @@ export const Input = (type: string = "text", value: string = "", placeholder?: s
     input.placeholder = placeholder;
   }
 
-  input.className = `p-2 border rounded-lg focus:outline-none transition ${
-    editable ? "bg-white focus:ring-2 focus:ring-blue-500" : "bg-gray-200 cursor-not-allowed"
+  input.className = `p-2 rounded-lg focus:outline-none transition bg-white focus:ring-2 focus:ring-blue-500 border text-gray-900 ${
+    !editable && "cursor-default"
   }`;
 
   input.addEventListener("input", () => {

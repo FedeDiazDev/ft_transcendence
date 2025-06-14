@@ -30,7 +30,7 @@ export async function getFriends(request, reply) {
     }
     try {
         const query = db.prepare(`
-            SELECT users.id, users.username
+            SELECT users.id, users.username, users.avatar_blob
             FROM friends
             JOIN users ON friends.friend_id = users.id
             WHERE friends.user_id = (SELECT id FROM users WHERE username = ?)
@@ -60,13 +60,34 @@ export async function addFriend(request, reply) {
         return reply.status(400).send({ error: "Falta el username" });
     }
     try {
+        // First check if trying to add self as friend
+        const selfCheckQuery = db.prepare("SELECT id FROM users WHERE username = ?");
+        const userResult = selfCheckQuery.get(username);
+        
+        if (userResult.id === request.body.friendId) {
+            return reply.status(400).send({ error: "No puedes agregarte a ti mismo como amigo" });
+        }
+
+        // Then check if the friendship already exists
+        const checkQuery = db.prepare(`
+            SELECT COUNT(*) as count 
+            FROM friends 
+            WHERE user_id = (SELECT id FROM users WHERE username = ?) 
+            AND friend_id = ?
+        `);
+        const result = checkQuery.get(username, request.body.friendId);
+        
+        if (result.count > 0) {
+            return reply.status(400).send({ error: "Ya tienes a este usuario como amigo" });
+        }
+
+        // If all checks pass, add the friend
         const query = db.prepare("INSERT INTO friends (user_id, friend_id) VALUES((SELECT id FROM users WHERE username = ?), ?);");
         query.run(username, request.body.friendId);
         reply.status(200).send({ message: "Friend added" });
     } catch (error) {
         reply.status(500).send({ error: "Error al agregar el amigo." });
     }
-
 }
 
 
@@ -101,13 +122,25 @@ export async function searchUsersByName(request, reply) {
     if (!searchText || searchText.trim() === "") {
         return reply.status(400).send({ error: "Texto de búsqueda vacío" });
     }
+
+    // Get the logged-in username
+    const username = getUsername(request, reply);
+    if (!username) {
+        return reply.status(400).send({ error: "Falta el username" });
+    }
+
     try {
-        const query = db.prepare("SELECT id, username FROM users WHERE username LIKE ?");
-        const results = query.all(`%${searchText}%`);
+        // Modified query to exclude the logged-in user
+        const query = db.prepare(`
+            SELECT id, username 
+            FROM users 
+            WHERE username LIKE ? 
+            AND username != ?
+        `);
+        const results = query.all(`%${searchText}%`, username);
         reply.status(200).send({ results })
     } catch (error) {
         reply.status(500).send({ error: "Error en la búsqueda" });
     }
-
 }
 

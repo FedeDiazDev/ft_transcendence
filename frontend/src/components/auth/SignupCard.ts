@@ -1,5 +1,35 @@
 import { navigateTo } from "../../router.js";
 
+function parseUsername(username: string, errors: string[])
+{
+	if (/[^a-zA-Z0-9\s.,@!#$%&*()\-_=+]/.test(username))
+		errors.push("*Username contains forbidden characters")
+	if (username.length > 20)
+		errors.push("*Username must be below 20 characters")
+}
+
+function parseEmail(email: string, errors: string[])
+{
+	if (!/^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/.test(email))
+		errors.push("*Incorrect email format");
+}
+
+function parsePassword(password: string, errors: string[])
+{
+	if (password.length < 8 || password.length > 20)
+		errors.push("*Password must be between 8 and 20 characters");
+	if (!/[A-Za-z]/.test(password))
+		errors.push("*Password must contain at least one letter");
+	if (!/\d/.test(password))
+		errors.push("*Password must contain at least one number");
+}
+
+function parseCheckPwd(password: string, confirmPassword: string, errors: string[])
+{
+	if (password !== confirmPassword)
+		errors.push("*Confirm Password does not match");
+}
+
 function parseFront(sendData: { username?: string, email?: string, password?: string, confirmPassword?: string }) {
 
 	let errors: string[] = [];
@@ -8,21 +38,18 @@ function parseFront(sendData: { username?: string, email?: string, password?: st
 		errors.push("*All fields must be filled");
 		return errors;
 	}
-	if (sendData.username && !/^[a-zA-Z0-9]+$/.test(sendData.username))
-		errors.push("*Incorrect username format");
-	if (sendData.password && sendData.password !== sendData.confirmPassword)
-		errors.push("*Confirm Password does not match");
-	if (sendData.password && !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d ]{8,}$/.test(sendData.password))
-		errors.push("*Incorrect password format");
-	if (sendData.email && !/^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/.test(sendData.email))
-		errors.push("*Incorrect email format");
+	parseUsername(sendData.username, errors);
+	parseEmail(sendData.email, errors);
+	parsePassword(sendData.password, errors);
+	parseCheckPwd(sendData.password, sendData.confirmPassword, errors);
+
 	return errors;
 }
 
 function showErrors(frontErrors: string[], errorDiv: HTMLDivElement) {
 	for (let i = 0; i < frontErrors.length; i++) {
 		const newDiv = document.createElement("div");
-		newDiv.className = "text-sm mt-2 h-6 text-red-400";
+		newDiv.className = "text-sm mt-2 mb-2 text-red-400";
 		newDiv.textContent = frontErrors[i];
 		errorDiv.appendChild(newDiv);
 	}
@@ -44,14 +71,14 @@ function clickOnButtonSignup(button: HTMLButtonElement, names: string[], errorDi
 			"confirmPassword": inputs[3]
 		}
 
-		localStorage.setItem("username", inputs[0].trim());
-		localStorage.setItem("email", inputs[1].trim());
 
 		let frontErrors: string[] = parseFront(sendData);
 
 		showErrors(frontErrors, errorDiv);
 
 		if (frontErrors.length === 0) {
+			localStorage.setItem("username", inputs[0].trim());
+			localStorage.setItem("email", inputs[1].trim());
 			fetchSignup(sendData, errorDiv);
 		}
 	});

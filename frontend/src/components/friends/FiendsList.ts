@@ -20,8 +20,9 @@ export const FriendList = async () => {
 			container.appendChild(noFriendsMessage);
 			return container;
 		}
-		response.forEach(({ username, id }: UserI) => {
-			const { element, statusDot } = Friend("https://dummyimage.com/128x72/fff/aaa", username, false, id);
+		response.forEach(({ username, id, avatar_blob }: UserI) => {
+			console.log("Friend data:", { username, id, avatar_blob });
+			const { element, statusDot } = Friend(avatar_blob || "https://dummyimage.com/128x72/fff/aaa", username, false, id);
 			statusDots.set(id, statusDot);
 			container.appendChild(element);
 		});		
