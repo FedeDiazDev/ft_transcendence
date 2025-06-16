@@ -6,16 +6,12 @@ function shuffle(array) {
     return array;
 }
 
-function pairPlayers(players) {
-    let matches = [];
-    for (let i = 0; i < players.length; i += 2) {
-        matches.push([players[i], players[i + 1]]);
-    }
-    return matches;
-}
+export const tournaments = new Map();
+export const tournamentSockets = new Map();
+
 
 async function tournamentLogic(fastify, opts) {
-    const tournaments = {};
+  
 
     fastify.register(async function (fastify) {
         fastify.get('/api/game/tournament_logic', { websocket: true }, (socket, req) => {
@@ -34,7 +30,7 @@ async function tournamentLogic(fastify, opts) {
                             status: "waiting",
                             organizerSocket: socket
                         };
-
+                        tournamentSockets.set(tournamentId, socket);
                     }
                     return;
                 }
@@ -47,12 +43,15 @@ async function tournamentLogic(fastify, opts) {
                     if (tournament.players.length < tournament.number_players) return;
 
                     shuffle(tournament.players);
-                    tournament.matches = pairPlayers(tournament.players);
                     tournament.status = "playing";
+                    tournament.matches = [];
 
-                    tournament.matches.forEach((pair, index) => {
-                        const [player1, player2] = pair;
-                        const matchId = `match_${index}_${player1.username}_vs_${player2.username}_${Date.now()}`;
+                    // empareja jugadores
+                    for (let i = 0; i < tournament.players.length; i += 2) {
+                        const player1 = tournament.players[i];
+                        const player2 = tournament.players[i + 1];
+
+                        const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
 
                         const gameState = {
                             roomId: matchId,
@@ -67,6 +66,15 @@ async function tournamentLogic(fastify, opts) {
                             rightPoints: 0
                         };
 
+                        tournament.matches.push({
+                            id: matchId,
+                            player1: player1.username,
+                            socket1: player1.socket,
+                            player2: player2.username,
+                            socket2: player2.socket,
+                            gameState
+                        });
+
                         const payload = {
                             action: "start_match",
                             matchId,
@@ -78,9 +86,11 @@ async function tournamentLogic(fastify, opts) {
 
                         player1.socket.send(JSON.stringify({ ...payload, opponent: player2.username }));
                         player2.socket.send(JSON.stringify({ ...payload, opponent: player1.username }));
-                    });
+                    }
+
                     return;
                 }
+
 
                 if (data.action === "report_winner" || data.action === "tournament_match_finished") {
                     console.log("                                                      ")
@@ -104,13 +114,6 @@ async function tournamentLogic(fastify, opts) {
                         if (expectedWinners === 1) {
                             tournament.status = "finished";
                             const champion = tournament.winners[0];
-                            tournament.players.forEach(p => {
-                                p.socket.send(JSON.stringify({
-                                    action: "tournament_winner",
-                                    winner: champion,
-                                    tournamentId
-                                }));
-                            });
                             tournament.organizerSocket?.send(JSON.stringify({
                                 action: "tournament_ended",
                                 message: `¡Ganador del torneo: ${champion}!`,
@@ -125,12 +128,14 @@ async function tournamentLogic(fastify, opts) {
                         );
                         tournament.winners = [];
                         shuffle(tournament.players);
-                        tournament.matches = pairPlayers(tournament.players);
+                        tournament.matches = [];
 
-                        tournament.matches.forEach((pair, index) => {
-                            const [player1, player2] = pair;
-                            const matchId = `match_${index}_${player1.username}_vs_${player2.username}_${Date.now()}`;
-
+                        for (let i = 0; i < tournament.players.length; i += 2) {
+                            const player1 = tournament.players[i];
+                            const player2 = tournament.players[i + 1];
+                        
+                            const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
+                        
                             const gameState = {
                                 roomId: matchId,
                                 status: "playing",
@@ -143,7 +148,16 @@ async function tournamentLogic(fastify, opts) {
                                 leftPoints: 0,
                                 rightPoints: 0
                             };
-
+                        
+                            tournament.matches.push({
+                                id: matchId,
+                                player1: player1.username,
+                                socket1: player1.socket,
+                                player2: player2.username,
+                                socket2: player2.socket,
+                                gameState
+                            });
+                        
                             const basePayload = {
                                 action: "start_match",
                                 matchId,
@@ -151,21 +165,21 @@ async function tournamentLogic(fastify, opts) {
                                 gameState,
                                 tournamentInfo: {
                                     tournamentId,
-                                    round: tournament.round,
+                                    round: tournament.round
                                 }
                             };
-
+                        
                             player1.socket.send(JSON.stringify({
                                 ...basePayload,
                                 opponent: player2.username
                             }));
-
+                        
                             player2.socket.send(JSON.stringify({
                                 ...basePayload,
                                 opponent: player1.username
                             }));
-
-                        });
+                        }
+                        
                     }
                 }
             });

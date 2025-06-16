@@ -1,6 +1,14 @@
 import { openTournaments, registerPlayer } from "../api/game/tournamentAPI.js";
 import { fetchUserData } from "../hooks/fetchUserData.js";
 import { joinSocket } from "../sockets/tournamentSocket.js"
+
+declare global {
+	interface Window {
+		tournamentSocket?: WebSocket;
+	}
+}
+
+
 export const JoinTournament = () => {
 	const container = document.createElement("div");
 	container.className = "flex flex-row items-center justify-center h-screen bg-gray-900 text-white gap-6";
@@ -60,7 +68,7 @@ export const JoinTournament = () => {
 			parentContainer.appendChild(gameContainer);
   
 			fetchUserData((user) => {
-			  joinSocket(user.username, "join", tournament.id, gameContainer);
+				window.tournamentSocket = joinSocket(user.username, "join", tournament.id, gameContainer);
 			});
   
 		  } catch (error) {

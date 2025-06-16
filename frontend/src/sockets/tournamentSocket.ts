@@ -46,6 +46,10 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 waitMsg.innerText = "Esperando siguiente ronda...";
                 container.appendChild(waitMsg);
                 break;
+            case "report_winner":
+                const {winner, round, tournamentId} = data;
+                console.log(data);
+                break;
 
             case "tournament_ended":
                 container.innerHTML = "";

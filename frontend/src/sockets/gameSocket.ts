@@ -22,8 +22,18 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 		if (data.type === "game_over") {
 			console.log("Partida terminada, ganador:", data.winner);
 			alert(`¡Fin del juego! Ganador: ${data.winner}`);
+					
+			if (tournamentInfo && window.tournamentSocket) {
+				window.tournamentSocket.send(JSON.stringify({
+					action: "report_winner",
+					tournamentId: tournamentInfo.tournamentId,
+					round: tournamentInfo.round,
+					winner: data.winner
+				}));
+			}
 			return;
 		}
+		
 		if (data.gameState) {
 			updateGameState(data);
 		}
@@ -48,6 +58,7 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 				roomId
 			}));
 		},
-		close: () => socket.close()
+		close: () => socket.close(),
+		socket
 	};
 };

@@ -1,5 +1,5 @@
 import { Game } from "../models/Game.js";
-
+import { tournamentSockets } from "./tournament.js";
 const games = new Map();
 
 function startGameLoop(roomId) {
@@ -43,12 +43,13 @@ function startGameLoop(roomId) {
 				console.error("Failed to send game data:", err);
 			}
 
+			const winnerPlayer = players.find(p => p.id === winnerId);
 			const tournamentInfo = room.tournamentInfo;
 			console.log("ROOOOM: ")
 			console.log(room);
-			if (tournamentInfo && tournamentInfo.socket) {
-				console.log("INFOOOODELTORNEO")
-				tournamentInfo.socket.send(JSON.stringify({
+			if (winnerPlayer && winnerPlayer.socket) {
+				console.log("Winner: ", winnerPlayer);
+				winnerPlayer.socket.send(JSON.stringify({
 					action: "report_winner",
 					tournamentId: tournamentInfo.tournamentId,
 					round: tournamentInfo.round,
@@ -95,7 +96,8 @@ async function gameLogic(fastify, opts) {
 					if (!games.has(roomId)) {
 						const tournamentInfo = data.tournamentInfo || null;
 						if (tournamentInfo) {
-							tournamentInfo.socket = socket;
+							const orgSocket = tournamentSockets.get(tournamentInfo.tournamentId);
+							tournamentInfo.socket = orgSocket;
 						}
 						console.log("Guardando room con tournamentInfo:", tournamentInfo);
 						games.set(roomId, {
