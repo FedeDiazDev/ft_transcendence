@@ -1,17 +1,13 @@
-import jwt from "jsonwebtoken"
-import dotenv from "dotenv"
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import { validateAuthorizationHeader } from "./verifyAuth.js"; 
 
 dotenv.config();
 
 export function getUserStats(request, reply) {
     try {
+        const payload = validateAuthorizationHeader(request);
         // Extract username from JWT token
-        const authHeader = request.headers['authorization'];
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return reply.code(401).send({ error: 'Authorization token required' });
-        }
-        const token = authHeader.split(' ')[1];
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
         const username = payload.username;
         const db = request.server.db;
         
@@ -50,7 +46,8 @@ export function getUserStats(request, reply) {
 
 export function getFriendStats(request, reply) {
     try {
-    const friendname = request.params.username;
+        const payload = validateAuthorizationHeader(request);
+        const friendname =  payload.username;
         const db = request.server.db;
 
         // Get wins count

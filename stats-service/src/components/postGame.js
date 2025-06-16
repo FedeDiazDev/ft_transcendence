@@ -1,4 +1,7 @@
+import { validateAuthorizationHeader } from "./verifyAuth.js";
+
 export default function postGame(request, reply){
+    const payload = validateAuthorizationHeader(request);
     const db = request.server.db;
     const query = db.prepare("INSERT INTO games (winner_username, winner_points, looser_username, looser_points, game_date) VALUES (?, ?, ?, ?, ?)");
      // Format the date string for SQLite
