@@ -1,3 +1,5 @@
+let gameSocketInstance: ReturnType<typeof gameSocket> | null = null;
+
 export const gameSocket = (updateGameState: any, id: number, name: string, roomId: string, tournamentInfo : any) => {
 	const socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/online_game");
 
@@ -49,7 +51,7 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 		alert(`[error]`);
 	};
 
-	return {
+	const instance = {
 		sendMove: (direction: "up" | "down", id: number) => {
 			socket.send(JSON.stringify({
 				action: "move_paddle",
@@ -61,4 +63,12 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 		close: () => socket.close(),
 		socket
 	};
+	
+	gameSocketInstance = instance;
+
+	return instance;
 };
+
+window.addEventListener("beforeunload", () => {
+	gameSocketInstance?.close();
+});

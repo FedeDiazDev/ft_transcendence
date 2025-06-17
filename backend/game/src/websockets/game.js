@@ -44,10 +44,8 @@ function startGameLoop(roomId) {
 			}
 
 			const winnerPlayer = players.find(p => p.id === winnerId);
-			const tournamentInfo = room.tournamentInfo;
-			console.log("ROOOOM: ")
-			console.log(room);
-			if (winnerPlayer && winnerPlayer.socket) {
+			const tournamentInfo = room.tournamentInfo;			
+			if (winnerPlayer && winnerPlayer.socket && tournamentInfo) {
 				console.log("Winner: ", winnerPlayer);
 				winnerPlayer.socket.send(JSON.stringify({
 					action: "report_winner",
@@ -153,6 +151,43 @@ async function gameLogic(fastify, opts) {
 					startGameLoop(roomId);
 				}
 			});
+			socket.on('close', () => {
+				const roomEntry = [...games.entries()].find(([, room]) =>
+					room.players.some(p => p.socket === socket)
+				);
+			
+				if (!roomEntry) return;
+			
+				const [roomId, room] = roomEntry;
+				const disconnectedPlayer = room.players.find(p => p.socket === socket);
+				const remainingPlayer = room.players.find(p => p.socket !== socket);
+			
+				console.log(`Jugador desconectado: ${disconnectedPlayer?.name}`);
+			
+				if (remainingPlayer) {
+					remainingPlayer.socket.send(JSON.stringify({
+						type: "game_over",
+						reason: "opponent_disconnected",
+						winner: remainingPlayer.name,
+						roomId
+					}));
+					remainingPlayer.socket.close();
+				}
+			
+				if (room.tournamentInfo && remainingPlayer) {
+					room.tournamentInfo.socket?.send(JSON.stringify({
+						action: "report_winner",
+						tournamentId: room.tournamentInfo.tournamentId,
+						round: room.tournamentInfo.round,
+						winner: remainingPlayer.name
+					}));
+				}
+			
+				clearInterval(room.interval);
+				games.delete(roomId);
+			});
+			
+
 		});
 	});
 }
