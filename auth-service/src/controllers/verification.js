@@ -20,7 +20,14 @@ export default function postVerification(request, reply)
 	if (verified)
 	{
 		const userToken = createWebToken(request.body.username, request.body.email);
-		reply.send({message : "Verified OTP Code", token : userToken});
+
+		reply.setCookie("refreshToken", userToken.refreshToken, {
+      		httpOnly: true,
+      		secure: true,
+      		sameSite: "none",
+      		path: "/",
+			maxAge: 60 * 60 * 24 * 2
+		}).status(200).send({message : "Verified OTP Code", token : userToken.accessToken});
 	}
 	else
 		reply.status(401).send({message : "OTP Verification failed"});
