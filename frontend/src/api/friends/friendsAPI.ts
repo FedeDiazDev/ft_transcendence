@@ -5,9 +5,6 @@ export const getFriendsList = async (): Promise<any> => {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.profile}/getFriends`, {
             method: 'GET',
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
         });
         const data = await response.json();
         return data.friends;
@@ -21,9 +18,6 @@ export const getUserByName = async (text: string): Promise<any> => {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.profile}/searchUsers/${encodeURIComponent(text)}`, {
             method: 'GET',
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
         });
 
         if (!response.ok) throw new Error("Error en la búsqueda");

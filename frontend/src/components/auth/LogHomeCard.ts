@@ -15,7 +15,7 @@ async function googleCallback(response : any)
 
 		localStorage.setItem("username", data.username);
 		localStorage.setItem("email", data.email);
-		localStorage.setItem("authToken", data.token);
+		localStorage.setItem("authToken", data.token.accessToken);
 
 		navigateTo("/");
 	}
@@ -46,51 +46,36 @@ export const LogHomeCard = async (): Promise<HTMLElement> => {
 
     const token = localStorage.getItem("authToken");
 
-    if (token) {
-      // User is logged in, show Logout button
-      const logoutButton = document.createElement("button");
-      logoutButton.textContent = "Logout";
-      logoutButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
-      logoutButton.onclick = () => {
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("username");
-        localStorage.removeItem("email");
-        navigateTo("/loghome");
-      };
-      div.appendChild(logoutButton);
-    } else {
-      // User is not logged in, show Login and SignUp buttons
-      const loginButton = document.createElement("button");
-      loginButton.textContent = "Login";
-      loginButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
-      loginButton.addEventListener("click", () => {
-          navigateTo("/login");
-      });
-      
-      const signupButton = document.createElement("button");
-      signupButton.textContent = "Sign Up";
-      signupButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
-      signupButton.addEventListener("click", () => {
-          navigateTo("/signup");
-      });
-  
-      div.appendChild(loginButton);
-      div.appendChild(signupButton);
+    const loginButton = document.createElement("button");
+    loginButton.textContent = "Login";
+    loginButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
+    loginButton.addEventListener("click", () => {
+        navigateTo("/login");
+    });
+    
+    const signupButton = document.createElement("button");
+    signupButton.textContent = "Sign Up";
+    signupButton.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700";
+    signupButton.addEventListener("click", () => {
+        navigateTo("/signup");
+    });
+ 
+    div.appendChild(loginButton);
+    div.appendChild(signupButton);
 
-      await loadGoogleScript();
-      google.accounts.id.initialize({
-        client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
-        callback: googleCallback
-      });
+    await loadGoogleScript();
+    google.accounts.id.initialize({
+      client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
+      callback: googleCallback
+    });
 
-      const googleDiv = document.createElement("div");
+    const googleDiv = document.createElement("div");
 
-      google.accounts.id.renderButton(googleDiv, {
-        theme: "outline",
-        size: "large",
-      });
-      div.appendChild(googleDiv);
-    }
+    google.accounts.id.renderButton(googleDiv, {
+      theme: "outline",
+      size: "large",
+    });
+    div.appendChild(googleDiv);
 
-    return div;  // Mueve esta línea fuera del bloque 'else'
+    return div;
 }
