@@ -105,7 +105,6 @@ async function gameLogic(fastify, opts) {
 							tournamentInfo: tournamentInfo,
 						});
 						console.log("Room guardado:", games.get(roomId));
-
 					}
 					const room = games.get(roomId);
 					room.players.push({ id, name, socket });
@@ -126,19 +125,15 @@ async function gameLogic(fastify, opts) {
 						startGameLoop(roomId);
 					}
 				}
-
 				else if (action === "move_paddle") {
 					const room = games.get(roomId);
 					if (!room || !room.game) return;
-
 					const { game, players } = room;
-
 					if (id === game.paddles.left.playerId) {
 						game.movePaddle('left', direction);
 					} else if (id === game.paddles.right.playerId) {
 						game.movePaddle('right', direction);
 					}
-
 					players.forEach(player => {
 						player.socket.send(JSON.stringify({
 							gameState: game,
@@ -155,15 +150,11 @@ async function gameLogic(fastify, opts) {
 				const roomEntry = [...games.entries()].find(([, room]) =>
 					room.players.some(p => p.socket === socket)
 				);
-			
 				if (!roomEntry) return;
-			
 				const [roomId, room] = roomEntry;
 				const disconnectedPlayer = room.players.find(p => p.socket === socket);
 				const remainingPlayer = room.players.find(p => p.socket !== socket);
-			
 				console.log(`Jugador desconectado: ${disconnectedPlayer?.name}`);
-			
 				if (remainingPlayer) {
 					remainingPlayer.socket.send(JSON.stringify({
 						type: "game_over",
@@ -173,7 +164,6 @@ async function gameLogic(fastify, opts) {
 					}));
 					remainingPlayer.socket.close();
 				}
-			
 				if (room.tournamentInfo && remainingPlayer) {
 					room.tournamentInfo.socket?.send(JSON.stringify({
 						action: "report_winner",
@@ -182,12 +172,9 @@ async function gameLogic(fastify, opts) {
 						winner: remainingPlayer.name
 					}));
 				}
-			
 				clearInterval(room.interval);
 				games.delete(roomId);
 			});
-			
-
 		});
 	});
 }

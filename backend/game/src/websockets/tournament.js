@@ -11,7 +11,7 @@ export const tournamentSockets = new Map();
 
 
 async function tournamentLogic(fastify, opts) {
-  
+
 
     fastify.register(async function (fastify) {
         fastify.get('/api/game/tournament_logic', { websocket: true }, (socket, req) => {
@@ -34,13 +34,24 @@ async function tournamentLogic(fastify, opts) {
                     }
                     return;
                 }
-
+                if (data.action === "ping")
+                    socket.send(JSON.stringify({ action: 'pong' }));
                 if (data.action === "join") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament) return;
 
                     tournament.players.push({ username: data.username, socket });
-                    if (tournament.players.length < tournament.number_players) return;
+                    if (tournament.players.length < tournament.number_players) {
+                        tournament.players.forEach(p => {
+                            p.socket.send(JSON.stringify({
+                                action: "update_queue",
+                                players: tournament.players.map(pl => pl.username),
+                                tournamentId
+                            }));
+                        });
+
+                        return;
+                    }
 
                     shuffle(tournament.players);
                     tournament.status = "playing";
@@ -72,6 +83,7 @@ async function tournamentLogic(fastify, opts) {
                             socket1: player1.socket,
                             player2: player2.username,
                             socket2: player2.socket,
+                            round: tournament.round,
                             gameState
                         });
 
@@ -101,8 +113,13 @@ async function tournamentLogic(fastify, opts) {
 
                     const round = data.round;
                     const winner = data.winner;
+                    const match = tournament.matches.find(m =>
+                        m.socket1 === socket || m.socket2 === socket);
 
-                    if (round !== tournament.round) {
+                    if (!match) return console.log("No se encontró match para este socket");
+
+                    console.log("Comparando rounds", match.round, tournament.round);
+                    if (match.round !== tournament.round) {
                         console.warn(`Ganador de ronda antigua ignorado`);
                         return;
                     }
@@ -127,15 +144,20 @@ async function tournamentLogic(fastify, opts) {
                             tournament.winners.includes(p.username)
                         );
                         tournament.winners = [];
+                        if (tournament.players.length % 2 !== 0) {
+                            console.warn("Esperando al último ganador para emparejar la siguiente ronda");
+                            return;
+                        }
                         shuffle(tournament.players);
                         tournament.matches = [];
-
+                        console.log("➡️ Nueva ronda con jugadores:", tournament.players);
                         for (let i = 0; i < tournament.players.length; i += 2) {
+                            console.log("TOURNAMENT DESSSSSSSSPPUES: ", tournament);
                             const player1 = tournament.players[i];
                             const player2 = tournament.players[i + 1];
-                        
+
                             const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
-                        
+
                             const gameState = {
                                 roomId: matchId,
                                 status: "playing",
@@ -148,16 +170,17 @@ async function tournamentLogic(fastify, opts) {
                                 leftPoints: 0,
                                 rightPoints: 0
                             };
-                        
+
                             tournament.matches.push({
                                 id: matchId,
                                 player1: player1.username,
                                 socket1: player1.socket,
                                 player2: player2.username,
                                 socket2: player2.socket,
+                                round: tournament.round,
                                 gameState
                             });
-                        
+
                             const basePayload = {
                                 action: "start_match",
                                 matchId,
@@ -168,18 +191,18 @@ async function tournamentLogic(fastify, opts) {
                                     round: tournament.round
                                 }
                             };
-                        
+
                             player1.socket.send(JSON.stringify({
                                 ...basePayload,
                                 opponent: player2.username
                             }));
-                        
+
                             player2.socket.send(JSON.stringify({
                                 ...basePayload,
                                 opponent: player1.username
                             }));
                         }
-                        
+
                     }
                 }
             });

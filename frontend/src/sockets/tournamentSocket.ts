@@ -1,9 +1,16 @@
 import { GameCanvas } from "../components/game/Canvas.js";
 import { fetchUserData } from "../hooks/fetchUserData.js";
 
+let interval: number | null = null;
 export const joinSocket = (username: string, action: string, tournamentId: number, container: any, nb_players?: number) => {
     let socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/tournament_logic");
     socket.onopen = function () {
+        console.log("✅ WebSocket conectado");
+        interval = setInterval(() => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ action: "ping" }));
+            }
+        }, 30000);
         if (action === "create") {
             socket.send(JSON.stringify({ action: "create_tournament", username: username, number_players: nb_players, tournamentId: tournamentId }))
         } else if (action === "join") {
@@ -39,7 +46,18 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     }
                 });
                 break;
+            case "update_queue":
+                const queueList = document.getElementById("queue-list");
+                if (queueList) {
+                    queueList.innerHTML = "";
+                    data.players.forEach((username: string) => {
+                        const li = document.createElement("li");
+                        li.textContent = username;
+                        queueList.appendChild(li);
+                    });
+                }
 
+                break;
             case "tournament_match_finished":
                 container.innerHTML = "";
                 const waitMsg = document.createElement("p");
@@ -47,7 +65,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 container.appendChild(waitMsg);
                 break;
             case "report_winner":
-                const {winner, round, tournamentId} = data;
+                const { winner, round, tournamentId } = data;
                 console.log(data);
                 break;
 
@@ -64,10 +82,8 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 waiting.innerText = `Jugadores unidos: ${data.joined}/${data.required}`;
                 container.appendChild(waiting);
                 break;
-
-            // case "game_over":
-            //     // opcional
-            //     break;
+            case "pong":
+                break;
 
             default:
                 console.warn("Acción no reconocida:", data.action);
@@ -75,6 +91,18 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
         }
     };
 
+    socket.onclose = (event) => {
+        if (interval) {
+            clearInterval(interval);
+        }
+
+        console.log(
+            event.wasClean
+                ? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`
+                : "[close] La conexión se cayó en statusSocket"
+        );
+        //socket = null;
+    };
 
     socket.onerror = () => {
         console.error("[error] en WebSocket joinSocket");

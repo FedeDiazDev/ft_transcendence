@@ -42,8 +42,7 @@ function validateAuthorizationHeader(request) {
 }
 
 //? Si pasa x tiempo sin que el torneo se inice, se cierra cambiando el status?
-//? Código o listado y unirse
-//?
+
 export async function createTournament(request, reply) {
     const { name, players } = request.body;
     if (!name || !players) {
