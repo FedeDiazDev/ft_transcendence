@@ -16,7 +16,7 @@ async function routes (fastify, opts)
 	//*Tournaments
 	fastify.post("/api/game/tournament/create", createTournament);
 	fastify.post("/api/game/tournament/addPlayer", addPlayerToTournament);;
-	fastify.get("/api/game/tournament/open", listOpenTournaments);
+	fastify.get("/api/game/tournament/open", listOpenTournaments);	
 }
 	
 export default routes;

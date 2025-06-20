@@ -90,27 +90,27 @@ async function gameLogic(fastify, opts) {
 				const { action, id, name, roomId, direction } = data;
 
 				if (action === "join_game") {
-					console.log("Mensaje recibido en game-service:", data);
+//					console.log("Mensaje recibido en game-service:", data);
 					if (!games.has(roomId)) {
 						const tournamentInfo = data.tournamentInfo || null;
 						if (tournamentInfo) {
 							const orgSocket = tournamentSockets.get(tournamentInfo.tournamentId);
 							tournamentInfo.socket = orgSocket;
 						}
-						console.log("Guardando room con tournamentInfo:", tournamentInfo);
+//						console.log("Guardando room con tournamentInfo:", tournamentInfo);
 						games.set(roomId, {
 							players: [],
 							game: null,
 							gameLoopRunning: false,
 							tournamentInfo: tournamentInfo,
 						});
-						console.log("Room guardado:", games.get(roomId));
+//						console.log("Room guardado:", games.get(roomId));
 					}
 					const room = games.get(roomId);
 					room.players.push({ id, name, socket });
 					if (room.players.length === 2) {
 						room.game = new Game(room.players[0].id, room.players[1].id);
-						console.log("Game started in room:", roomId);
+//						console.log("Game started in room:", roomId);
 						room.game.start();
 
 						room.players.forEach(player => {

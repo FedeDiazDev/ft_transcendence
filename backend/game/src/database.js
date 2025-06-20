@@ -20,7 +20,7 @@ function dbConnector(fastify) {
         CREATE TABLE IF NOT EXISTS tournament_players (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tournament_id INTEGER NOT NULL,
-        username TEXT UNIQUE NOT NULL,
+        username TEXT NOT NULL,
         FOREIGN KEY (tournament_id) REFERENCES tournaments(id));
         `);
 

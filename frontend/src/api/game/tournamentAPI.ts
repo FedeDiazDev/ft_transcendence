@@ -26,7 +26,7 @@ export const createTournament = async (name: string, players: number) => {
     }
 }
 
-export const registerPlayer = async (tournamentId : number) => {
+export const registerPlayer = async (tournamentId: number) => {
 
     try {
         const token = localStorage.getItem("authToken");
@@ -38,7 +38,7 @@ export const registerPlayer = async (tournamentId : number) => {
             },
             body: JSON.stringify({ tournamentId: tournamentId })
         });
-        if (!response.ok){
+        if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
         const data = await response.json();
@@ -53,7 +53,7 @@ export const registerPlayer = async (tournamentId : number) => {
 }
 
 export const openTournaments = async () => {
-    try {        
+    try {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.game}/tournament/open`, {
             method: "GET",
