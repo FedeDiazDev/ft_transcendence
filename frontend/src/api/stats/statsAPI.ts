@@ -49,3 +49,35 @@ export async function getFriendStats(id: number) {
         return null;
     }
 }
+
+export async function getAllPlayers() {
+    try {
+        const response = await fetch("https://" + window.location.hostname + ":8080/api/stats/players", {
+            method: "GET"
+        });
+
+        if (!response.ok)
+            throw new Error(`Failed to fetch players: ${response.statusText}`);
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching players:", error);
+        return [];
+    }
+}
+
+export async function getAllGames() {
+    try {
+        const response = await fetch("https://" + window.location.hostname + ":8080/api/stats/games", {
+            method: "GET"
+        });
+
+        if (!response.ok)
+            throw new Error(`Failed to fetch games: ${response.statusText}`);
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching games:", error);
+        return [];
+    }
+}

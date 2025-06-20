@@ -37,3 +37,15 @@ export interface UserI{
     avatar_blob : { data: Uint8Array }   
 }
 
+export interface PlayerStats {
+    username: string;
+    elo: number;
+  }
+  
+export interface GameStats {
+    winner_username: string;
+    looser_username: string;
+    looser_points: number;
+    game_date: string;
+  }
+  
