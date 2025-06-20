@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-async function validateAuthorizationHeader(request) {
+export async function validateAuthorizationHeader(request) {
     const authHeader = request.headers['authorization'];
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

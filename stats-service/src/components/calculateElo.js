@@ -1,4 +1,4 @@
-function calculateElo(winnerElo, loserElo) {
+export function calculateElo(winnerElo, loserElo) {
 	const K = 32;
 	const expectedWinner = 1 / (1 + Math.pow(10, (loserElo - winnerElo) / 400));
 	const expectedLoser = 1 / (1 + Math.pow(10, (winnerElo - loserElo) / 400));
