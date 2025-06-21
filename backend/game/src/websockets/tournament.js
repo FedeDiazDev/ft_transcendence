@@ -22,12 +22,12 @@ function shuffle(array) {
 }
 
 function findTournamentIdBySocket(socket) {
-	for (const [tournamentId, tournament] of Object.entries(tournaments)) {
-		if (tournament.players.some(p => p.socket === socket)) {
-			return tournamentId;
-		}
-	}
-	return null;
+    for (const [tournamentId, tournament] of Object.entries(tournaments)) {
+        if (tournament.players.some(p => p.socket === socket)) {
+            return tournamentId;
+        }
+    }
+    return null;
 }
 
 
@@ -78,7 +78,7 @@ async function tournamentLogic(fastify, opts) {
                     }
                     shuffle(tournament.players);
                     tournament.status = "playing";
-                    tournament.matches = [];                    
+                    tournament.matches = [];
                     for (let i = 0; i < tournament.players.length; i += 2) {
                         const player1 = tournament.players[i];
                         const player2 = tournament.players[i + 1];
@@ -129,20 +129,34 @@ async function tournamentLogic(fastify, opts) {
                     const tournament = tournaments[tournamentId];
                     if (!tournament || tournament.status === "finished") return;
 
-                    const round = data.round;
                     const winner = data.winner;
                     const match = tournament.matches.find(m =>
-                        m.socket1 === socket || m.socket2 === socket);
+                        m.player1 === winner || m.player2 === winner);
+
 
                     if (!match) return console.log("No se encontró match para este socket");
 
-                    console.log("Comparando rounds", match.round, tournament.round);
+                    //console.log("Comparando rounds", match.round, tournament.round);
+                    const loserUsername = match.player1 === winner ? match.player2 : match.player1;
+                    const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
+                    const winnerSocket = match.player1 === winner ? match.socket1 : match.socket2;
+
                     if (match.round !== tournament.round) {
                         console.warn(`Ganador de ronda antigua ignorado`);
                         return;
                     }
 
-                    tournament.winners.push(winner);
+                    loserSocket.send(JSON.stringify({
+                        action: "eliminated_from_tournament",
+                        message: "Has perdido esta ronda del torneo. Serás redirigido al menú principal."
+                    }), () => {                        
+                        loserSocket.close();
+                    });
+
+                    tournament.players = tournament.players.filter(p => p.username !== loserUsername);
+                    if (!tournament.winners.includes(winner)) {
+                        tournament.winners.push(winner);
+                    }
                     const expectedWinners = tournament.number_players / Math.pow(2, tournament.round);
 
                     if (tournament.winners.length === expectedWinners) {
@@ -167,8 +181,8 @@ async function tournamentLogic(fastify, opts) {
                             return;
                         }
                         shuffle(tournament.players);
-                        tournament.matches = [];                        
-                        for (let i = 0; i < tournament.players.length; i += 2) {                            
+                        tournament.matches = [];
+                        for (let i = 0; i < tournament.players.length; i += 2) {
                             const player1 = tournament.players[i];
                             const player2 = tournament.players[i + 1];
 
@@ -221,24 +235,23 @@ async function tournamentLogic(fastify, opts) {
                     }
                 }
             });
-            //TODO: Borrar de la base de datos al cerrar tb el socket!!!
             socket.on('close', () => {
                 const tournamentId = findTournamentIdBySocket(socket);
-            
+
                 if (!tournamentId || !tournaments[tournamentId]) return;
-            
+
                 const tournament = tournaments[tournamentId];
                 const player = tournament.players.find(p => p.socket === socket);
-            
+
                 if (!player) return;
-                            
+
                 try {
                     deletePlayerFromTournament(player.username, tournamentId, fastify.db);
                 } catch (err) {
                     console.error("Error al eliminar jugador de BDD:", err);
                 }
 
-                tournament.players = tournament.players.filter(p => p.socket !== socket);                
+                tournament.players = tournament.players.filter(p => p.socket !== socket);
                 tournament.players.forEach(p => {
                     p.socket.send(JSON.stringify({
                         action: "update_queue",
@@ -247,8 +260,8 @@ async function tournamentLogic(fastify, opts) {
                     }));
                 });
             });
-            
-            
+
+
         });
     });
 }

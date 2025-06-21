@@ -1,5 +1,6 @@
 import { GameCanvas } from "../components/game/Canvas.js";
 import { fetchUserData } from "../hooks/fetchUserData.js";
+import { navigateTo } from "../router.js";
 
 let interval: number | null = null;
 export const joinSocket = (username: string, action: string, tournamentId: number, container: any, nb_players?: number) => {
@@ -84,7 +85,9 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 break;
             case "pong":
                 break;
-
+            case "eliminated_from_tournament":
+                navigateTo("/");
+                break;
             default:
                 console.warn("Acción no reconocida:", data.action);
                 break;

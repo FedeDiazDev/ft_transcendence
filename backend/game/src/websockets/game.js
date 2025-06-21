@@ -46,7 +46,7 @@ function startGameLoop(roomId) {
 			const winnerPlayer = players.find(p => p.id === winnerId);
 			const tournamentInfo = room.tournamentInfo;			
 			if (winnerPlayer && winnerPlayer.socket && tournamentInfo) {
-				console.log("Winner: ", winnerPlayer);
+				//console.log("Winner: ", winnerPlayer);
 				winnerPlayer.socket.send(JSON.stringify({
 					action: "report_winner",
 					tournamentId: tournamentInfo.tournamentId,
@@ -85,7 +85,7 @@ async function gameLogic(fastify, opts) {
 		fastify.get('/api/game/online_game', { websocket: true }, (socket, req) => {
 			socket.on('message', message => {
 				const data = JSON.parse(message);
-				console.log("Data received:", data);
+				//console.log("Data received:", data);
 
 				const { action, id, name, roomId, direction } = data;
 
