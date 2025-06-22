@@ -1,3 +1,5 @@
+import { navigateTo } from "../router.js";
+
 let gameSocketInstance: ReturnType<typeof gameSocket> | null = null;
 
 export const gameSocket = (updateGameState: any, id: number, name: string, roomId: string, tournamentInfo : any) => {
@@ -21,10 +23,9 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 
 		if (data.roomId && data.roomId !== roomId) return;
 
-		if (data.type === "game_over") {
+		if (data.type === "game_over") {			
 			console.log("Partida terminada, ganador:", data.winner);
 			alert(`¡Fin del juego! Ganador: ${data.winner}`);
-					
 			if (tournamentInfo && window.tournamentSocket) {
 				window.tournamentSocket.send(JSON.stringify({
 					action: "report_winner",

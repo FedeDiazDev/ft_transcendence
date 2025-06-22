@@ -133,107 +133,99 @@ async function tournamentLogic(fastify, opts) {
                     const match = tournament.matches.find(m =>
                         m.player1 === winner || m.player2 === winner);
 
-
-                    if (!match) return console.log("No se encontró match para este socket");
-
-                    //console.log("Comparando rounds", match.round, tournament.round);
-                    const loserUsername = match.player1 === winner ? match.player2 : match.player1;
-                    const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
-                    const winnerSocket = match.player1 === winner ? match.socket1 : match.socket2;
-
-                    if (match.round !== tournament.round) {
-                        console.warn(`Ganador de ronda antigua ignorado`);
-                        return;
-                    }
-
-                    loserSocket.send(JSON.stringify({
-                        action: "eliminated_from_tournament",
-                        message: "Has perdido esta ronda del torneo. Serás redirigido al menú principal."
-                    }), () => {                        
-                        loserSocket.close();
-                    });
-
-                    tournament.players = tournament.players.filter(p => p.username !== loserUsername);
+                    if (!match) return;
                     if (!tournament.winners.includes(winner)) {
                         tournament.winners.push(winner);
                     }
-                    const expectedWinners = tournament.number_players / Math.pow(2, tournament.round);
+                    const loserUsername = match.player1 === winner ? match.player2 : match.player1;
+                    const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
 
-                    if (tournament.winners.length === expectedWinners) {
-                        if (expectedWinners === 1) {
-                            tournament.status = "finished";
-                            const champion = tournament.winners[0];
-                            tournament.organizerSocket?.send(JSON.stringify({
+                    loserSocket.send(JSON.stringify({
+                        action: "eliminated_from_tournament",
+                        message: "Has perdido esta ronda del torneo — serás redirigido al menú."
+                    }), () => loserSocket.close());
+                    tournament.players = tournament.players.filter(p => p.username !== loserUsername);
+                    const expectedWinners = tournament.number_players / Math.pow(2, tournament.round);
+                    if (tournament.winners.length < expectedWinners) return;
+                    if (expectedWinners === 1) {
+                        tournament.status = "finished";
+                        const champion = tournament.winners[0];
+                        tournament.organizerSocket?.send(JSON.stringify({
+                            action: "tournament_ended",
+                            winner: champion,
+                            tournamentId
+                        }));
+                        tournament.players.forEach(p => {
+                            p.socket.send(JSON.stringify({
                                 action: "tournament_ended",
-                                message: `¡Ganador del torneo: ${champion}!`,
+                                winner: champion,
                                 tournamentId
                             }));
-                            return;
-                        }
+                            p.socket.close();
+                        });
 
-                        tournament.round += 1;
-                        tournament.players = tournament.players.filter(p =>
-                            tournament.winners.includes(p.username)
-                        );
-                        tournament.winners = [];
-                        if (tournament.players.length % 2 !== 0) {
-                            console.warn("Esperando al último ganador para emparejar la siguiente ronda");
-                            return;
-                        }
-                        shuffle(tournament.players);
-                        tournament.matches = [];
-                        for (let i = 0; i < tournament.players.length; i += 2) {
-                            const player1 = tournament.players[i];
-                            const player2 = tournament.players[i + 1];
+                        return;
+                    }
+                    tournament.round += 1;
+                    tournament.players = tournament.players.filter(p =>
+                        tournament.winners.includes(p.username)
+                    );
+                    tournament.winners = [];
+                    shuffle(tournament.players);
+                    tournament.matches = [];
+                    for (let i = 0; i < tournament.players.length; i += 2) {
+                        const player1 = tournament.players[i];
+                        const player2 = tournament.players[i + 1];
 
-                            const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
+                        const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
 
-                            const gameState = {
-                                roomId: matchId,
-                                status: "playing",
-                                ball: { x: 600, y: 300 },
-                                paddles: {
-                                    left: { player: "left", x: 0, y: 225, width: 15, height: 150, speed: 15 },
-                                    right: { player: "right", x: 1185, y: 225, width: 15, height: 150, speed: 15 }
-                                },
-                                points: 0,
-                                leftPoints: 0,
-                                rightPoints: 0
-                            };
+                        const gameState = {
+                            roomId: matchId,
+                            status: "playing",
+                            ball: { x: 600, y: 300 },
+                            paddles: {
+                                left: { player: "left", x: 0, y: 225, width: 15, height: 150, speed: 15 },
+                                right: { player: "right", x: 1185, y: 225, width: 15, height: 150, speed: 15 }
+                            },
+                            points: 0,
+                            leftPoints: 0,
+                            rightPoints: 0
+                        };
 
-                            tournament.matches.push({
-                                id: matchId,
-                                player1: player1.username,
-                                socket1: player1.socket,
-                                player2: player2.username,
-                                socket2: player2.socket,
-                                round: tournament.round,
-                                gameState
-                            });
+                        tournament.matches.push({
+                            id: matchId,
+                            player1: player1.username,
+                            socket1: player1.socket,
+                            player2: player2.username,
+                            socket2: player2.socket,
+                            round: tournament.round,
+                            gameState
+                        });
 
-                            const basePayload = {
-                                action: "start_match",
-                                matchId,
-                                players: [player1.username, player2.username],
-                                gameState,
-                                tournamentInfo: {
-                                    tournamentId,
-                                    round: tournament.round
-                                }
-                            };
+                        const basePayload = {
+                            action: "start_match",
+                            matchId,
+                            players: [player1.username, player2.username],
+                            gameState,
+                            tournamentInfo: {
+                                tournamentId,
+                                round: tournament.round
+                            }
+                        };
 
-                            player1.socket.send(JSON.stringify({
-                                ...basePayload,
-                                opponent: player2.username
-                            }));
+                        player1.socket.send(JSON.stringify({
+                            ...basePayload,
+                            opponent: player2.username
+                        }));
 
-                            player2.socket.send(JSON.stringify({
-                                ...basePayload,
-                                opponent: player1.username
-                            }));
-                        }
+                        player2.socket.send(JSON.stringify({
+                            ...basePayload,
+                            opponent: player1.username
+                        }));
                     }
                 }
+
+
             });
             socket.on('close', () => {
                 const tournamentId = findTournamentIdBySocket(socket);

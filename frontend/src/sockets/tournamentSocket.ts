@@ -26,7 +26,6 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         console.log("DATA: ", data);
-
         switch (data.action) {
             case "start_match":
                 if (!data.tournamentInfo && data.tournamentId && data.round) {
@@ -39,7 +38,6 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     if (data.players.includes(user.username)) {
                         container.innerHTML = "";
                         container.className = "flex flex-col items-center justify-center h-screen bg-gray-900 text-white";
-
                         const score = document.createElement("p");
                         score.innerText = "0 - 0";
                         container.appendChild(score);
@@ -57,7 +55,6 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                         queueList.appendChild(li);
                     });
                 }
-
                 break;
             case "tournament_match_finished":
                 container.innerHTML = "";
@@ -69,14 +66,13 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 const { winner, round, tournamentId } = data;
                 console.log(data);
                 break;
-
             case "tournament_ended":
                 container.innerHTML = "";
                 const resultMsg = document.createElement("h2");
-                resultMsg.innerText = data.message || "¡El torneo ha terminado!";
+                resultMsg.innerText = data.message || "¡El torneo ha terminado! Has ganado";
                 container.appendChild(resultMsg);
+                socket.close();
                 break;
-
             case "waiting_players":
                 container.innerHTML = "";
                 const waiting = document.createElement("p");
@@ -86,6 +82,10 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
             case "pong":
                 break;
             case "eliminated_from_tournament":
+                navigateTo("/");
+                socket.close();
+                break;
+            case "finished":
                 navigateTo("/");
                 break;
             default:
@@ -103,8 +103,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
             event.wasClean
                 ? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`
                 : "[close] La conexión se cayó en statusSocket"
-        );
-        //socket = null;
+        );        
     };
 
     socket.onerror = () => {
