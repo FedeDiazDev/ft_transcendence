@@ -34,7 +34,7 @@ export const Stats = async () => {
       .forEach((player: PlayerStats) => {
         const li = document.createElement("li");
         li.className = "py-2 flex justify-between";
-        li.innerHTML = `<span>👤 ${player.username}</span><span class="font-bold text-yellow-400">${player.elo}</span>`;
+        li.innerHTML = `<span class="text-white">👤 ${player.username}</span><span class="font-bold text-yellow-400">${player.elo}</span>`;
         list.appendChild(li);
       });
 
@@ -63,7 +63,7 @@ export const Stats = async () => {
       li.className = "py-2";
       const date = new Date(game.game_date).toLocaleString();
       li.innerHTML = `
-        🏁 <strong>${game.winner_username}</strong> venció a 
+        🏁 <strong><span class="text-white">${game.winner_username}</span></strong> venció a 
         <strong>${game.looser_username}</strong> 
         (${game.looser_points} pts) 
         <span class="text-sm text-gray-400 ml-2">📆 ${date}</span>
