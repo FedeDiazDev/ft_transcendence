@@ -1,9 +1,5 @@
-import { validateAuthorizationHeader } from "./verifyAuth.js";
-
 export function getAllGamesData(request, reply) {
 	try {
-	  validateAuthorizationHeader(request);
-  
 	  const db = request.server.db;
   
 	  const games = db.prepare(`

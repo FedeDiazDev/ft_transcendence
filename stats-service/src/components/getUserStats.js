@@ -1,12 +1,9 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { validateAuthorizationHeader } from "./verifyAuth.js"; 
-
 dotenv.config();
 
 export function getUserStats(request, reply) {
     try {
-        const payload = validateAuthorizationHeader(request);
         // Extract username from JWT token
         const username = payload.username;
         const db = request.server.db;
@@ -46,7 +43,6 @@ export function getUserStats(request, reply) {
 
 export function getFriendStats(request, reply) {
     try {
-        const payload = validateAuthorizationHeader(request);
         const friendname =  payload.username;
         const db = request.server.db;
 

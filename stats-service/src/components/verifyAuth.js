@@ -1,21 +1,23 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 export async function validateAuthorizationHeader(request) {
-    const authHeader = request.headers['authorization'];
+  const authHeader = request.headers['authorization'];
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return reply.code(401).send({ error: "Token no proporcionado" });
-    }
+  console.log("Logging auth header: ")
+  console.log(request.headers['authorization']);
 
-    const token = authHeader.split(' ')[1];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error("Token no proporcionado");
+  }
 
-    try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET);
-      request.user = payload; // attach user payload to request
-    } catch (err) {
-      return reply.code(401).send({ error: "Token inválido o expirado" });
-    }
-};
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    request.user = payload;
+  } catch (err) {
+    throw new Error("Token inválido o expirado");
+  }
+}

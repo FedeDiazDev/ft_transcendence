@@ -1,6 +1,6 @@
 import { calculateElo } from "./calculateElo.js";
 
-export default async function saveGameAndUpdateElo(db, {
+export async function saveGameAndUpdateElo(db, {
   winner_username,
   looser_username,
   looser_points,

@@ -1,16 +1,18 @@
-import { validateAuthorizationHeader } from "./verifyAuth.js";
-
 export function getAllPlayersData(request, reply) {
   try {
-    validateAuthorizationHeader(request);
-
     const db = request.server.db;
+
+    console.log("Calling getAllPlayers...");
+    console.log("Sending token:", request);
+
 
     const players = db.prepare(`
       SELECT username, elo 
-      FROM users 
+      FROM players 
       ORDER BY elo DESC
     `).all();
+    request.log.info("Players returned:");
+    console.log(players)
 
     return players;
   } catch (error) {
