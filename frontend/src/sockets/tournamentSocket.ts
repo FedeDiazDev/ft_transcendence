@@ -61,6 +61,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 const waitMsg = document.createElement("p");
                 waitMsg.innerText = "Esperando siguiente ronda...";
                 container.appendChild(waitMsg);
+
                 break;
             case "report_winner":
                 const { winner, round, tournamentId } = data;
@@ -72,6 +73,9 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 resultMsg.innerText = data.message || "¡El torneo ha terminado! Has ganado";
                 container.appendChild(resultMsg);
                 socket.close();
+                setTimeout(() => {
+                    navigateTo("/");
+                }, 3000);
                 break;
             case "waiting_players":
                 container.innerHTML = "";
@@ -87,6 +91,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 break;
             case "finished":
                 navigateTo("/");
+                socket.close();
                 break;
             default:
                 console.warn("Acción no reconocida:", data.action);
@@ -103,7 +108,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
             event.wasClean
                 ? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`
                 : "[close] La conexión se cayó en statusSocket"
-        );        
+        );
     };
 
     socket.onerror = () => {
