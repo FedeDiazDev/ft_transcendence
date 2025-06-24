@@ -1,3 +1,4 @@
+import { fetchUserData } from "../hooks/fetchUserData.js";
 import { navigateTo } from "../router.js";
 
 let gameSocketInstance: ReturnType<typeof gameSocket> | null = null;
@@ -25,15 +26,27 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 
 		if (data.type === "game_over") {			
 			console.log("Partida terminada, ganador:", data.winner);
-			alert(`¡Fin del juego! Ganador: ${data.winner}`);
-			if (tournamentInfo && window.tournamentSocket) {
-				window.tournamentSocket.send(JSON.stringify({
-					action: "report_winner",
-					tournamentId: tournamentInfo.tournamentId,
-					round: tournamentInfo.round,
-					winner: data.winner
-				}));
-			}
+			fetchUserData((user) => {
+				if (user.username === data.winner) console.log("Ganaste!!!!!! ")
+				else console.log("perdiste!!!!!!!!!!!!!");
+			})
+			setTimeout(() => {
+				if (
+					tournamentInfo &&
+					window.tournamentSocket &&
+					window.tournamentSocket.readyState === 1
+				) {
+					console.log("Enviando report_winner al servidor...");
+					window.tournamentSocket.send(JSON.stringify({
+						action: "report_winner",
+						tournamentId: tournamentInfo.tournamentId,
+						round: tournamentInfo.round,
+						winner: data.winner
+					}));
+				} else {
+					console.warn("Socket no listo para enviar report_winner");
+				}
+			}, 200);			
 			return;
 		}
 		
