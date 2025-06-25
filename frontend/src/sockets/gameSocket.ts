@@ -46,7 +46,7 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 				} else {
 					console.warn("Socket no listo para enviar report_winner");
 				}
-			}, 200);			
+			}, 1000);			
 			return;
 		}
 		

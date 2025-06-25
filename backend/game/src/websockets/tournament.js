@@ -130,8 +130,10 @@ async function tournamentLogic(fastify, opts) {
                     if (!tournament || tournament.status === "finished") return;
 
                     const winner = data.winner;
+                    const reportedRound = data.round;
                     const match = tournament.matches.find(m =>
-                        m.player1 === winner || m.player2 === winner);
+                        m.round === reportedRound && (m.player1 === winner || m.player2 === winner));
+
 
                     if (!match) return;
                     if (!tournament.winners.includes(winner)) {
@@ -139,14 +141,18 @@ async function tournamentLogic(fastify, opts) {
                     }
                     const loserUsername = match.player1 === winner ? match.player2 : match.player1;
                     const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
-
+                    console.log("LOOOOSER", loserUsername);
                     loserSocket.send(JSON.stringify({
                         action: "eliminated_from_tournament",
                         message: "Has perdido esta ronda del torneo — serás redirigido al menú."
                     }), () => loserSocket.close());
                     tournament.players = tournament.players.filter(p => p.username !== loserUsername);
                     const expectedWinners = tournament.number_players / Math.pow(2, tournament.round);
-                    if (tournament.winners.length < expectedWinners) return;
+                    if (tournament.winners.length < expectedWinners) {
+                        const winnerSocket = match.player1 === winner ? match.socket1 : match.socket2;
+                        winnerSocket.send(JSON.stringify({ action: "tournament_match_finished" }));
+                        return;
+                    }
                     if (expectedWinners === 1) {
                         tournament.status = "finished";
                         const champion = tournament.winners[0];
@@ -224,8 +230,6 @@ async function tournamentLogic(fastify, opts) {
                         }));
                     }
                 }
-
-
             });
             socket.on('close', () => {
                 const tournamentId = findTournamentIdBySocket(socket);
@@ -259,3 +263,4 @@ async function tournamentLogic(fastify, opts) {
 }
 
 export default tournamentLogic;
+
