@@ -27,7 +27,7 @@ export const Navbar = () => {
       { text: "Perfil", path: "/profile" },
       { text: "Amigos", path: "/friends" },
       { text: "Estadísticas", path: "/stats" },
-      { text: "Log", path: "/loghome" },
+      { text: "Log In", path: "/loghome" },
     ];
   
 	links.forEach(({ text, path }) => {
