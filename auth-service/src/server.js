@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import dbConnector from './database.js';
 import routes from './routes.js';
 import cors from '@fastify/cors';
+import cookie from "@fastify/cookie";
 
 const opts = {
 	logger: true,
@@ -29,6 +30,10 @@ function serverError(err) {
 async function startServer(){
 	try{
 		await fastify.register(cors, { origin: '*' });
+		await fastify.register(cookie, {
+  			secret: process.env.COOKIE_SECRET,
+  			hook: 'onRequest'
+		});
 		await fastify.register(routes);
 		await fastify.register(dbConnector);
 		await fastify.listen(connectOptions, serverError);

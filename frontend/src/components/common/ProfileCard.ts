@@ -198,9 +198,6 @@ async function fetchProfile(container: HTMLDivElement) {
                     formData.append("avatar", file);
                     const response = await fetch("https://" + window.location.hostname + ":8080/api/users/updateAvatar", {
                         method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("authToken")}`
-                        },
                         // No Content-Type header - FormData sets it automatically
                         body: formData
                     });                    
@@ -292,7 +289,6 @@ async function fetchProfile(container: HTMLDivElement) {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${localStorage.getItem("authToken")}`
                                 },
                                 body: JSON.stringify({
                                     presentacion: newValue
