@@ -17,6 +17,17 @@ function generateUniqueUsername(baseName, db) {
 	return username;
 }
 
+function replyWebToken(reply, {accessToken, refreshToken})
+{
+    reply.setCookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 2
+    }).status(200).send({ accessToken });
+}
+
 export default async function googleRegister(request, reply) {
 
 	const db = request.server.db;
@@ -37,7 +48,7 @@ export default async function googleRegister(request, reply) {
 
 	if (existing){
 		userToken = createWebToken(existing.username, existing.email);
-		reply.status(200).send({message : "Logged in", username : existing.username, email : existing.email, token : userToken});
+		replyWebToken(reply, userToken);
 	}
 	else
 	{
@@ -48,6 +59,13 @@ export default async function googleRegister(request, reply) {
 		const query = db.prepare("INSERT INTO users (username, email) VALUES (?, ?)");
 		query.run(uniqueUsername, email);
 		publishUserRegisteredEvent(uniqueUsername);
-		reply.status(200).send({message : "Sign up", username : uniqueUsername, email : payload.email, token : userToken});
+
+		reply.setCookie("refreshToken", userToken.refreshToken, {
+      		httpOnly: true,
+      		secure: true,
+      		sameSite: "none",
+      		path: "/",
+			maxAge: 60 * 60 * 24 * 2
+    	}).status(200).send({message : "Sign up", username : uniqueUsername, email : payload.email, token : userToken.accessToken});
 	}
 }

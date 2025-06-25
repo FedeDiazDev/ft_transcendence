@@ -5,9 +5,6 @@ export const getUserData = async (): Promise<any> => {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.profile}/getUser`, {
             method: 'GET',
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
         });
         const data = await response.json();
         return data;
@@ -35,7 +32,6 @@ export const addFriend = async (friendId: number): Promise<any> => {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({ friendId })
         });
@@ -51,9 +47,6 @@ export const deleteFriend = async (friendId : number) : Promise <any> => {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.profile}/deleteFriend/${friendId}`, {
             method: 'DELETE',
-            headers: {                
-                "Authorization": `Bearer ${token}`
-            }            
         });
         const data = await response.json();
         return data;

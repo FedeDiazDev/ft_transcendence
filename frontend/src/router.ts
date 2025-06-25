@@ -12,6 +12,8 @@ import { statusSocket } from "./sockets/statusSocket.js";
 import { QRCode } from "./pages/qrcode.js"
 import { TwoFALogin } from "./pages/twofalogin.js"
 import { Stats } from "./pages/stats.js"
+import { Navbar } from "./components/common/Navbar.js";
+import "./interceptFetch.js"
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -33,6 +35,13 @@ export const render = () => {
   const app = document.getElementById("app");
   if (!app) return;
   app.innerHTML = "";
+
+  const existingNavbar = document.getElementById("navbar");
+  if (existingNavbar){
+    existingNavbar.remove();
+  }
+
+	document.body.insertBefore(Navbar(), app);
 
   const path = window.location.pathname;
   const pathParts = path.split("/");
