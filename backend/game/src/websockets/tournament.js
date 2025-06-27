@@ -161,6 +161,7 @@ async function tournamentLogic(fastify, opts) {
                             winner: champion,
                             tournamentId
                         }));
+                        console.log("ELL GANADOR DEL TORNEO ES: ", champion);
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
                                 action: "tournament_ended",
