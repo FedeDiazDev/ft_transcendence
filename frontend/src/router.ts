@@ -11,6 +11,7 @@ import { fetchUserData } from "./hooks/fetchUserData.js";
 import { statusSocket } from "./sockets/statusSocket.js";
 import { QRCode } from "./pages/qrcode.js"
 import { TwoFALogin } from "./pages/twofalogin.js"
+import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
 
@@ -26,6 +27,7 @@ const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/online_game": Online,
   "/create_tournament": CreateTournament,
   "/tournament/waiting_room": Online,
+  "/stats": Stats,
   "/": Home,
 };
 

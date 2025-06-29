@@ -1,4 +1,5 @@
 import { Game } from "../models/Game.js";
+import  publishGameResultEvent  from "../events/publishGameResultEvent.js"
 
 let players = [];
 let game = null;
@@ -28,23 +29,36 @@ function startGameLoop() {
 			console.log("game over winnername is: ", winnerName);
 			console.log("game over looserName is: ", looserName);
 			console.log("game over looserPoints is: ", looserPoints);
-			const response = await fetch("http://stats-service:3000/api/stats/game", {
-				method: 'POST',
-				headers: {
-				  'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
+			try {
+				await publishGameResultEvent({
 				  winner_username: winnerName,
 				  looser_username: looserName,
 				  looser_points: looserPoints,
 				  game_date: game.date
-				})
-			  });
-			if (!response.ok) {
-				console.error('Error sending game data to stats-service:', response.statusText);
+				});
+
+				console.log('Game result published to RabbitMQ');
+			} catch (error) {
+				console.error('Failed to publish game result to RabbitMQ:', error);
 			}
+			// const response = await fetch("http://stats-service:3000/api/stats/game", {
+			// 	method: 'POST',
+			// 	headers: {
+			// 	  'Content-Type': 'application/json'
+			// 	},
+			// 	body: JSON.stringify({
+			// 	  winner_username: winnerName,
+			// 	  looser_username: looserName,
+			// 	  looser_points: looserPoints,
+			// 	  game_date: game.date
+			// 	})
+			//   });
+
+			// if (!response.ok) {
+			// 	console.error('Error sending game data to stats-service:', response.statusText);
+			// }
+			// console.log("response from stats container is : ", response);
 			console.log('Game data sent to stats-service successfully');
-			console.log("response from stats container is : ", response);
 			players.forEach(player => {
 				player.socket.send(JSON.stringify({
 					type: "game_over",

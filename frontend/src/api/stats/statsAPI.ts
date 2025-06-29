@@ -9,6 +9,10 @@ export async function getUserStats() {
 
         const response = await fetch("https://" + window.location.hostname + ":8080/api/stats/user", {
             method: "GET",
+            credentials: "include",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
         });
 
         if (!response.ok) {
@@ -26,13 +30,19 @@ export async function getUserStats() {
 export async function getFriendStats(id: number) {
 
     try {
+        const token = localStorage.getItem("authToken");
+
         console.log("Fetching friend data for user ID:", id);
         const friendData = await getFriendData(id);
         console.log("Friend data are:", friendData);
         const username = friendData.user.username;
         console.log("friend username is :", username);
         const response = await fetch("https://" + window.location.hostname + ":8080/api/stats/friend/" + username, {
-            method: "GET"
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
         });
 
         if (!response.ok) {
@@ -44,5 +54,51 @@ export async function getFriendStats(id: number) {
     } catch (error) {
         console.error("Error fetching friend stats:", error);
         return null;
+    }
+}
+
+export async function getAllPlayers() {
+    try {
+        const token = localStorage.getItem("authToken");
+
+        const response = await fetch("https://" + window.location.hostname + ":8080/api/stats/players", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        console.log("Player stats response:", response);
+
+        if (!response.ok)
+            throw new Error(`Failed to fetch players: ${response.statusText}`);
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching players:", error);
+        return [];
+    }
+}
+
+export async function getAllGames() {
+    try {
+        const token = localStorage.getItem("authToken");
+
+        const response = await fetch("https://" + window.location.hostname + ":8080/api/stats/games", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok)
+            throw new Error(`Failed to fetch games: ${response.statusText}`);
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching games:", error);
+        return [];
     }
 }
