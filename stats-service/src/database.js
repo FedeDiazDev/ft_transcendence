@@ -15,7 +15,13 @@ function dbConnector(fastify) {
         winner_points INTEGER NOT NULL,
         looser_username TEXT NOT NULL,
         looser_points INTEGER NOT NULL,
-        game_date TEXT NOT NULL
+        game_date TEXT NOT NULL,
+        elo 
+      );
+
+      CREATE TABLE IF NOT EXISTS players (
+        username TEXT PRIMARY KEY,
+        elo INTEGER NOT NULL DEFAULT 500
       );
     `);//SQLite doesn't have a native DATE type
  

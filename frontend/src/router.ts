@@ -13,6 +13,7 @@ import { statusSocket } from "./sockets/statusSocket.js";
 import { QRCode } from "./pages/qrcode.js"
 import { TwoFALogin } from "./pages/twofalogin.js"
 import { JoinTournament } from "./pages/join_tournament.js"
+import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
 
@@ -30,6 +31,7 @@ const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/tournament/create": CreateTournament,
   "/tournament/join": JoinTournament, 
   "/tournament/waiting_room": Online,
+  "/stats": Stats,
   "/": Home,
 };
 

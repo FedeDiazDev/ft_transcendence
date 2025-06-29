@@ -1,5 +1,7 @@
 import { Game } from "../models/Game.js";
 import { tournamentSockets } from "./tournament.js";
+import  publishGameResultEvent  from "../events/publishGameResultEvent.js"
+
 const games = new Map();
 
 function startGameLoop(roomId) {
@@ -22,39 +24,43 @@ function startGameLoop(roomId) {
 			const winnerName = players.find(p => p.id === winnerId)?.name || "Desconocido";
 			const looserName = players.find(p => p.id !== winnerId)?.name || "Desconocido";
 
+			//POST result to stats-service
+			console.log("game over game is: ", game);//game.date
+			console.log("game over game.date is: ", game.date);
+			console.log("game over winnerId is: ", winnerId);
+			console.log("game over winnername is: ", winnerName);
+			console.log("game over looserName is: ", looserName);
+			console.log("game over looserPoints is: ", looserPoints);
 			try {
-				const response = await fetch("http://stats-service:3000/api/stats/game", {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						winner_username: winnerName,
-						looser_username: looserName,
-						looser_points: looserPoints,
-						game_date: game.date
-					})
+				await publishGameResultEvent({
+				  winner_username: winnerName,
+				  looser_username: looserName,
+				  looser_points: looserPoints,
+				  game_date: game.date
 				});
 
-				if (!response.ok) {
-					console.error('Error sending game data to stats-service:', response.statusText);
-				} else {
-					console.log('Game data sent to stats-service successfully');
-				}
-			} catch (err) {
-				console.error("Failed to send game data:", err);
+				console.log('Game result published to RabbitMQ');
+			} catch (error) {
+				console.error('Failed to publish game result to RabbitMQ:', error);
 			}
+			// const response = await fetch("http://stats-service:3000/api/stats/game", {
+			// 	method: 'POST',
+			// 	headers: {
+			// 	  'Content-Type': 'application/json'
+			// 	},
+			// 	body: JSON.stringify({
+			// 	  winner_username: winnerName,
+			// 	  looser_username: looserName,
+			// 	  looser_points: looserPoints,
+			// 	  game_date: game.date
+			// 	})
+			//   });
 
-			const winnerPlayer = players.find(p => p.id === winnerId);
-			const tournamentInfo = room.tournamentInfo;			
-			if (winnerPlayer && winnerPlayer.socket && tournamentInfo) {
-				//console.log("Winner: ", winnerPlayer);
-				winnerPlayer.socket.send(JSON.stringify({
-					action: "report_winner",
-					tournamentId: tournamentInfo.tournamentId,
-					round: tournamentInfo.round,
-					winner: winnerName
-				}));
-			}
-
+			// if (!response.ok) {
+			// 	console.error('Error sending game data to stats-service:', response.statusText);
+			// }
+			// console.log("response from stats container is : ", response);
+			console.log('Game data sent to stats-service successfully');
 			players.forEach(player => {
 				player.socket.send(JSON.stringify({
 					type: "game_over",

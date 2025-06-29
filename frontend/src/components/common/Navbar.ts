@@ -22,12 +22,13 @@ export const Navbar = () => {
 	const menu = document.createElement("div");
 	menu.className = "flex space-x-4";
   
-	const links = [
-	  { text: "Inicio", path: "/" },
-	  { text: "Perfil", path: "/profile" },
-	  { text: "Amigos", path: "/friends" },
-	  { text: "Log In", path: "/loghome" },
-	];
+    const links = [
+      { text: "Inicio", path: "/" },
+      { text: "Perfil", path: "/profile" },
+      { text: "Amigos", path: "/friends" },
+      { text: "Estadísticas", path: "/stats" },
+      { text: "Log In", path: "/loghome" },
+    ];
   
 	links.forEach(({ text, path }) => {
 	  const a = document.createElement("a");
