@@ -5,7 +5,7 @@ import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement: any) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId : string,  tournamentInfo ?: any) => {
 
     // Llamamos a la función para obtener los datos
     const canvas = document.createElement("canvas");
@@ -106,18 +106,16 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
         const onlineLoop = (socket : any, userId : number) => {
             const loop = () => {
                 if (pressedKeys.w || pressedKeys.ArrowUp) {
-                    socket.sendMove("up", userId);
+                    socket.sendMove("up", userId, roomId);
                 }
                 if (pressedKeys.s || pressedKeys.ArrowDown) {
-                    socket.sendMove("down", userId);
+                    socket.sendMove("down", userId, roomId);
                 }
                 draw();
                 requestAnimationFrame(loop);
             };
             loop();
         };
-        // const id = localStorage.getItem("id");
-        //console.log("State", gameState);
         const updateGameState = (newState: any) => {
             const { gameState: receivedGameState, player1Name, player2Name } = newState;
             gameState = { ...gameState, ...receivedGameState };
@@ -125,7 +123,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any) =>
           };
           
         fetchUserData((user) => {
-            const socket = gameSocket(updateGameState, user.id, user.username);
+            console.log("Enviando join_game con tournamentInfo:", tournamentInfo);
+            const socket = gameSocket(updateGameState, user.id, user.username, roomId, tournamentInfo);
             onlineLoop(socket, user.id)
         });
         const renderGame = (player1Name: string, player2Name: string) => {

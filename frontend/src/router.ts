@@ -4,6 +4,7 @@ import { Profile, FriendProfile } from "./pages/profile.js";
 import { LogHome } from "./pages/loghome.js";
 import { Login } from "./pages/login.js";
 import { Signup } from "./pages/signup.js";
+import { Tournament } from "./pages/tournament.js"
 import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
@@ -11,6 +12,7 @@ import { fetchUserData } from "./hooks/fetchUserData.js";
 import { statusSocket } from "./sockets/statusSocket.js";
 import { QRCode } from "./pages/qrcode.js"
 import { TwoFALogin } from "./pages/twofalogin.js"
+import { JoinTournament } from "./pages/join_tournament.js"
 import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
@@ -25,7 +27,9 @@ const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/friends": Friend,
   "/local_game": () => Game("local"),
   "/online_game": Online,
-  "/create_tournament": CreateTournament,
+  "/tournament": Tournament,
+  "/tournament/create": CreateTournament,
+  "/tournament/join": JoinTournament, 
   "/tournament/waiting_room": Online,
   "/stats": Stats,
   "/": Home,

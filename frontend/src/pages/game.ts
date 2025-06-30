@@ -54,7 +54,7 @@ export const Game = (mode: string) => {
                 gameState = gameData.gameState as GameState;
 
                 if (mode === "local") {
-                    const canvas = GameCanvas(gameState, "local", score);                    
+                    const canvas = GameCanvas(gameState, "local", score, Date.now.toString());
                     container.appendChild(score);
                     container.appendChild(canvas);
                     const scoreElement = document.querySelector("#score");
@@ -65,7 +65,7 @@ export const Game = (mode: string) => {
             })
             .catch(err => console.error("Error al crear el juego:", err));
     } else if (mode === "online") {
-        const canvas = GameCanvas(gameState, "online", score);
+        const canvas = GameCanvas(gameState, "online", score, Date.now.toString());
         container.appendChild(canvas);
     }
 
