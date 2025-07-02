@@ -50,7 +50,7 @@ async function fetchLogin(sendData: { user: string, password: string }, errorDiv
 
 export const LoginCard = () => {
 	const div = document.createElement("div");
-	div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-64 min-h-64 mx-auto text-white justify-evenly";
+	div.className = "flex flex-col items-center gap-2 p-6 bg-base-black2 shadow-xl rounded-lg w-64 min-h-64 mx-auto text-white justify-evenly";
 
 	const names = ["Username", "Password"];
 	for (let i: number = 0; i < names.length; i++) {
