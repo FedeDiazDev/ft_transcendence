@@ -24,7 +24,7 @@ function showMessage(message: string, isError: boolean = false) {
 
 export const Friend = (avatarBlob: { data: Uint8Array }, name: string, connected: boolean, userId: number) => {
     const container = document.createElement("div");
-    container.className = "flex justify-between items-center p-4 bg-gray-800 text-white rounded-lg shadow-md w-80";
+    container.className = "flex justify-between items-center p-4 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white rounded-lg shadow-md w-80";
 
     const leftContainer = document.createElement("div");
     leftContainer.className = "flex items-center gap-3";

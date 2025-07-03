@@ -23,12 +23,12 @@ export const CreateTournament = () => {
 	nameInput.placeholder = "Nombre del torneo";
 	nameInput.required = true;
 	nameInput.className =
-		"p-2 bg-gray-800 text-white border border-gray-600 rounded-lg";
+		"p-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border border-gray-600 rounded-lg";
 
 	const selectInput = document.createElement("select");
 	selectInput.required = true;
 	selectInput.className =
-		"p-2 bg-gray-800 text-white border border-gray-600 rounded-lg";
+		"p-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border border-gray-600 rounded-lg";
 
 	const fourOption = document.createElement("option");
 	fourOption.value = "4";

@@ -33,7 +33,7 @@ export const JoinTournament = () => {
 	const renderTournaments = (tournaments: any[]) => {
 		tournaments.forEach((tournament) => {
 			const tournamentCard = document.createElement("div");
-			tournamentCard.className = "bg-gray-800 p-4 rounded-xl shadow-md mb-4 w-80 text-center";
+			tournamentCard.className = "bg-gradient-to-r from-[#0D1013] to-[#101115] p-4 rounded-xl shadow-md mb-4 w-80 text-center";
 
 			const name = document.createElement("h3");
 			name.textContent = tournament.name;

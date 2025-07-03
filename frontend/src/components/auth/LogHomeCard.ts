@@ -42,7 +42,7 @@ async function loadGoogleScript() {
 
 export const LogHomeCard = async (): Promise<HTMLElement> => {
     const div = document.createElement("div");
-    div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-64 min-h-80 mx-auto text-white justify-evenly";
+    div.className = "flex flex-col items-center gap-2 p-6 bg-gradient-to-r from-[#0D1013] to-[#101115] shadow-xl rounded-lg w-64 min-h-80 mx-auto text-white justify-evenly";
 
     const token = localStorage.getItem("authToken");
 

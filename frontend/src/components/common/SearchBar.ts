@@ -1,6 +1,6 @@
 export const SearchBar = (onSearch: (searchText: string) => void) => {
     const container = document.createElement("div");
-    container.className = "flex items-center gap-2 p-2 bg-gray-800 text-white rounded-lg shadow-md w-80";
+    container.className = "flex items-center gap-2 p-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white rounded-lg shadow-md w-80";
 
     const input = document.createElement("input");
     input.type = "text";

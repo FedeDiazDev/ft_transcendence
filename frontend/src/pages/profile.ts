@@ -23,7 +23,7 @@ export const Profile = (): HTMLElement => {
 
   // Container to show stats
   const statsContainer = document.createElement("div");
-  statsContainer.className = "mt-6 w-full max-w-2xl bg-gray-800 p-4 rounded text-white";
+  statsContainer.className = "mt-6 w-full max-w-2xl bg-gradient-to-r from-[#0D1013] to-[#101115] p-4 rounded text-white";
   div.appendChild(statsContainer);
 
   statsButton.addEventListener("click", async () => {
