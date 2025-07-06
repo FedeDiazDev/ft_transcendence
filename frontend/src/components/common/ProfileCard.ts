@@ -132,7 +132,7 @@ async function fetchProfile(container: HTMLDivElement) {
 
         // Avatar image with edit button
         const avatarWrapper = document.createElement("div");
-        avatarWrapper.className = "flex items-center gap-2 mb-4";
+        avatarWrapper.className = "flex flex-col items-center gap-2 mb-4";
         const avatarImage = document.createElement("img");
         if (data.user.avatar_blob) {
             // The avatar_blob from SQLite is received as an object  { type: "Buffer", data: (2146) […] }, must be converted
@@ -146,7 +146,7 @@ async function fetchProfile(container: HTMLDivElement) {
 
         const editAvatarButton = document.createElement("button");
         editAvatarButton.textContent = "Edit";
-        editAvatarButton.className = "px-2 py-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600";
+        editAvatarButton.className = "px-4 py-2 text-sm text-white bg-base-black2 rounded-xl";
 
         editAvatarButton.addEventListener("click", () => {
             // Create hidden file input
@@ -329,12 +329,11 @@ async function fetchProfile(container: HTMLDivElement) {
 }
 export const ProfileView = () => {
     const container = document.createElement("div");
-    container.className = "flex flex-col gap-4 p-4 border";
+    container.className = "flex flex-col gap-4 p-4";
     // Use an immediately-invoked async function to avoid race condition between fetchProfile and fetchStats
     // and to ensure that the container is populated with data before being returned
     (async () => {
         await fetchProfile(container);
-        await fetchStats(container);
     })();
     
     return container;

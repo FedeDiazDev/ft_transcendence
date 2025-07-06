@@ -5,13 +5,13 @@ import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId : string,  tournamentInfo ?: any) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any) => {
 
     // Llamamos a la función para obtener los datos
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
     canvas.height = 600;
-    canvas.className = "border border-gray-600";
+    canvas.className = "border border-[#D9D9D9] bg-base-black1";
 
     const ctx = canvas.getContext("2d");
     let gameState: GameState = { ...state };
@@ -103,7 +103,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         //*ONLINE
     } else if (mode === "online") {
         const pressedKeys = useKeyPress();
-        const onlineLoop = (socket : any, userId : number) => {
+        const onlineLoop = (socket: any, userId: number) => {
             const loop = () => {
                 if (pressedKeys.w || pressedKeys.ArrowUp) {
                     socket.sendMove("up", userId, roomId);
@@ -120,8 +120,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             const { gameState: receivedGameState, player1Name, player2Name } = newState;
             gameState = { ...gameState, ...receivedGameState };
             renderGame(player1Name, player2Name);
-          };
-          
+        };
+
         fetchUserData((user) => {
             console.log("Enviando join_game con tournamentInfo:", tournamentInfo);
             const socket = gameSocket(updateGameState, user.id, user.username, roomId, tournamentInfo);
@@ -130,8 +130,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         const renderGame = (player1Name: string, player2Name: string) => {
             draw();
             scoreElement.innerHTML = `<span>Jugador 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span>: Jugador 2 ${player2Name}</span>`;
-          };
-          
+        };
+
     }
     return canvas;
 };
