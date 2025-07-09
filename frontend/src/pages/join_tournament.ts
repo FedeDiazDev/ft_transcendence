@@ -14,7 +14,10 @@ export const JoinTournament = () => {
 	container.className = "flex flex-row items-center justify-center h-screen bg-gray-900 text-white gap-6";
 
 	const parentContainer = document.createElement("div");
-	parentContainer.className = "flex flex-col items-center";
+	parentContainer.className = "flex flex-col items-center gap-6";
+
+	const tournamentsContainer = document.createElement("div");
+	tournamentsContainer.className = "flex flex-row items-center justify-center flex-wrap gap-12"
 
 	const createTitle = document.createElement("h2");
 	createTitle.textContent = "Torneos disponibles";
@@ -22,7 +25,7 @@ export const JoinTournament = () => {
 	parentContainer.appendChild(createTitle);
 
 	container.appendChild(parentContainer);
-
+	parentContainer.appendChild(tournamentsContainer);
 	const showError = (msg: string) => {
 		const errorMsg = document.createElement("p");
 		errorMsg.textContent = msg;
@@ -86,7 +89,7 @@ export const JoinTournament = () => {
 			tournamentCard.appendChild(status);
 			tournamentCard.appendChild(joinButton);
 
-			parentContainer.appendChild(tournamentCard);
+			tournamentsContainer.appendChild(tournamentCard);
 		});
 	};
 
