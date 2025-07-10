@@ -37,7 +37,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 fetchUserData((user) => {
                     if (data.players.includes(user.username)) {
                         container.innerHTML = "";
-                        container.className = "flex flex-col items-center justify-center h-screen bg-gray-900 text-white";
+                        container.className = "flex flex-col items-center justify-center h-screen text-white";
                         const score = document.createElement("p");
                         score.innerText = "0 - 0";
                         score.className ="text-[#C4C4C4]"
