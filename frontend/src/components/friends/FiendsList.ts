@@ -16,6 +16,7 @@ export const FriendList = async () => {
 
 		if (!response || response.length === 0) {
 			const noFriendsMessage = document.createElement("p");
+			noFriendsMessage.className = "text-white";
 			noFriendsMessage.textContent = "No tienes amigos aún.";
 			container.appendChild(noFriendsMessage);
 			return container;
