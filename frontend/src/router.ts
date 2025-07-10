@@ -29,7 +29,7 @@ const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/online_game": Online,
   "/tournament": Tournament,
   "/tournament/create": CreateTournament,
-  "/tournament/join": JoinTournament, 
+  "/tournament/join": JoinTournament,
   "/tournament/waiting_room": Online,
   "/stats": Stats,
   "/": Home,
@@ -41,11 +41,11 @@ export const render = () => {
   app.innerHTML = "";
 
   const existingNavbar = document.getElementById("navbar");
-  if (existingNavbar){
+  if (existingNavbar) {
     existingNavbar.remove();
   }
 
-	document.body.insertBefore(Navbar(), app);
+  document.body.insertBefore(Navbar(), app);
 
   const path = window.location.pathname;
   const pathParts = path.split("/");
@@ -98,36 +98,39 @@ export const authToken = () => {
 
 
 export const navigateTo = (path: string) => {
+  if (window.location.pathname === path) {
+    return;
+  }
 
-	const publicRoutes = ["/loghome", "/login", "/signup"];
-	const twoFARoutes = ["/qrcode", "/twofalogin"];
+  const publicRoutes = ["/loghome", "/login", "/signup"];
+  const twoFARoutes = ["/qrcode", "/twofalogin"];
 
-	const username = localStorage.getItem("username");
-	const token = authToken(); 
+  const username = localStorage.getItem("username");
+  const token = authToken();
 
-	if (publicRoutes.includes(path)) {
-		window.history.pushState({}, "", path);
-		render();
-		return;
-	}
+  if (publicRoutes.includes(path)) {
+    window.history.pushState({}, "", path);
+    render();
+    return;
+  }
 
-	if (twoFARoutes.includes(path)) {
-		if (username && !token) {
-			window.history.pushState({}, "", path);
-			render();
-			return;
-		} else {
-			window.history.pushState({}, "", "/loghome");
-			render();
-			return;
-		}
-	}
+  if (twoFARoutes.includes(path)) {
+    if (username && !token) {
+      window.history.pushState({}, "", path);
+      render();
+      return;
+    } else {
+      window.history.pushState({}, "", "/loghome");
+      render();
+      return;
+    }
+  }
 
-	if (token) {
-		window.history.pushState({}, "", path);
-		render();
-	} else {
-		window.history.pushState({}, "", "/loghome");
-		render();
-	}
+  if (token) {
+    window.history.pushState({}, "", path);
+    render();
+  } else {
+    window.history.pushState({}, "", "/loghome");
+    render();
+  }
 };
