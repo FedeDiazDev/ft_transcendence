@@ -34,7 +34,8 @@ export interface FriendI{
 export interface UserI{
     username : string,
     id : number,
-    avatar_blob : { data: Uint8Array }   
+    avatar_blob : { data: Uint8Array }   ,
+    presentacion : string
 }
 
 export interface PlayerStats {
