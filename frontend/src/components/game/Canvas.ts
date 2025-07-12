@@ -4,6 +4,7 @@ import { updateBall } from "../../api/game/gameAPI.js";
 import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
+import { navigateTo } from "../../router.js";
 
 export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any) => {
 
@@ -12,6 +13,20 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
     canvas.width = 1200;
     canvas.height = 600;
     canvas.className = "border border-[#D9D9D9] bg-base-black1";
+    const playAgainBtn = document.createElement("button");
+    playAgainBtn.id = "again";
+    playAgainBtn.textContent = "Play again";
+    playAgainBtn.className = "mt-6 px-4 py-2 bg-base-black3 text-base-white rounded-lg hover:bg-base-black2 transition hidden self-end"
+    playAgainBtn.style.position = "relative";
+    playAgainBtn.style.zIndex = "10";
+    playAgainBtn.addEventListener("click", () => {
+        navigateTo("/local_game");
+        window.location.reload();
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "flex flex-col items-center";
+    wrapper.append(canvas, playAgainBtn);
 
     const ctx = canvas.getContext("2d");
     let gameState: GameState = { ...state };
@@ -59,19 +74,17 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             }
 
             if (gameState.status === "game_over") {
-                console.log("GAME FINISHED:", gameState);
-                if (gameState.rightPoints == 10)
-                    alert("El ganador es el jugador de la derecha");
-                else
-                    alert("El ganador es el jugador de la izquierda");
+                const winner = gameState.rightPoints == 10 ? "derecha" : "izquierda";
+                alert(`El ganador es el jugador de la ${winner}`);
+                playAgainBtn!.classList.remove("hidden");
                 return;
             }
+
             await updateGameState();
-            const path = window.location.pathname;
-            if (path.endsWith("/local_game")) {
+
+            if (window.location.pathname.endsWith("/local_game")) {
                 requestAnimationFrame(loop);
             }
-            else return;
         };
 
         loop();
@@ -133,5 +146,5 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         };
 
     }
-    return canvas;
+    return wrapper;
 };

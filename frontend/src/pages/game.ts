@@ -5,7 +5,7 @@ import { GameState } from "../types/types.js";
 export const Game = (mode: string) => {
     const container = document.createElement("div");
     container.className = "flex flex-col justify-center items-center bg-gradient-to-r from-[#0D1013] to-[#101115] mt-10 border-[#262626] p-6 rounded-md";
-    const aux =  document.createElement("div");
+    const aux = document.createElement("div");
     aux.className = "flex flex-col justify-center items-center";
     let gameState: GameState = {
         roomId: "",
