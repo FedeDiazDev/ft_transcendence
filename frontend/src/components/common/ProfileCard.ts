@@ -145,7 +145,7 @@ async function fetchProfile(container: HTMLDivElement) {
         avatarImage.className = "w-24 h-24 rounded-full";
 
         const editAvatarButton = document.createElement("button");
-        editAvatarButton.textContent = "Edit";
+        editAvatarButton.textContent = "Edit avatar";
         editAvatarButton.className = "px-4 py-2 text-sm text-white bg-[#1E90FF] hover:bg-[#1C86EE] text-white rounded-xl";
 
         editAvatarButton.addEventListener("click", () => {
@@ -221,7 +221,6 @@ async function fetchProfile(container: HTMLDivElement) {
                     // Reset button state
                     editAvatarButton.textContent = "Edit";
                     editAvatarButton.disabled = false;
-
                     // Remove the file input
                     document.body.removeChild(fileInput);
                 }
@@ -237,96 +236,76 @@ async function fetchProfile(container: HTMLDivElement) {
         // Add each field with label to container
         fields.forEach((field) => {
             const fieldWrapper = document.createElement("div");
-            fieldWrapper.className = "flex items-center mb-2";
+            fieldWrapper.className = "flex flex-col gap-2 mb-4";
+
+            const lineContainer = document.createElement("div");
+            lineContainer.className = "flex items-center gap-2";
 
             const label = document.createElement("label");
             label.textContent = field.name + ": ";
             label.className = "w-24 font-medium text-gray-600";
 
-            fieldWrapper.appendChild(label);
-            fieldWrapper.appendChild(field.input);
+            lineContainer.append(label, field.input);
+            fieldWrapper.append(lineContainer);
 
-            // Add "Edit" button next to "Presentacion" field
             if (field.name === "Presentacion") {
-                const editPresentacionButton = document.createElement("button");
-                editPresentacionButton.textContent = "Edit";
-                editPresentacionButton.className = "ml-2 px-2 py-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600";
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "Edit presentation";
+                editBtn.className =
+                    "self-end px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700";
 
-                // Add click event listener to handle editing
-                editPresentacionButton.addEventListener("click", async () => {
-                    // Get current value
-                    const currentValue = field.input.value;
+                editBtn.addEventListener("click", () => {
+                    lineContainer.removeChild(field.input);
+                    editBtn.remove();
 
-                    // Remove existing input and edit button
-                    fieldWrapper.removeChild(field.input);
-                    fieldWrapper.removeChild(editPresentacionButton);
-
-                    // Create textarea for editing
                     const textarea = document.createElement("textarea");
-                    textarea.value = currentValue;
-                    textarea.className = "p-2 border rounded w-full text-black bg-white";
+                    textarea.value = field.input.value;
                     textarea.rows = 3;
+                    textarea.className = "p-2 rounded border w-full text-black";
+                    lineContainer.append(textarea);
 
-                    // Create save button
-                    const saveButton = document.createElement("button");
-                    saveButton.textContent = "Save";
-                    saveButton.className = "mt-2 px-4 py-2 text-sm text-white bg-green-500 rounded hover:bg-green-600";
+                    const saveBtn = document.createElement("button");
+                    saveBtn.textContent = "Save";
+                    saveBtn.className =
+                        "self-end mt-2 px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700";
+                    fieldWrapper.append(saveBtn);
 
-                    // Add new elements
-                    fieldWrapper.appendChild(textarea);
-                    fieldWrapper.appendChild(saveButton);
-
-                    // Focus the textarea
-                    textarea.focus();
-
-                    // Add save functionality
-                    saveButton.addEventListener("click", async () => {
-                        const newValue = textarea.value;
-
+                    saveBtn.addEventListener("click", async () => {
                         try {
-                            // Call API to update the presentacion
-                            const response = await fetch("https://" + window.location.hostname + ":8080/api/users/updateProfileText", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    presentacion: newValue
-                                })
-                            });
+                            await fetch(
+                                "https://" +
+                                window.location.hostname +
+                                ":8080/api/users/updateProfileText",
+                                {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ presentacion: textarea.value }),
+                                }
+                            );
 
-                            if (!response.ok) {
-                                throw new Error("Failed to update presentacion");
-                            }
-
-                            // Replace textarea with updated input
-                            fieldWrapper.removeChild(textarea);
-                            fieldWrapper.removeChild(saveButton);
-
-                            // Create new input with updated value
-                            const updatedInput = Input("text", newValue, "Presentacion", false);
-                            field.input = updatedInput; // Update the reference in the fields array
-
-                            // Add back the elements
-                            fieldWrapper.appendChild(updatedInput);
-                            fieldWrapper.appendChild(editPresentacionButton);
-
-                        } catch (error) {
-                            console.error("Failed to update presentacion:", error);
-                            alert("Failed to update presentacion. Please try again.");
+                            textarea.remove();
+                            saveBtn.remove();
+                            field.input.value = textarea.value;
+                            lineContainer.append(field.input);
+                            fieldWrapper.append(editBtn);
+                        } catch (err) {
+                            console.error("Failed to update presentacion", err);
+                            alert("Error al actualizar la presentación");
                         }
                     });
                 });
 
-                fieldWrapper.appendChild(editPresentacionButton);
+                fieldWrapper.append(editBtn);
             }
 
-            container.appendChild(fieldWrapper);
+            container.append(fieldWrapper);
         });
+
     } catch (error) {
         console.error("Fetch error:", error);
     }
 }
+
 export const ProfileView = () => {
     const container = document.createElement("div");
     container.className = "bg-[#1c1c1c] text-white p-6 rounded-xl shadow-md w-full max-w-xl mx-auto";

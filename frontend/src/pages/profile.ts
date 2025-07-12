@@ -16,7 +16,7 @@ export const Profile = (): HTMLElement => {
   left.id = "profile-header";
 
   const right = ProfileView();
-  right.className = "flex flex-col w-1/2 p-10 items-center justify-center"
+  right.className = "flex flex-col w-1/2 p-10 items-center justify-center gap-4"
 
   row.appendChild(left);
   row.appendChild(right);
