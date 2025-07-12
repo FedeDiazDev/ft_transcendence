@@ -27,7 +27,7 @@ export const Stats = async () => {
     leaderboard.appendChild(heading);
 
     const list = document.createElement("ul");
-    list.className = "bg-gray-800 rounded p-4 divide-y divide-gray-700 shadow-md";
+    list.className = "bg-gradient-to-r from-[#0D1013] to-[#101115] rounded p-4 divide-y divide-gray-700 shadow-md";
 
     players
       .sort((a: PlayerStats, b: PlayerStats) => b.elo - a.elo)
@@ -56,7 +56,7 @@ export const Stats = async () => {
     gameHistory.appendChild(gameTitle);
 
     const gameList = document.createElement("ul");
-    gameList.className = "bg-gray-800 rounded p-4 divide-y divide-gray-700 shadow-md";
+    gameList.className = "bg-gradient-to-r from-[#0D1013] to-[#101115] rounded p-4 divide-y divide-gray-700 shadow-md";
 
     games.forEach((game: GameStats) => {
       const li = document.createElement("li");

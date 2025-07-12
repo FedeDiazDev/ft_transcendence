@@ -4,7 +4,7 @@ import { fetchUserData } from "../../hooks/fetchUserData.js";
 
 export const WaitingRoom = () => {
     const container = document.createElement("div");
-    container.className = "flex flex-col items-center justify-center h-screen bg-gray-900 text-white";
+    container.className = "flex flex-col items-center justify-center h-screen text-white";
 
     const text = document.createElement("p");
     text.className = "text-2xl font-semibold";
@@ -27,7 +27,7 @@ export const WaitingRoom = () => {
             const score = document.createElement("p");
             matchmakingSocket.close();
             container.innerHTML = "";
-            container.className = "flex flex-col items-center justify-center bg-gray-900 text-white";
+            container.className = "flex flex-col items-center justify-center text-white";
             score.innerHTML = '0 - 0';
             container.appendChild(score);
             container.appendChild(GameCanvas(gameState, "online", score, roomId));

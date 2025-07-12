@@ -6,52 +6,56 @@ import { fetchUserData } from "../hooks/fetchUserData.js";
 export const CreateTournament = () => {
 	const container = document.createElement("div");
 	container.className =
-		"flex flex-row items-center justify-center h-screen bg-gray-900 text-white gap-6";
+		"flex flex-col items-center justify-center h-screen text-white gap-6";
+	const data = document.createElement("div");
+	data.className ="flex flex-col items-center justify-center gap-4";
 
 	const parentContainer = document.createElement("div");
-	parentContainer.className = "flex flex-col items-center";
+	parentContainer.className = "flex flex-col items-center p-16 rounded-xl bg-base-black2";
 
 	const createTitle = document.createElement("h2");
-	createTitle.textContent = "🏆 Crear Torneo";
+	createTitle.textContent = "🏆 Create Tournament";
 	createTitle.className = "text-2xl font-semibold mb-4";
 
 	const createForm = document.createElement("form");
-	createForm.className = "flex flex-col gap-4";
+	createForm.className = "flex flex-col gap-14 my-8";
 
 	const nameInput = document.createElement("input");
 	nameInput.type = "text";
-	nameInput.placeholder = "Nombre del torneo";
+	nameInput.placeholder = "Name";
 	nameInput.required = true;
 	nameInput.className =
-		"p-2 bg-gray-800 text-white border border-gray-600 rounded-lg";
+		"p-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-b border-white focus:outline-none focus:border-white transition";
 
 	const selectInput = document.createElement("select");
 	selectInput.required = true;
 	selectInput.className =
-		"p-2 bg-gray-800 text-white border border-gray-600 rounded-lg";
+		"appearance-none bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-0 border-b-2 border-white px-2 py-2 rounded-none";
+
 
 	const fourOption = document.createElement("option");
 	fourOption.value = "4";
-	fourOption.textContent = "4 participantes";
+	fourOption.textContent = "4 participants";
 
 	const eightOption = document.createElement("option");
 	eightOption.value = "8";
-	eightOption.textContent = "8 participantes";
+	eightOption.textContent = "8 participants";
 
 	selectInput.append(fourOption, eightOption);
 
 	const submitBtn = document.createElement("button");
 	submitBtn.type = "submit";
-	submitBtn.textContent = "Crear torneo";
-	submitBtn.className =
-		"mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white";
+	submitBtn.textContent = "Create";
+	submitBtn.className = "mt-2 px-8 py-4 rounded-xl text-white bg-base-black2 self-end";
 
-	createForm.append(nameInput, selectInput, submitBtn);
+	createForm.append(nameInput, selectInput);
 	parentContainer.append(createTitle, createForm);
-	container.appendChild(parentContainer);
+	data.appendChild(parentContainer);
+	data.appendChild(submitBtn);
+	container.append(data);
 
 	// Evento submit
-	createForm.addEventListener("submit", async (e) => {
+	submitBtn.addEventListener("click", async (e) => {
 		e.preventDefault();
 
 		const name = nameInput.value.trim();
@@ -67,7 +71,7 @@ export const CreateTournament = () => {
 			console.log("Torneo creado correctamente");
 			fetchUserData((user) => {
 				joinSocket(user.username, "create", response.tournamentState.id, container, number_participants);
-				
+
 			})
 		} catch (error) {
 			console.error("Error creating tournnament");

@@ -6,7 +6,7 @@ import { fetchUserData } from "../../hooks/fetchUserData.js";
 
 export const FriendList = async () => {
 	const container = document.createElement("div");
-	container.className = "rounded-lg shadow-lg border flex flex-col gap-6 p-4 text-2xl mt-10 items-center w-full";
+	container.className = "rounded-lg flex flex-col gap-6 p-4 text-2xl mt-10 items-center w-full";
 
 	const statusDots = new Map<number, HTMLElement>();
 
@@ -16,13 +16,14 @@ export const FriendList = async () => {
 
 		if (!response || response.length === 0) {
 			const noFriendsMessage = document.createElement("p");
+			noFriendsMessage.className = "text-white";
 			noFriendsMessage.textContent = "No tienes amigos aún.";
 			container.appendChild(noFriendsMessage);
 			return container;
 		}
-		response.forEach(({ username, id, avatar_blob }: UserI) => {
-			console.log("Friend data:", { username, id, avatar_blob });
-			const { element, statusDot } = Friend(avatar_blob || "https://dummyimage.com/128x72/fff/aaa", username, false, id);
+		response.forEach(({ username, id, avatar_blob, presentacion }: UserI) => {
+			console.log("Friend data:", { username, id, avatar_blob, presentacion });
+			const { element, statusDot } = Friend(avatar_blob || "https://dummyimage.com/128x72/fff/aaa", username, false, id, presentacion);
 			statusDots.set(id, statusDot);
 			container.appendChild(element);
 		});		

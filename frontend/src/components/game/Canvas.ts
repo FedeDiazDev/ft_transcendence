@@ -4,14 +4,29 @@ import { updateBall } from "../../api/game/gameAPI.js";
 import { useKeyPress } from "../../hooks/useKeyPress.js";
 import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
+import { navigateTo } from "../../router.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId : string,  tournamentInfo ?: any) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any) => {
 
     // Llamamos a la función para obtener los datos
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
     canvas.height = 600;
-    canvas.className = "border border-gray-600";
+    canvas.className = "border border-[#D9D9D9] bg-base-black1";
+    const playAgainBtn = document.createElement("button");
+    playAgainBtn.id = "again";
+    playAgainBtn.textContent = "Play again";
+    playAgainBtn.className = "mt-6 px-4 py-2 bg-base-black3 text-base-white rounded-lg hover:bg-base-black2 transition hidden self-end"
+    playAgainBtn.style.position = "relative";
+    playAgainBtn.style.zIndex = "10";
+    playAgainBtn.addEventListener("click", () => {
+        navigateTo("/local_game");
+        window.location.reload();
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "flex flex-col items-center";
+    wrapper.append(canvas, playAgainBtn);
 
     const ctx = canvas.getContext("2d");
     let gameState: GameState = { ...state };
@@ -59,19 +74,17 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             }
 
             if (gameState.status === "game_over") {
-                console.log("GAME FINISHED:", gameState);
-                if (gameState.rightPoints == 10)
-                    alert("El ganador es el jugador de la derecha");
-                else
-                    alert("El ganador es el jugador de la izquierda");
+                const winner = gameState.rightPoints == 10 ? "derecha" : "izquierda";
+                alert(`El ganador es el jugador de la ${winner}`);
+                playAgainBtn!.classList.remove("hidden");
                 return;
             }
+
             await updateGameState();
-            const path = window.location.pathname;
-            if (path.endsWith("/local_game")) {
+
+            if (window.location.pathname.endsWith("/local_game")) {
                 requestAnimationFrame(loop);
             }
-            else return;
         };
 
         loop();
@@ -103,7 +116,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         //*ONLINE
     } else if (mode === "online") {
         const pressedKeys = useKeyPress();
-        const onlineLoop = (socket : any, userId : number) => {
+        const onlineLoop = (socket: any, userId: number) => {
             const loop = () => {
                 if (pressedKeys.w || pressedKeys.ArrowUp) {
                     socket.sendMove("up", userId, roomId);
@@ -120,8 +133,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             const { gameState: receivedGameState, player1Name, player2Name } = newState;
             gameState = { ...gameState, ...receivedGameState };
             renderGame(player1Name, player2Name);
-          };
-          
+        };
+
         fetchUserData((user) => {
             console.log("Enviando join_game con tournamentInfo:", tournamentInfo);
             const socket = gameSocket(updateGameState, user.id, user.username, roomId, tournamentInfo);
@@ -130,8 +143,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         const renderGame = (player1Name: string, player2Name: string) => {
             draw();
             scoreElement.innerHTML = `<span>Jugador 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span>: Jugador 2 ${player2Name}</span>`;
-          };
-          
+        };
+
     }
-    return canvas;
+    return wrapper;
 };

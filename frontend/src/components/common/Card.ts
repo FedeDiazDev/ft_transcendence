@@ -2,7 +2,7 @@ import { render } from "../../router.js";
 
 export const Card = (icon: string, text: string, path: string) => {
     const card = document.createElement("button");
-    card.className = "card w-64 h-80 bg-gray-800 text-white p-6 rounded-lg shadow-lg relative overflow-hidden transition-transform duration-300 hover:scale-105";
+    card.className = "card w-64 h-80 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white p-6 rounded-lg shadow-lg relative overflow-hidden transition-transform duration-300 hover:scale-105";
     
     card.innerHTML = `
       <div class='flex flex-col items-center justify-center h-full'>

@@ -4,7 +4,9 @@ import { GameState } from "../types/types.js";
 
 export const Game = (mode: string) => {
     const container = document.createElement("div");
-    container.className = "flex flex-col justify-center items-center bg-black mt-10";
+    container.className = "flex flex-col justify-center items-center bg-gradient-to-r from-[#0D1013] to-[#101115] mt-10 border-[#262626] p-6 rounded-md";
+    const aux = document.createElement("div");
+    aux.className = "flex flex-col justify-center items-center";
     let gameState: GameState = {
         roomId: "",
         status: "waiting",
@@ -36,7 +38,7 @@ export const Game = (mode: string) => {
 
     const score = document.createElement("p");
     score.id = "score";
-    score.className = "text-2xl text-white m-2 p-2"
+    score.className = "text-2xl text-[#C4C4C4] m-2 p-2"
     if (mode == "local") {
         createGame(1, 2)
             .then(gameData => {
@@ -55,8 +57,8 @@ export const Game = (mode: string) => {
 
                 if (mode === "local") {
                     const canvas = GameCanvas(gameState, "local", score, Date.now.toString());
-                    container.appendChild(score);
-                    container.appendChild(canvas);
+                    aux.appendChild(score);
+                    aux.appendChild(canvas);
                     const scoreElement = document.querySelector("#score");
                     if (scoreElement) {
                         scoreElement.innerHTML = `${gameState.leftPoints} - ${gameState.rightPoints}`;
@@ -66,8 +68,8 @@ export const Game = (mode: string) => {
             .catch(err => console.error("Error al crear el juego:", err));
     } else if (mode === "online") {
         const canvas = GameCanvas(gameState, "online", score, Date.now.toString());
-        container.appendChild(canvas);
+        aux.appendChild(canvas);
     }
-
+    container.appendChild(aux);
     return container;
 };

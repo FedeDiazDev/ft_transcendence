@@ -5,9 +5,9 @@ export const Home = () => {
   div.className = "flex justify-center gap-12 p-10";
 
   const cards = [
-    { title: "🔥", description: "Local", path: '/local_game' },
-    { title: "🚀", description: "Online", path: '/online_game' },
-    { title: "🎮", description: "Torneo", path: '/tournament' },
+    { title: "🎮", description: "Play tournament", path: '/tournament' },
+    { title: "🔥", description: "Play game", path: '/local_game' },
+    { title: "🚀", description: "Play online game", path: '/online_game' },
   ];
 
   cards.forEach(({ title, description, path }) => {

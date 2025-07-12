@@ -106,7 +106,7 @@ async function fetchSignup(sendData: { username: string, email: string, password
 
 export const SignupCard = () => {
 	const div = document.createElement("div");
-	div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-80 min-h-80 mx-auto text-white justify-evenly";
+	div.className = "flex flex-col items-center gap-2 p-6 bg-gradient-to-r from-[#0D1013] to-[#101115] shadow-xl rounded-lg w-80 min-h-80 mx-auto text-white justify-evenly";
 
 	const names = ["Username", "Email", "Password", "Confirm password"];
 	const types = ["text", "email", "password", "password"];
@@ -117,7 +117,7 @@ export const SignupCard = () => {
 		div.appendChild(text);
 
 		const input = document.createElement("input");
-		input.className = "text-black p-2 border rounded focus:outline-none transition";
+		input.className = "text-white bg-transparent p-2 border-0 border-b border-white focus:outline-none focus:border-white transition";
 		input.type = types[i];
 		input.id = names[i];
 		div.appendChild(input);
