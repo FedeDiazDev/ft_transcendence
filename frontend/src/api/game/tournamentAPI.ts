@@ -70,3 +70,32 @@ export const openTournaments = async () => {
         console.error("Error en /tournament/open:", error)
     }
 }
+
+export const closeTournament = async (tournamentId: number): Promise<any> => {
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            throw new Error("Token de autenticación no encontrado");
+        }
+
+        const response = await fetch(`${API_URLS.tournaments}/close`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ tournamentId })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data?.error || "Error desconocido del servidor");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error en /tournament/close:", error);
+        throw error;
+    }
+};

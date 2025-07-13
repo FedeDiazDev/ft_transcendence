@@ -1,3 +1,5 @@
+import { closeTournament } from "../controllers/tournamentController.js";
+
 function deletePlayerFromTournament(username, tournamentId, db) {
     console.log("Intentando borrar:", username, tournamentId);
     try {
@@ -170,7 +172,7 @@ async function tournamentLogic(fastify, opts) {
                             }));
                             p.socket.close();
                         });
-
+                        closeTournament(tournamentId);
                         return;
                     }
                     tournament.round += 1;

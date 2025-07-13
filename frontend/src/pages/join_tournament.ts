@@ -8,10 +8,9 @@ declare global {
 	}
 }
 
-
 export const JoinTournament = () => {
 	const container = document.createElement("div");
-	container.className = "flex flex-row items-center justify-center h-screen bg-gray-900 text-white gap-6";
+	container.className = "flex flex-row items-center justify-center h-screen text-white gap-6";
 
 	const parentContainer = document.createElement("div");
 	parentContainer.className = "flex flex-col items-center gap-6";

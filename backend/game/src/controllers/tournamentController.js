@@ -90,6 +90,36 @@ export async function listOpenTournaments(request, reply) {
     }
 }
 
+export async function closeTournament(request, reply) {
+    let payload;
+    try {
+        payload = validateAuthorizationHeader(request);
+    } catch (error) {
+        return reply.status(401).send({ error: "No autorizado" });
+    }
+
+    const db = request.server.db;
+    const { tournamentId } = request.body;
+
+    if (!tournamentId) {
+        return reply.status(400).send({ error: "ID de torneo no proporcionado" });
+    }
+
+    try {
+        const query = db.prepare("UPDATE tournaments SET status = 'closed' WHERE id = ?");
+        const result = query.run(tournamentId);
+
+        if (result.changes === 0) {
+            return reply.status(404).send({ error: "Torneo no encontrado" });
+        }
+
+        return reply.status(200).send({ message: "Torneo cerrado correctamente" });
+    } catch (error) {
+        console.error("Error al cerrar el torneo:", error);
+        return reply.status(500).send({ error: "Error al cerrar el torneo" });
+    }
+}
+
 
 export async function addPlayerToTournament(request, reply) {
     const db = request.server.db;
