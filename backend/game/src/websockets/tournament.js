@@ -126,7 +126,7 @@ async function tournamentLogic(fastify, opts) {
                     return;
                 }
 
-
+                //TODO: meter delay de x segundos para dejar que el popup de win/lloose desaparezaca
                 if (data.action === "report_winner" || data.action === "tournament_match_finished") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament || tournament.status === "finished") return;
