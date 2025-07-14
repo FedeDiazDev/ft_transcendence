@@ -71,6 +71,7 @@ export const CreateTournament = () => {
 			console.log("Torneo creado correctamente");
 			fetchUserData((user) => {
 				joinSocket(user.username, "create", response.tournamentState.id, container, number_participants);
+				navigateTo("/tournament/join")
 
 			})
 		} catch (error) {

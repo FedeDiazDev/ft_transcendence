@@ -22,7 +22,6 @@ function showMessage(message: string, isError: boolean = false) {
     }, 3000);
 }
 
-//export const Friend = (avatarBlob: { data: Uint8Array }, name: string, connected: boolean, userId: number) => {
 export const Friend = (
   avatarBlob: { data: Uint8Array },
   username: string,

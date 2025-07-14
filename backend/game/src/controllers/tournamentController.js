@@ -91,13 +91,7 @@ export async function listOpenTournaments(request, reply) {
 }
 
 export async function closeTournament(request, reply) {
-    let payload;
-    try {
-        payload = validateAuthorizationHeader(request);
-    } catch (error) {
-        return reply.status(401).send({ error: "No autorizado" });
-    }
-
+  
     const db = request.server.db;
     const { tournamentId } = request.body;
 

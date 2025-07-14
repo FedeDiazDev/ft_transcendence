@@ -31,7 +31,9 @@ function findTournamentIdBySocket(socket) {
     }
     return null;
 }
-
+function pause(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export const tournaments = new Map();
 export const tournamentSockets = new Map();
@@ -143,7 +145,7 @@ async function tournamentLogic(fastify, opts) {
                     }
                     const loserUsername = match.player1 === winner ? match.player2 : match.player1;
                     const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
-                    console.log("LOOOOSER", loserUsername);
+                    //console.log("LOOOOSER", loserUsername);
                     loserSocket.send(JSON.stringify({
                         action: "eliminated_from_tournament",
                         message: "Has perdido esta ronda del torneo — serás redirigido al menú."
@@ -163,7 +165,7 @@ async function tournamentLogic(fastify, opts) {
                             winner: champion,
                             tournamentId
                         }));
-                        console.log("ELL GANADOR DEL TORNEO ES: ", champion);
+                        //console.log("ELL GANADOR DEL TORNEO ES: ", champion);
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
                                 action: "tournament_ended",
@@ -175,6 +177,7 @@ async function tournamentLogic(fastify, opts) {
                         closeTournament(tournamentId);
                         return;
                     }
+                    pause(3000);
                     tournament.round += 1;
                     tournament.players = tournament.players.filter(p =>
                         tournament.winners.includes(p.username)

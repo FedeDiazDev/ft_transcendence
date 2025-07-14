@@ -64,7 +64,7 @@ export const JoinTournament = () => {
 					}
 
 					const gameContainer = document.createElement("div");
-					gameContainer.className = "flex flex-col items-center justify-center h-screen bg-gray-900 text-white";
+					gameContainer.className = "flex flex-col items-center justify-center h-screen text-white";
 
 					parentContainer.innerHTML = "";
 					parentContainer.appendChild(gameContainer);
