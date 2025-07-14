@@ -54,3 +54,22 @@ export const deleteFriend = async (friendId : number) : Promise <any> => {
         console.error("Fetch error: ", error);
     }
 }
+
+export const getUserByUsername = async (username: string) => {
+    try {
+        const res = await fetch(`${API_URLS.profile}/getUserByUsername/${username}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("authToken")}`,
+            }
+        });
+
+        if (!res.ok) throw new Error('User not found');
+        const data = await res.json();
+
+        return data.user;
+    } catch(error) {
+        console.error('Error fetching user by username');
+        throw error;
+    }
+}
