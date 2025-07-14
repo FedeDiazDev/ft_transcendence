@@ -177,7 +177,6 @@ async function tournamentLogic(fastify, opts) {
                         closeTournament(tournamentId);
                         return;
                     }
-                    pause(3000);
                     tournament.round += 1;
                     tournament.players = tournament.players.filter(p =>
                         tournament.winners.includes(p.username)
