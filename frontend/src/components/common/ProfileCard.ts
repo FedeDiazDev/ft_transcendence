@@ -146,7 +146,7 @@ async function fetchProfile(container: HTMLDivElement) {
 
         const editAvatarButton = document.createElement("button");
         editAvatarButton.textContent = "Edit avatar";
-        editAvatarButton.className = "px-4 py-2 text-sm text-white bg-[#1E90FF] hover:bg-[#1C86EE] text-white rounded-xl";
+        editAvatarButton.className = "self-end px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700";
 
         editAvatarButton.addEventListener("click", () => {
             // Create hidden file input
