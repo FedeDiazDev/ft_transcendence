@@ -54,34 +54,54 @@ export const JoinTournament = () => {
 			joinButton.addEventListener("click", async () => {
 				joinButton.disabled = true;
 				joinButton.textContent = "Uniendo...";
-				try {
-					const response = await registerPlayer(tournament.id);
-					if (response.error) {
-						showError(response.error);
-						joinButton.disabled = false;
-						joinButton.textContent = "Unirse";
-						return;
-					}
 
-					const gameContainer = document.createElement("div");
-					gameContainer.className = "flex flex-col items-center justify-center h-screen text-white";
-
-					parentContainer.innerHTML = "";
-					parentContainer.appendChild(gameContainer);
-					const queueList = document.createElement("ul");
-					queueList.id = "queue-list";
-					gameContainer.appendChild(queueList);
-
-					fetchUserData((user) => {
-						window.tournamentSocket = joinSocket(user.username, "join", tournament.id, gameContainer);
-					});
-
-				} catch (error) {
-					showError("Error al unirse al torneo");
+				const saved = localStorage.getItem("lastTournamentAlias") || "";
+				const alias = prompt(
+				  "Elige tu nick para este torneo:",
+				  saved
+				)?.trim() || "default :(";
+			  
+				if (alias === null) {
+				  joinButton.disabled = false;
+				  joinButton.textContent = "Unirse";
+				  return;
+				}
+			  
+				try {				  
+				  const response = await registerPlayer(tournament.id, alias);
+				  if (response.error) {
+					showError(response.error);
 					joinButton.disabled = false;
 					joinButton.textContent = "Unirse";
+					return;
+				  }
+				  if (alias) localStorage.setItem("lastTournamentAlias", alias);
+			  
+				  const gameContainer = document.createElement("div");
+				  gameContainer.className =
+					"flex flex-col items-center justify-center h-screen text-white";
+				  parentContainer.innerHTML = "";
+				  parentContainer.appendChild(gameContainer);
+			  
+				  const queueList = document.createElement("ul");
+				  queueList.id = "queue-list";
+				  gameContainer.appendChild(queueList);			
+				  fetchUserData((user) => {
+					window.tournamentSocket = joinSocket(
+					  user.username,
+					  "join",
+					  tournament.id,
+					  gameContainer,
+					  alias
+					);
+				  });
+				} catch (error) {
+				  showError("Error al unirse al torneo");
+				  joinButton.disabled = false;
+				  joinButton.textContent = "Unirse";
 				}
-			});
+			  });
+			  
 
 			tournamentCard.appendChild(name);
 			tournamentCard.appendChild(players);

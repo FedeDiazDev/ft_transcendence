@@ -26,7 +26,7 @@ export const createTournament = async (name: string, players: number) => {
     }
 }
 
-export const registerPlayer = async (tournamentId: number) => {
+export const registerPlayer = async (tournamentId: number, alias : string) => {
 
     try {
         const token = localStorage.getItem("authToken");

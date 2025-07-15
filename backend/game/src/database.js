@@ -21,7 +21,11 @@ function dbConnector(fastify) {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tournament_id INTEGER NOT NULL,
         username TEXT NOT NULL,
+        display_name TEXT NOT NULL,
         FOREIGN KEY (tournament_id) REFERENCES tournaments(id));
+
+          CREATE INDEX IF NOT EXISTS idx_tp_tournament ON tournament_players(tournament_id);
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_tp_tourn_user ON tournament_players(tournament_id, user_id);
         `);
 
     fastify.decorate("db", db);
