@@ -98,7 +98,7 @@ export const authToken = () => {
 
 
 export const navigateTo = (path: string) => {
-  if (window.location.pathname === path) {
+  if (window.location.pathname === path && authToken()) {
     return;
   }
 

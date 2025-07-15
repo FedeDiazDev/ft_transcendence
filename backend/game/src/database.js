@@ -24,8 +24,8 @@ function dbConnector(fastify) {
         display_name TEXT NOT NULL,
         FOREIGN KEY (tournament_id) REFERENCES tournaments(id));
 
-          CREATE INDEX IF NOT EXISTS idx_tp_tournament ON tournament_players(tournament_id);
-  CREATE UNIQUE INDEX IF NOT EXISTS idx_tp_tourn_user ON tournament_players(tournament_id, user_id);
+         CREATE INDEX IF NOT EXISTS idx_tp_tournament ON tournament_players(tournament_id);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_tp_tourn_user ON tournament_players(tournament_id, username);
         `);
 
     fastify.decorate("db", db);
