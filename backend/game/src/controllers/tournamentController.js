@@ -121,9 +121,9 @@ export async function addPlayerToTournament(request, reply) {
     if (!username) {
         return reply.status(400).send({ error: "Falta el username" });
     }
-
-    const { tournamentId, display_name } = request.body;
-    if (!tournamentId || !display_name) {
+    console.log("BODYYYYY: ", request.body);
+    const { tournamentId, alias } = request.body;
+    if (!tournamentId || !alias) {
         return reply.status(400).send({ error: "Faltan datos" });
     }
 
@@ -144,7 +144,7 @@ export async function addPlayerToTournament(request, reply) {
             }
 
             const insertQuery = db.prepare("INSERT INTO tournament_players (tournament_id, username, display_name) VALUES (?, ?, ?)");
-            insertQuery.run(tournamentId, username, display_name);
+            insertQuery.run(tournamentId, username, alias);
         });
 
         insertTransaction();

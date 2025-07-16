@@ -3,7 +3,7 @@ import { fetchUserData } from "../hooks/fetchUserData.js";
 import { navigateTo } from "../router.js";
 
 let interval: number | null = null;
-export const joinSocket = (username: string, action: string, tournamentId: number, container: any, alias ?: string, nb_players?: number) => {
+export const joinSocket = (username: string, action: string, tournamentId: number, container: any, alias?: string, nb_players?: number) => {
     let socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/tournament_logic");
     socket.onopen = function () {
         console.log("✅ WebSocket conectado");
@@ -34,17 +34,15 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                         round: data.round,
                     };
                 }
-                fetchUserData((user) => {
-                    if (data.players.includes(user.username)) {
-                        container.innerHTML = "";
-                        container.className = "flex flex-col items-center justify-center h-screen text-white";
-                        const score = document.createElement("p");
-                        score.innerText = "0 - 0";
-                        score.className ="text-[#C4C4C4]"
-                        container.appendChild(score);
-                        container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo));
-                    }
-                });
+                if (data.players.includes(alias)) {
+                    container.innerHTML = "";
+                    container.className = "flex flex-col items-center justify-center h-screen text-white";
+                    const score = document.createElement("p");
+                    score.innerText = "0 - 0";
+                    score.className = "text-[#C4C4C4]"
+                    container.appendChild(score);
+                    container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo));
+                }
                 break;
             case "update_queue":
                 const queueList = document.getElementById("queue-list");

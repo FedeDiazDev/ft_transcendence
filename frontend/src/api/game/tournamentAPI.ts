@@ -26,8 +26,8 @@ export const createTournament = async (name: string, players: number) => {
     }
 }
 
-export const registerPlayer = async (tournamentId: number, alias : string) => {
-
+export const registerPlayer = async (tournamentId: number, alias: string) => {
+    console.log("DATOS: ", tournamentId, alias);
     try {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.game}/tournament/addPlayer`, {
@@ -36,7 +36,7 @@ export const registerPlayer = async (tournamentId: number, alias : string) => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ tournamentId: tournamentId })
+            body: JSON.stringify({ tournamentId: tournamentId, alias: alias })
         });
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);

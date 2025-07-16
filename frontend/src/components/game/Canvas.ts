@@ -6,7 +6,7 @@ import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 import { navigateTo } from "../../router.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any, alias ?: string) => {
 
     // Llamamos a la función para obtener los datos
     const canvas = document.createElement("canvas");
