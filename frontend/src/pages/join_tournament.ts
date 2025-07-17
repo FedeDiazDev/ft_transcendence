@@ -67,8 +67,7 @@ export const JoinTournament = () => {
 					return;
 				}
 
-				try {
-					console.log(alias);
+				try {					
 					const response = await registerPlayer(tournament.id, alias);
 					if (response.error) {
 						showError(response.error);

@@ -130,14 +130,14 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             loop();
         };
         const updateGameState = (newState: any) => {
-            const { gameState: receivedGameState, player1Name, player2Name } = newState;
-            gameState = { ...gameState, ...receivedGameState };
+            const { gameState: receivedGameState, player1Name, player2Name } = newState;            
+            gameState = { ...gameState, ...receivedGameState };            
             renderGame(player1Name, player2Name);
         };
 
         fetchUserData((user) => {
             //console.log("Enviando join_game con tournamentInfo:", tournamentInfo);
-            const socket = gameSocket(updateGameState, user.id, user.username, roomId, tournamentInfo);
+            const socket = gameSocket(updateGameState, user.id, alias || user.username, roomId, tournamentInfo);
             onlineLoop(socket, user.id)
         });
         const renderGame = (player1Name: string, player2Name: string) => {

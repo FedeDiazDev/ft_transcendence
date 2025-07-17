@@ -40,8 +40,8 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     const score = document.createElement("p");
                     score.innerText = "0 - 0";
                     score.className = "text-[#C4C4C4]"
-                    container.appendChild(score);
-                    container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo));
+                    container.appendChild(score);                    
+                    container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo, alias));
                 }
                 break;
             case "update_queue":
