@@ -113,7 +113,7 @@ export const renderProfilePage = async (username: string): Promise<HTMLElement> 
     statsContainer.textContent = "Cargando estadísticas...";
 
     try {
-      const data = await getUserStats();
+      const data = await getUserByUsername(username);
       if (!data) {
         statsContainer.textContent = "No se pudieron cargar las estadísticas.";
         return;
