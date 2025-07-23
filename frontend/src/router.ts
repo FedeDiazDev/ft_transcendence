@@ -62,7 +62,7 @@ export const render = async () => {
     } else {      
       try {
         const user = await getUserByUsername(identifier);
-        const profileElement = await renderProfilePage(user.username);
+        const profileElement = FriendProfile(user.id);
         div.appendChild(profileElement);
       } catch (error) {
         div.innerHTML = "<h2 class='text-white'>Usuario no encontrado</h2>";
