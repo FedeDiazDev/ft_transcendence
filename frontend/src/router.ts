@@ -15,6 +15,7 @@ import { TwoFALogin } from "./pages/twofalogin.js"
 import { JoinTournament } from "./pages/join_tournament.js"
 import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
+import { renderProfilePage } from "./pages/profile.js";
 import "./interceptFetch.js"
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
@@ -122,6 +123,17 @@ export const navigateTo = (path: string) => {
     } else {
       window.history.pushState({}, "", "/loghome");
       render();
+      return;
+    }
+  }
+
+  if (path.startsWith("/profile/")) {
+    const profileUsername = path.split("/")[2]; // Extract username from path
+    console.log("Extracted username: ", profileUsername)
+    if (profileUsername) {
+      console.log("Getting here")
+      window.history.pushState({}, "", path);
+      renderProfilePage(profileUsername); // Render the profile page dynamically
       return;
     }
   }
