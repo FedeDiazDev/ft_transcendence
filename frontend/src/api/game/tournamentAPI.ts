@@ -26,8 +26,8 @@ export const createTournament = async (name: string, players: number) => {
     }
 }
 
-export const registerPlayer = async (tournamentId: number) => {
-
+export const registerPlayer = async (tournamentId: number, alias: string) => {
+    console.log("DATOS: ", tournamentId, alias);
     try {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.game}/tournament/addPlayer`, {
@@ -36,7 +36,7 @@ export const registerPlayer = async (tournamentId: number) => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ tournamentId: tournamentId })
+            body: JSON.stringify({ tournamentId: tournamentId, alias: alias })
         });
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -70,3 +70,32 @@ export const openTournaments = async () => {
         console.error("Error en /tournament/open:", error)
     }
 }
+
+export const closeTournament = async (tournamentId: number): Promise<any> => {
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            throw new Error("Token de autenticación no encontrado");
+        }
+
+        const response = await fetch(`${API_URLS.tournaments}/close`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ tournamentId })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data?.error || "Error desconocido del servidor");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error en /tournament/close:", error);
+        throw error;
+    }
+};

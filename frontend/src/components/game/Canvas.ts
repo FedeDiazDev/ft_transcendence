@@ -6,7 +6,7 @@ import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 import { navigateTo } from "../../router.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any, alias ?: string) => {
 
     // Llamamos a la función para obtener los datos
     const canvas = document.createElement("canvas");
@@ -130,14 +130,14 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             loop();
         };
         const updateGameState = (newState: any) => {
-            const { gameState: receivedGameState, player1Name, player2Name } = newState;
-            gameState = { ...gameState, ...receivedGameState };
+            const { gameState: receivedGameState, player1Name, player2Name } = newState;            
+            gameState = { ...gameState, ...receivedGameState };            
             renderGame(player1Name, player2Name);
         };
 
         fetchUserData((user) => {
-            console.log("Enviando join_game con tournamentInfo:", tournamentInfo);
-            const socket = gameSocket(updateGameState, user.id, user.username, roomId, tournamentInfo);
+            //console.log("Enviando join_game con tournamentInfo:", tournamentInfo);
+            const socket = gameSocket(updateGameState, user.id, alias || user.username, roomId, tournamentInfo);
             onlineLoop(socket, user.id)
         });
         const renderGame = (player1Name: string, player2Name: string) => {

@@ -25,12 +25,12 @@ function startGameLoop(roomId) {
 			const looserName = players.find(p => p.id !== winnerId)?.name || "Desconocido";
 
 			//POST result to stats-service
-			console.log("game over game is: ", game);//game.date
-			console.log("game over game.date is: ", game.date);
-			console.log("game over winnerId is: ", winnerId);
-			console.log("game over winnername is: ", winnerName);
-			console.log("game over looserName is: ", looserName);
-			console.log("game over looserPoints is: ", looserPoints);
+			// console.log("game over game is: ", game);//game.date
+			// console.log("game over game.date is: ", game.date);
+			// console.log("game over winnerId is: ", winnerId);
+			// console.log("game over winnername is: ", winnerName);
+			// console.log("game over looserName is: ", looserName);
+			// console.log("game over looserPoints is: ", looserPoints);
 			try {
 				await publishGameResultEvent({
 				  winner_username: winnerName,
@@ -60,7 +60,7 @@ function startGameLoop(roomId) {
 			// 	console.error('Error sending game data to stats-service:', response.statusText);
 			// }
 			// console.log("response from stats container is : ", response);
-			console.log('Game data sent to stats-service successfully');
+			//console.log('Game data sent to stats-service successfully');
 			players.forEach(player => {
 				player.socket.send(JSON.stringify({
 					type: "game_over",

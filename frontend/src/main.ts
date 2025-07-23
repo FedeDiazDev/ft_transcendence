@@ -1,4 +1,3 @@
-import { Navbar } from "./components/common/Navbar.js";
 import { navigateTo } from "./router.js";
 
 document.addEventListener("DOMContentLoaded", () => {

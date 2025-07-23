@@ -90,6 +90,30 @@ export async function listOpenTournaments(request, reply) {
     }
 }
 
+export async function closeTournament(request, reply) {
+  
+    const db = request.server.db;
+    const { tournamentId } = request.body;
+
+    if (!tournamentId) {
+        return reply.status(400).send({ error: "ID de torneo no proporcionado" });
+    }
+
+    try {
+        const query = db.prepare("UPDATE tournaments SET status = 'closed' WHERE id = ?");
+        const result = query.run(tournamentId);
+
+        if (result.changes === 0) {
+            return reply.status(404).send({ error: "Torneo no encontrado" });
+        }
+
+        return reply.status(200).send({ message: "Torneo cerrado correctamente" });
+    } catch (error) {
+        console.error("Error al cerrar el torneo:", error);
+        return reply.status(500).send({ error: "Error al cerrar el torneo" });
+    }
+}
+
 
 export async function addPlayerToTournament(request, reply) {
     const db = request.server.db;
@@ -97,9 +121,9 @@ export async function addPlayerToTournament(request, reply) {
     if (!username) {
         return reply.status(400).send({ error: "Falta el username" });
     }
-
-    const { tournamentId } = request.body;
-    if (!tournamentId) {
+    console.log("BODYYYYY: ", request.body);
+    const { tournamentId, alias } = request.body;
+    if (!tournamentId || !alias) {
         return reply.status(400).send({ error: "Faltan datos" });
     }
 
@@ -119,8 +143,8 @@ export async function addPlayerToTournament(request, reply) {
                 throw new Error("El torneo está lleno");
             }
 
-            const insertQuery = db.prepare("INSERT INTO tournament_players (tournament_id, username) VALUES (?, ?)");
-            insertQuery.run(tournamentId, username);
+            const insertQuery = db.prepare("INSERT INTO tournament_players (tournament_id, username, display_name) VALUES (?, ?, ?)");
+            insertQuery.run(tournamentId, username, alias);
         });
 
         insertTransaction();

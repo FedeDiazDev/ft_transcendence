@@ -1,3 +1,5 @@
+import { closeTournament } from "../controllers/tournamentController.js";
+
 function deletePlayerFromTournament(username, tournamentId, db) {
     console.log("Intentando borrar:", username, tournamentId);
     try {
@@ -29,7 +31,9 @@ function findTournamentIdBySocket(socket) {
     }
     return null;
 }
-
+function pause(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export const tournaments = new Map();
 export const tournamentSockets = new Map();
@@ -65,6 +69,10 @@ async function tournamentLogic(fastify, opts) {
                     const tournament = tournaments[tournamentId];
                     if (!tournament) return;
                     tournament.players.push({ username: data.username, socket });
+                    console.log("Torneo:", tournamentId);
+                    console.log("Jugadores actuales:", tournament.players.map(p => p.username));
+                    console.log("Esperados:", tournament.number_players);
+
                     if (tournament.players.length < tournament.number_players) {
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
@@ -73,10 +81,13 @@ async function tournamentLogic(fastify, opts) {
                                 tournamentId
                             }));
                         });
-
                         return;
                     }
                     shuffle(tournament.players);
+                    if (tournament.players.length === tournament.number_players) {
+                        console.log("Se alcanzó el número de jugadores. Empezando torneo...");
+                    }
+
                     tournament.status = "playing";
                     tournament.matches = [];
                     for (let i = 0; i < tournament.players.length; i += 2) {
@@ -84,7 +95,8 @@ async function tournamentLogic(fastify, opts) {
                         const player2 = tournament.players[i + 1];
 
                         const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
-
+                        console.log(`  Player 1: ${player1?.username || "undefined"}`);
+                        console.log(`  Player 2: ${player2?.username || "undefined"}`);
                         const gameState = {
                             roomId: matchId,
                             status: "playing",
@@ -122,9 +134,7 @@ async function tournamentLogic(fastify, opts) {
                     }
 
                     return;
-                }
-
-
+                }                
                 if (data.action === "report_winner" || data.action === "tournament_match_finished") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament || tournament.status === "finished") return;
@@ -141,7 +151,7 @@ async function tournamentLogic(fastify, opts) {
                     }
                     const loserUsername = match.player1 === winner ? match.player2 : match.player1;
                     const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
-                    console.log("LOOOOSER", loserUsername);
+                    //console.log("LOOOOSER", loserUsername);
                     loserSocket.send(JSON.stringify({
                         action: "eliminated_from_tournament",
                         message: "Has perdido esta ronda del torneo — serás redirigido al menú."
@@ -161,7 +171,7 @@ async function tournamentLogic(fastify, opts) {
                             winner: champion,
                             tournamentId
                         }));
-                        console.log("ELL GANADOR DEL TORNEO ES: ", champion);
+                        //console.log("ELL GANADOR DEL TORNEO ES: ", champion);
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
                                 action: "tournament_ended",
@@ -170,7 +180,7 @@ async function tournamentLogic(fastify, opts) {
                             }));
                             p.socket.close();
                         });
-
+                        closeTournament(tournamentId);
                         return;
                     }
                     tournament.round += 1;

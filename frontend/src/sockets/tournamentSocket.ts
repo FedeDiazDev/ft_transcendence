@@ -3,7 +3,7 @@ import { fetchUserData } from "../hooks/fetchUserData.js";
 import { navigateTo } from "../router.js";
 
 let interval: number | null = null;
-export const joinSocket = (username: string, action: string, tournamentId: number, container: any, nb_players?: number) => {
+export const joinSocket = (username: string, action: string, tournamentId: number, container: any, alias?: string, nb_players?: number) => {
     let socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/tournament_logic");
     socket.onopen = function () {
         console.log("✅ WebSocket conectado");
@@ -17,7 +17,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
         } else if (action === "join") {
             fetchUserData((user) => {
                 console.log("ID:", user.id);
-                socket.send(JSON.stringify({ action: "join", username: username, tournamentId: tournamentId, userId: user.id }));
+                socket.send(JSON.stringify({ action: "join", username: alias, tournamentId: tournamentId, userId: user.id }));
 
             })
         }
@@ -25,7 +25,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
 
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("DATA: ", data);
+        //console.log("DATA: ", data);
         switch (data.action) {
             case "start_match":
                 if (!data.tournamentInfo && data.tournamentId && data.round) {
@@ -34,17 +34,15 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                         round: data.round,
                     };
                 }
-                fetchUserData((user) => {
-                    if (data.players.includes(user.username)) {
-                        container.innerHTML = "";
-                        container.className = "flex flex-col items-center justify-center h-screen text-white";
-                        const score = document.createElement("p");
-                        score.innerText = "0 - 0";
-                        score.className ="text-[#C4C4C4]"
-                        container.appendChild(score);
-                        container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo));
-                    }
-                });
+                if (data.players.includes(alias)) {
+                    container.innerHTML = "";
+                    container.className = "flex flex-col items-center justify-center h-screen text-white";
+                    const score = document.createElement("p");
+                    score.innerText = "0 - 0";
+                    score.className = "text-[#C4C4C4]"
+                    container.appendChild(score);                    
+                    container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo, alias));
+                }
                 break;
             case "update_queue":
                 const queueList = document.getElementById("queue-list");
