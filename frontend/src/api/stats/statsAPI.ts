@@ -31,7 +31,6 @@ export async function getFriendStats(id: number) {
 
     try {
         const token = localStorage.getItem("authToken");
-
         console.log("Fetching friend data for user ID:", id);
         const friendData = await getFriendData(id);
         console.log("Friend data are:", friendData);

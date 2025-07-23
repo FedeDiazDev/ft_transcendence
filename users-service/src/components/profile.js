@@ -206,3 +206,43 @@ export async function updateAvatar(request, reply) {
         });
     }
 }
+
+export async function getUserByUsername(request, reply) {
+    const { username } = request.params;
+
+    const authHeader = request.headers.authorization;
+      if (!authHeader) {
+        return reply.code(401).send({ error: "Authorization header missing" });
+    }
+  
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+    return reply.code(401).send({ error: "Token missing" });
+    }
+  
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    const db = request.server.db;
+    const query = db.prepare("SELECT * FROM users WHERE username = ?");
+    let response;
+
+    try {
+        response = query.get(username);
+    } catch (error) {
+        console.error("Error querying the database:", error);
+        return reply.status(500).send({
+            error: "Error querying the database for username"
+        });
+    }
+
+    if (!response) {
+        console.error("Username not found");
+        return reply.status(404).send({
+            error: "Username not found in database"
+        });
+    }
+
+    reply.status(200).send({
+        message: "User found", user: response
+    });
+}

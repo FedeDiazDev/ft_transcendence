@@ -5,7 +5,8 @@
     "target": "ES6",
     "module": "ESNext",
     "strict": true,
-    "lib": ["ES2017", "DOM"]
+    "lib": ["ES2017", "DOM"],
+    "moduleResolution": "node"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

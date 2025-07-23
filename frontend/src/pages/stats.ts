@@ -1,8 +1,17 @@
 import { getAllPlayers, getAllGames } from "../api/stats/statsAPI.js";
+import { navigateTo } from "../router.js";
 import type { PlayerStats, GameStats } from "../types/types.ts";
+
+declare global {
+  interface Window {
+    Chart: any;
+  }
+}
+export const Chart = window.Chart;
 
 
 export const Stats = async () => {
+
   try {
     const container = document.createElement("div");
     container.className = "flex flex-col gap-6 items-center w-full p-4";
@@ -18,6 +27,7 @@ export const Stats = async () => {
       return container;
     }
 
+    // Leaderboard
     const leaderboard = document.createElement("div");
     leaderboard.className = "w-full max-w-2xl";
 
@@ -34,7 +44,14 @@ export const Stats = async () => {
       .forEach((player: PlayerStats) => {
         const li = document.createElement("li");
         li.className = "py-2 flex justify-between";
-        li.innerHTML = `<span class="text-white">👤 ${player.username}</span><span class="font-bold text-yellow-400">${player.elo}</span>`;
+        li.innerHTML = `<span class="text-white hover:underline cursor-pointer">👤 ${player.username}</span><span class="font-bold text-yellow-400">${player.elo}</span>`;
+        const usernameSpan = li.querySelector("span");
+        if (usernameSpan) {
+          usernameSpan.addEventListener("click", () => {
+            navigateTo(`/profile/${player.username}`);
+          });
+        }
+
         list.appendChild(li);
       });
 
@@ -47,6 +64,110 @@ export const Stats = async () => {
       return container;
     }
 
+    // Average wins per player
+    const totalWins = games.length;
+    const averageWins = totalWins / players.length;
+
+    const avgDiv = document.createElement("div");
+    avgDiv.className = "text-center mt-4 text-gray-300";
+    avgDiv.textContent = `🏆 Promedio de victorias por jugador: ${averageWins.toFixed(2)}`;
+    container.appendChild(avgDiv);
+
+    // Wins per player Pie Chart
+    const winsChartDiv = document.createElement("div");
+    winsChartDiv.className = "w-full max-w-md";
+    const winsCanvas = document.createElement("canvas");
+    winsChartDiv.appendChild(winsCanvas);
+    container.appendChild(winsChartDiv);
+
+    // Calculate wins per player
+    const winsCount: Record<string, number> = {};
+    games.forEach((game: GameStats) => {
+      winsCount[game.winner_username] = (winsCount[game.winner_username] || 0) + 1;
+    });
+
+    const winsLabels = Object.keys(winsCount);
+    const winsData = Object.values(winsCount);
+
+    new Chart(winsCanvas, {
+      type: "pie",
+      data: {
+        labels: winsLabels,
+        datasets: [{
+          label: "Victorias",
+          data: winsData,
+          backgroundColor: [
+            "#FBBF24", "#34D399", "#60A5FA", "#F472B6",
+            "#F87171", "#A78BFA", "#4ADE80", "#FCD34D"
+          ],
+        }],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: "🏆 Distribución de Victorias por Jugador",
+            color: "#e5e7eb"
+          },
+          legend: {
+            labels: {
+              color: "#e5e7eb"
+            }
+          }
+        }
+      }
+    });
+
+    // ELO Bar Chart
+    const eloChartDiv = document.createElement("div");
+    eloChartDiv.className = "w-full max-w-md";
+    const eloCanvas = document.createElement("canvas");
+    eloChartDiv.appendChild(eloCanvas);
+    container.appendChild(eloChartDiv);
+
+    const eloLabels = players.map((p: PlayerStats) => p.username);
+    const eloData = players.map((p: PlayerStats) => p.elo);
+
+    new Chart(eloCanvas, {
+      type: "bar",
+      data: {
+        labels: eloLabels,
+        datasets: [{
+          label: "ELO",
+          data: eloData,
+          backgroundColor: "#3B82F6", // Tailwind blue-500
+        }],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: "📊 ELO de Jugadores",
+            color: "#e5e7eb"
+          },
+          legend: {
+            labels: {
+              color: "#e5e7eb"
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: "#e5e7eb"
+            }
+          },
+          y: {
+            ticks: {
+              color: "#e5e7eb"
+            },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    // Game History
     const gameHistory = document.createElement("div");
     gameHistory.className = "w-full max-w-2xl";
 
@@ -61,18 +182,46 @@ export const Stats = async () => {
     games.forEach((game: GameStats) => {
       const li = document.createElement("li");
       li.className = "py-2";
+
       const date = new Date(game.game_date).toLocaleString();
-      li.innerHTML = `
-        🏁 <strong><span class="text-white">${game.winner_username}</span></strong> venció a 
-        <strong>${game.looser_username}</strong> 
-        (${game.looser_points} pts) 
-        <span class="text-sm text-gray-400 ml-2">📆 ${date}</span>
-      `;
+
+      const winnerLink = document.createElement("span");
+      winnerLink.textContent = game.winner_username;
+      winnerLink.className = "text-white hover:underline cursor-pointer";
+      winnerLink.addEventListener("click", () => navigateTo(`/profile/${game.winner_username}`));
+
+      const looserLink = document.createElement("span");
+      looserLink.textContent = game.looser_username;
+      looserLink.className = "hover:underline cursor-pointer";
+      looserLink.addEventListener("click", () => navigateTo(`/profile/${game.looser_username}`));
+
+      const strongWinner = document.createElement("strong");
+      strongWinner.appendChild(winnerLink);
+
+      const strongLooser = document.createElement("strong");
+      strongLooser.appendChild(looserLink);
+
+      const text1 = document.createTextNode("🏁 ");
+      const text2 = document.createTextNode(" venció a ");
+      const text3 = document.createTextNode(` (${game.looser_points} pts) `);
+
+      const dateSpan = document.createElement("span");
+      dateSpan.className = "text-sm text-gray-400 ml-2";
+      dateSpan.textContent = `📆 ${date}`;
+
+      li.appendChild(text1);
+      li.appendChild(strongWinner);
+      li.appendChild(text2);
+      li.appendChild(strongLooser);
+      li.appendChild(text3);
+      li.appendChild(dateSpan);
+
       gameList.appendChild(li);
     });
 
     gameHistory.appendChild(gameList);
     container.appendChild(gameHistory);
+
 
     return container;
   } catch (error) {
@@ -82,3 +231,4 @@ export const Stats = async () => {
     return container;
   }
 };
+

@@ -60,7 +60,7 @@ export const Friend = (
   login.className = "text-white text-sm font-medium cursor-pointer hover:text-blue-400";
   login.title = "Ver perfil";
   container.addEventListener("click", () => {
-    navigateTo(`/profile/${userId}`);
+    navigateTo(`/profile/${username}`);
   });
 
   const statusDot = Status(connected);
