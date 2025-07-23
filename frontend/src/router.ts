@@ -17,6 +17,7 @@ import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
 import { renderProfilePage } from "./pages/profile.js";
 import "./interceptFetch.js"
+import { getUserByUsername, getUserData } from "./api/profile/profileAPI.js";
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -36,7 +37,7 @@ const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/": Home,
 };
 
-export const render = () => {
+export const render = async () => {
   const app = document.getElementById("app");
   if (!app) return;
   app.innerHTML = "";
@@ -51,15 +52,28 @@ export const render = () => {
   const path = window.location.pathname;
   const pathParts = path.split("/");
 
-  //navigates to a user´s friend profile (the logged user profile is at url /profile while the friend profile is at url /profile/id)
   if (pathParts[1] === "profile" && pathParts.length === 3) {
-    app.innerHTML = "";
-    const id = pathParts[2];
+    const identifier = pathParts[2];
     const div = document.createElement("div");
-    div.appendChild(FriendProfile(id));
+  
+    if (/^\d+$/.test(identifier)) {      
+      const profileComponent = FriendProfile(identifier);
+      div.appendChild(profileComponent);
+    } else {      
+      try {
+        const user = await getUserByUsername(identifier);
+        const profileElement = await renderProfilePage(user.username);
+        div.appendChild(profileElement);
+      } catch (error) {
+        div.innerHTML = "<h2 class='text-white'>Usuario no encontrado</h2>";
+      }
+    }
+  
     app.appendChild(div);
     return;
   }
+  
+
   const component = routes[path] || (() => {
     if (path !== '/') {
       const div = document.createElement("div");
@@ -127,16 +141,16 @@ export const navigateTo = (path: string) => {
     }
   }
 
-  if (path.startsWith("/profile/")) {
-    const profileUsername = path.split("/")[2]; // Extract username from path
-    console.log("Extracted username: ", profileUsername)
-    if (profileUsername) {
-      console.log("Getting here")
-      window.history.pushState({}, "", path);
-      renderProfilePage(profileUsername); // Render the profile page dynamically
-      return;
-    }
-  }
+  // if (path.startsWith("/profile/")) {
+  //   const profileUsername = path.split("/")[2]; // Extract username from path
+  //   console.log("Extracted username: ", profileUsername)
+  //   if (profileUsername) {
+  //     console.log("Getting here")
+  //     window.history.pushState({}, "", path);
+  //     renderProfilePage(profileUsername); // Render the profile page dynamically
+  //     return;
+  //   }
+  // }
 
   if (token) {
     window.history.pushState({}, "", path);

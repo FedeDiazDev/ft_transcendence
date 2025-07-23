@@ -1,4 +1,5 @@
 import { getAllPlayers, getAllGames } from "../api/stats/statsAPI.js";
+import { navigateTo } from "../router.js";
 import type { PlayerStats, GameStats } from "../types/types.ts";
 
 declare global {
@@ -43,7 +44,14 @@ export const Stats = async () => {
       .forEach((player: PlayerStats) => {
         const li = document.createElement("li");
         li.className = "py-2 flex justify-between";
-        li.innerHTML = `<a href="/profile/${player.username}" class="text-white hover:underline">👤 ${player.username}</a><span class="font-bold text-yellow-400">${player.elo}</span>`;
+        li.innerHTML = `<span class="text-white hover:underline cursor-pointer">👤 ${player.username}</span><span class="font-bold text-yellow-400">${player.elo}</span>`;
+        const usernameSpan = li.querySelector("span");
+        if (usernameSpan) {
+          usernameSpan.addEventListener("click", () => {
+            navigateTo(`/profile/${player.username}`);
+          });
+        }
+
         list.appendChild(li);
       });
 
@@ -60,9 +68,9 @@ export const Stats = async () => {
     const totalWins = games.length;
     const averageWins = totalWins / players.length;
 
-    const avgDiv  = document.createElement("div");
-    avgDiv.className  = "text-center mt-4 text-gray-300";
-    avgDiv.textContent  = `🏆 Promedio de victorias por jugador: ${averageWins.toFixed(2)}`;
+    const avgDiv = document.createElement("div");
+    avgDiv.className = "text-center mt-4 text-gray-300";
+    avgDiv.textContent = `🏆 Promedio de victorias por jugador: ${averageWins.toFixed(2)}`;
     container.appendChild(avgDiv);
 
     // Wins per player Pie Chart
@@ -174,26 +182,46 @@ export const Stats = async () => {
     games.forEach((game: GameStats) => {
       const li = document.createElement("li");
       li.className = "py-2";
+
       const date = new Date(game.game_date).toLocaleString();
-      li.innerHTML = `
-        🏁 <strong>
-          <a href="/profile/${game.winner_username}" class="text-white hover:underline">
-            ${game.winner_username}
-          </a>
-        </strong> venció a 
-        <strong>
-          <a href="/profile/${game.looser_username}" class="hover:underline">
-            ${game.looser_username}
-          </a>
-        </strong> 
-        (${game.looser_points} pts) 
-        <span class="text-sm text-gray-400 ml-2">📆 ${date}</span>
-      `;
+
+      const winnerLink = document.createElement("span");
+      winnerLink.textContent = game.winner_username;
+      winnerLink.className = "text-white hover:underline cursor-pointer";
+      winnerLink.addEventListener("click", () => navigateTo(`/profile/${game.winner_username}`));
+
+      const looserLink = document.createElement("span");
+      looserLink.textContent = game.looser_username;
+      looserLink.className = "hover:underline cursor-pointer";
+      looserLink.addEventListener("click", () => navigateTo(`/profile/${game.looser_username}`));
+
+      const strongWinner = document.createElement("strong");
+      strongWinner.appendChild(winnerLink);
+
+      const strongLooser = document.createElement("strong");
+      strongLooser.appendChild(looserLink);
+
+      const text1 = document.createTextNode("🏁 ");
+      const text2 = document.createTextNode(" venció a ");
+      const text3 = document.createTextNode(` (${game.looser_points} pts) `);
+
+      const dateSpan = document.createElement("span");
+      dateSpan.className = "text-sm text-gray-400 ml-2";
+      dateSpan.textContent = `📆 ${date}`;
+
+      li.appendChild(text1);
+      li.appendChild(strongWinner);
+      li.appendChild(text2);
+      li.appendChild(strongLooser);
+      li.appendChild(text3);
+      li.appendChild(dateSpan);
+
       gameList.appendChild(li);
     });
 
     gameHistory.appendChild(gameList);
     container.appendChild(gameHistory);
+
 
     return container;
   } catch (error) {
