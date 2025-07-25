@@ -22,22 +22,29 @@ export const FriendList = async () => {
 			return container;
 		}
 		response.forEach(({ username, id, avatar_blob, presentacion }: UserI) => {
-			console.log("Friend data:", { username, id, avatar_blob, presentacion });
-			const { element, statusDot } = Friend(avatar_blob || "https://dummyimage.com/128x72/fff/aaa", username, false, id, presentacion);
-			statusDots.set(id, statusDot);
+			const { element, statusDot } = Friend(
+				avatar_blob || "https://dummyimage.com/128x72/fff/aaa",
+				username,
+				false,
+				Number(id),
+				presentacion
+			);
+			statusDots.set(Number(id), statusDot);
 			container.appendChild(element);
-		});		
+		});
+
 		fetchUserData((user) => {
-			console.log("⚙️ fetchUserData =>", user);
 			statusSocket(user.id, user.username, "getOnlineUsers", (onlineUsers) => {
-				console.log("ONLINE USERS: ", onlineUsers);
-				const onlineIds = onlineUsers.map((u) => u.id);
+				const onlineIds = onlineUsers
+					.filter((u) => u.id !== user.id)
+					.map((u) => Number(u.id));
 				statusDots.forEach((dot, friendId) => {
 					const isOnline = onlineIds.includes(friendId);
-					dot.className = `w-3 h-3 rounded-full ${isOnline ? "bg-green-500" : "bg-gray-500"}`;
+					dot.className = `w-3 h-3 rounded-full ${isOnline ? "bg-green-500" : "bg-red-500"}`;
 					dot.title = isOnline ? "Online" : "Offline";
 				});
 			});
+
 		});
 
 	} catch (error) {
