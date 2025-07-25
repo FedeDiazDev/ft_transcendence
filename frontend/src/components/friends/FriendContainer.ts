@@ -63,8 +63,7 @@ export const Friend = (
     navigateTo(`/profile/${username}`);
   });
 
-  const statusDot = Status(connected);
-  statusDot.classList.add("w-3", "h-3");
+  const statusDot = Status(connected);  
 
   usernameLine.appendChild(login);
   usernameLine.appendChild(statusDot);
@@ -88,7 +87,8 @@ export const Friend = (
   deleteBut.className = "text-xl cursor-pointer hover:text-red-400 transition self-end";
   deleteBut.title = "Eliminar amigo";
 
-  deleteBut.addEventListener("click", async () => {
+  deleteBut.addEventListener("click", async (e) => {
+    e.stopPropagation();
     try {
       await deleteFriend(userId);
       showMessage(`${username} ha sido eliminado de tu lista de amigos`);
