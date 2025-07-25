@@ -25,7 +25,7 @@ function replyWebToken(reply, {accessToken, refreshToken})
       sameSite: "none",
       path: "/",
       maxAge: 60 * 60 * 24 * 2
-    }).status(200).send({ accessToken });
+    }).status(200).send({ token : accessToken });
 }
 
 export default async function googleRegister(request, reply) {
@@ -33,8 +33,8 @@ export default async function googleRegister(request, reply) {
 	const db = request.server.db;
 
 	const verify = await client.verifyIdToken({
-		idToken: request.body.credentials.credential,
-		audience: "169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com"
+		idToken: request.body.credential,
+		audience: "169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com" //This should be an .env variable
 	});
 
 	const payload = verify.getPayload();
