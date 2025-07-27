@@ -51,6 +51,25 @@ export const render = async () => {
   const path = window.location.pathname;
   const pathParts = path.split("/");
 
+  const publicRoutes = ["/loghome", "/login", "/signup"];
+  const twoFARoutes = ["/qrcode", "/twofalogin"];
+  const username = localStorage.getItem("username");
+  const token = authToken();
+
+  if (!publicRoutes.includes(path) && !twoFARoutes.includes(path) && !token) {
+    window.history.pushState({}, "", "/loghome");
+    render();
+    return;
+  }
+
+  if (twoFARoutes.includes(path)) {
+    if (!username || token) {
+      window.history.pushState({}, "", "/loghome");
+      render();
+      return;
+    }
+  }
+
   if (pathParts[1] === "profile" && pathParts.length === 3) {
     const identifier = pathParts[2];
     const div = document.createElement("div");
@@ -112,39 +131,10 @@ export const authToken = () => {
 
 
 export const navigateTo = (path: string) => {
-  if (window.location.pathname === path && authToken()) {
+  if (window.location.pathname === path) {
     return;
   }
 
-  const publicRoutes = ["/loghome", "/login", "/signup"];
-  const twoFARoutes = ["/qrcode", "/twofalogin"];
-
-  const username = localStorage.getItem("username");
-  const token = authToken();
-
-  if (publicRoutes.includes(path)) {
-    window.history.pushState({}, "", path);
-    render();
-    return;
-  }
-
-  if (twoFARoutes.includes(path)) {
-    if (username && !token) {
-      window.history.pushState({}, "", path);
-      render();
-      return;
-    } else {
-      window.history.pushState({}, "", "/loghome");
-      render();
-      return;
-    }
-  }
-
-  if (token) {
-    window.history.pushState({}, "", path);
-    render();
-  } else {
-    window.history.pushState({}, "", "/loghome");
-    render();
-  }
+  window.history.pushState({}, "", path);
+  render();
 };
