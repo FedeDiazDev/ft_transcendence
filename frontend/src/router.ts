@@ -15,9 +15,8 @@ import { TwoFALogin } from "./pages/twofalogin.js"
 import { JoinTournament } from "./pages/join_tournament.js"
 import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
-import { renderProfilePage } from "./pages/profile.js";
 import "./interceptFetch.js"
-import { getUserByUsername, getUserData } from "./api/profile/profileAPI.js";
+import { getUserByUsername } from "./api/profile/profileAPI.js";
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -140,17 +139,6 @@ export const navigateTo = (path: string) => {
       return;
     }
   }
-
-  // if (path.startsWith("/profile/")) {
-  //   const profileUsername = path.split("/")[2]; // Extract username from path
-  //   console.log("Extracted username: ", profileUsername)
-  //   if (profileUsername) {
-  //     console.log("Getting here")
-  //     window.history.pushState({}, "", path);
-  //     renderProfilePage(profileUsername); // Render the profile page dynamically
-  //     return;
-  //   }
-  // }
 
   if (token) {
     window.history.pushState({}, "", path);
