@@ -50,7 +50,7 @@ async function fetchLogin(sendData: { user: string, password: string }, errorDiv
 
 export const LoginCard = () => {
 	const div = document.createElement("div");
-	div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-64 min-h-64 mx-auto text-white justify-evenly";
+	div.className = "flex flex-col items-center gap-2 p-6 bg-gradient-to-r from-[#0D1013] to-[#101115] shadow-xl rounded-lg w-64 min-h-64 mx-auto text-white justify-evenly";
 
 	const names = ["Username", "Password"];
 	for (let i: number = 0; i < names.length; i++) {
@@ -63,10 +63,10 @@ export const LoginCard = () => {
 			input.type = "password";
 		else
 			input.type = "text";
-		input.className = "text-black p-2 border rounded focus:outline-none transition";
+		input.className = "text-white bg-transparent p-2 border-0 border-b border-white focus:outline-none focus:border-white transition";
 		input.id = names[i];
-        div.appendChild(input);
-    }
+		div.appendChild(input);
+	}
 
 	const errorDiv = document.createElement("div");
 	div.appendChild(errorDiv);

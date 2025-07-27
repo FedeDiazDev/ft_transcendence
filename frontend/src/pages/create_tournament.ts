@@ -1,65 +1,102 @@
 import { navigateTo } from "../router.js";
+import { createTournament } from "../api/game/tournamentAPI.js"
+import { joinSocket } from "../sockets/tournamentSocket.js";
+import { fetchUserData } from "../hooks/fetchUserData.js";
 
 export const CreateTournament = () => {
 	const container = document.createElement("div");
-	container.className = "flex flex-row items-center justify-center h-screen bg-gray-900 text-white gap-6";
+	container.className =
+		"flex flex-col items-center justify-center h-screen text-white gap-6";
+	const data = document.createElement("div");
+	data.className ="flex flex-col items-center justify-center gap-4";
 
-	const createSection = document.createElement("div");
-	createSection.className = "flex flex-col items-center gap-3";
+	const parentContainer = document.createElement("div");
+	parentContainer.className = "flex flex-col items-center p-16 rounded-xl bg-base-black2";
 
 	const createTitle = document.createElement("h2");
-	createTitle.textContent = "🏆 Crear Torneo";
-	createTitle.className = "text-xl font-semibold";
+	createTitle.textContent = "🏆 Create Tournament";
+	createTitle.className = "text-2xl font-semibold mb-4";
 
-	const tournamentNameInput = document.createElement("input");
-	tournamentNameInput.type = "text";
-	tournamentNameInput.placeholder = "Nombre del torneo";
-	tournamentNameInput.className = "p-2 bg-gray-800 text-white border border-gray-600 rounded-lg";
+	const createForm = document.createElement("form");
+	createForm.className = "flex flex-col gap-14 my-8";
 
-	const createButton = document.createElement("button");
-	createButton.textContent = "Crear Torneo";
-	createButton.className = "p-2 bg-blue-500 rounded-lg hover:bg-blue-600 transition cursor-pointer";
+	const nameInput = document.createElement("input");
+	nameInput.type = "text";
+	nameInput.placeholder = "Name";
+	nameInput.required = true;
+	nameInput.className =
+		"p-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-b border-white focus:outline-none focus:border-white transition";
 
-	createSection.appendChild(createTitle);
-	createSection.appendChild(tournamentNameInput);
-	createSection.appendChild(createButton);
+	const selectInput = document.createElement("select");
+	selectInput.required = true;
+	selectInput.className =
+		"appearance-none bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-0 border-b-2 border-white px-2 py-2 rounded-none";
 
-	const joinSection = document.createElement("div");
-	joinSection.className = "flex flex-col items-center gap-3";
 
-	const joinTitle = document.createElement("h2");
-	joinTitle.textContent = "🔗 Unirse a Torneo";
-	joinTitle.className = "text-xl font-semibold";
+	const fourOption = document.createElement("option");
+	fourOption.value = "4";
+	fourOption.textContent = "4 participants";
 
-	const tournamentIdInput = document.createElement("input");
-	tournamentIdInput.type = "text";
-	tournamentIdInput.placeholder = "ID del torneo";
-	tournamentIdInput.className = "p-2 bg-gray-800 text-white border border-gray-600 rounded-lg";
+	const eightOption = document.createElement("option");
+	eightOption.value = "8";
+	eightOption.textContent = "8 participants";
 
-	const joinButton = document.createElement("button");
-	joinButton.textContent = "Unirse";
-	joinButton.className = "p-2 bg-green-500 rounded-lg hover:bg-green-600 transition cursor-pointer";
+	selectInput.append(fourOption, eightOption);
 
-	joinSection.appendChild(joinTitle);
-	joinSection.appendChild(tournamentIdInput);
-	joinSection.appendChild(joinButton);
-	container.appendChild(createSection);
-	container.appendChild(joinSection);
+	const submitBtn = document.createElement("button");
+	submitBtn.type = "submit";
+	submitBtn.textContent = "Create";
+	submitBtn.className = "mt-2 px-8 py-4 rounded-xl text-white bg-base-black2 self-end";
 
-	createButton.addEventListener("click", () => {
-		// const tournamentName = tournamentNameInput.value.trim();
-		navigateTo(`/tournament/waiting_room`);
-		// if (tournamentName) {
-			// navigateTo(`/tournament/create?name=${encodeURIComponent(tournamentName)}`);
+	createForm.append(nameInput, selectInput);
+	parentContainer.append(createTitle, createForm);
+	data.appendChild(parentContainer);
+	data.appendChild(submitBtn);
+	container.append(data);
+
+	// Evento submit
+	submitBtn.addEventListener("click", async (e) => {
+		e.preventDefault();
+
+		const name = nameInput.value.trim();
+		const number_participants = parseInt(selectInput.value);
+		try {
+
+			const response = await createTournament(name, number_participants);
+			if (response.error) {
+				console.error(response.error);
+				return;
+			}
+			console.log(response);
+			console.log("Torneo creado correctamente");
+			fetchUserData((user) => {
+				joinSocket(user.username, "create", response.tournamentState.id, container, "" ,number_participants);
+				navigateTo("/tournament/join")
+
+			})
+		} catch (error) {
+			console.error("Error creating tournnament");
+		}
+		// try {
+		// 	const res = await fetch("http://localhost:3000/tournaments", {
+		// 		method: "POST",
+		// 		headers: { "Content-Type": "application/json" },
+		// 		body: JSON.stringify({
+		// 			name,
+		// 			number_participants,
+		// 			status: "open", // o el estado que uses por defecto
+		// 		}),
+		// 	});
+
+		// 	if (!res.ok) throw new Error("Error al crear el torneo");
+
+		// 	// Redirige o muestra éxito
+		// 	navigateTo("/tournaments");
+		// } catch (err) {
+		// 	console.error(err);
+		// 	alert("No se pudo crear el torneo.");
 		// }
 	});
 
-	joinButton.addEventListener("click", () => {
-		// const tournamentId = tournamentIdInput.value.trim();
-		navigateTo(`/tournament/waiting_room`);
-		// if (tournamentId) {
-			// navigateTo(`/tournament/join?id=${encodeURIComponent(tournamentId)}`);
-		// }
-	});
 	return container;
 };

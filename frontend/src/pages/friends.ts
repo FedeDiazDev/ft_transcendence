@@ -24,7 +24,7 @@ export const Friend = async () => {
     const div = document.createElement("div");
     div.innerHTML = "";
     div.className = "flex flex-col gap-6 items-center w-full";
-    div.innerHTML = `<p class="text-center font-bold text-2xl">Mis amigos</p>`;
+    div.innerHTML = `<h2 class="text-center font-bold text-2xl text-white">Mis amigos</h2>`;
 
     const resultsContainer = document.createElement("div");
     resultsContainer.className = "w-full";
@@ -52,22 +52,23 @@ export const Friend = async () => {
         if (!result || result.length === 0) {
             const noResults = document.createElement("p");
             noResults.textContent = "No se encontraron usuarios.";
-            noResults.className = "text-gray-300";
+            noResults.className = "text-white";
             resultsContainer.appendChild(noResults);
             return;
         }
 
         (result as UserI[]).forEach((user: UserI) => {
             const userRow = document.createElement("div");
-            userRow.className = "flex items-center justify-between p-1 hover:bg-gray-600 hover:text-white rounded";
+            userRow.className = "flex items-center justify-between p-4 hover:bg-gray-600 hover:text-white rounded";
 
             const userEl = document.createElement("span");
-            userEl.textContent = `👤 ${user.username}`;
+            userEl.className = "text-white p-2";
+            userEl.textContent = `👤   ${user.username}`;
 
             const addButton = document.createElement("button");
             addButton.textContent = "➕";
             addButton.title = "Agregar como amigo";
-            addButton.className = "text-green-400 hover:text-green-300 transition";
+            addButton.className = "p-2";
             addButton.addEventListener("click", async () => {
                 try {
                     console.log(`Agregar a ${user.username} (id: ${user.id})`);

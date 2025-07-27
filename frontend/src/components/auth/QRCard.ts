@@ -4,7 +4,7 @@ import { statusSocket } from "../../sockets/statusSocket.js";
 
 function formatCorrectCard(div : HTMLDivElement, qr : HTMLImageElement, qrImg : string)
 {
-	div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-100 min-h-100 mx-auto text-white justify-evenly";
+	div.className = "flex flex-col items-center gap-2 p-6 bg-gradient-to-r from-[#0D1013] to-[#101115] shadow-xl rounded-lg w-100 min-h-100 mx-auto text-white justify-evenly";
 
 	const header = document.createElement("h3");
 	header.className = "text-lg font-semibold text-white-400";
@@ -80,7 +80,7 @@ async function fetchVerify(verifyInput : string)
 
 function formatIncorrectCard(div : HTMLDivElement)
 {
-	div.className = "flex flex-col items-center justify-center gap-4 p-6 bg-gray-800 shadow-xl rounded-lg w-80 h-40 mx-auto text-white text-center";
+	div.className = "flex flex-col items-center justify-center gap-4 p-6 bg-gradient-to-r from-[#0D1013] to-[#101115] shadow-xl rounded-lg w-80 h-40 mx-auto text-white text-center";
 
 	const sorry = document.createElement("div");
 	const text = document.createElement("h3");

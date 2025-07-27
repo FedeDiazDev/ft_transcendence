@@ -6,7 +6,7 @@ import { fetchUserData } from "../../hooks/fetchUserData.js";
 
 export const FriendList = async () => {
 	const container = document.createElement("div");
-	container.className = "rounded-lg shadow-lg border flex flex-col gap-6 p-4 text-2xl mt-10 items-center w-full";
+	container.className = "rounded-lg flex flex-col gap-6 p-4 text-2xl mt-10 items-center w-full";
 
 	const statusDots = new Map<number, HTMLElement>();
 
@@ -16,27 +16,35 @@ export const FriendList = async () => {
 
 		if (!response || response.length === 0) {
 			const noFriendsMessage = document.createElement("p");
+			noFriendsMessage.className = "text-white";
 			noFriendsMessage.textContent = "No tienes amigos aún.";
 			container.appendChild(noFriendsMessage);
 			return container;
 		}
-		response.forEach(({ username, id, avatar_blob }: UserI) => {
-			console.log("Friend data:", { username, id, avatar_blob });
-			const { element, statusDot } = Friend(avatar_blob || "https://dummyimage.com/128x72/fff/aaa", username, false, id);
-			statusDots.set(id, statusDot);
+		response.forEach(({ username, id, avatar_blob, presentacion }: UserI) => {
+			const { element, statusDot } = Friend(
+				avatar_blob || "https://dummyimage.com/128x72/fff/aaa",
+				username,
+				false,
+				Number(id),
+				presentacion
+			);
+			statusDots.set(Number(id), statusDot);
 			container.appendChild(element);
-		});		
+		});
+
 		fetchUserData((user) => {
-			console.log("⚙️ fetchUserData =>", user);
 			statusSocket(user.id, user.username, "getOnlineUsers", (onlineUsers) => {
-				console.log("ONLINE USERS: ", onlineUsers);
-				const onlineIds = onlineUsers.map((u) => u.id);
+				const onlineIds = onlineUsers
+					.filter((u) => u.id !== user.id)
+					.map((u) => Number(u.id));
 				statusDots.forEach((dot, friendId) => {
 					const isOnline = onlineIds.includes(friendId);
-					dot.className = `w-3 h-3 rounded-full ${isOnline ? "bg-green-500" : "bg-gray-500"}`;
+					dot.className = `w-3 h-3 rounded-full ${isOnline ? "bg-green-500" : "bg-red-500"}`;
 					dot.title = isOnline ? "Online" : "Offline";
 				});
 			});
+
 		});
 
 	} catch (error) {

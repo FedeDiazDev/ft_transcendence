@@ -78,6 +78,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - game-data-db:/data    # SQLite
+    env_file:
+      - .env
     depends_on:
       rabbitmq:
         condition: service_healthy

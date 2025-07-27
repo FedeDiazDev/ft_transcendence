@@ -4,14 +4,14 @@ declare const google: any;
 
 async function googleCallback(response : any)
 {
-	console.log("Response: ", response);
 	try{
 		const newResponse = await fetch ("https://" + window.location.hostname + ":8080/api/auth/google-register", {
 			method : "POST",
 			headers: {"Content-type" : "application/json; charset=UTF-8"},
-			body: JSON.stringify({ "credentials" : response})
+			body: JSON.stringify({ "credential" : response.credential})
 		});
 		const data = await newResponse.json();
+    console.log("Data: ", data);
 
 		localStorage.setItem("username", data.username);
 		localStorage.setItem("email", data.email);
@@ -42,7 +42,7 @@ async function loadGoogleScript() {
 
 export const LogHomeCard = async (): Promise<HTMLElement> => {
     const div = document.createElement("div");
-    div.className = "flex flex-col items-center gap-2 p-6 bg-gray-800 shadow-xl rounded-lg w-64 min-h-80 mx-auto text-white justify-evenly";
+    div.className = "flex flex-col items-center gap-2 p-6 bg-gradient-to-r from-[#0D1013] to-[#101115] shadow-xl rounded-lg w-64 min-h-80 mx-auto text-white justify-evenly";
 
     const token = localStorage.getItem("authToken");
 
@@ -65,7 +65,7 @@ export const LogHomeCard = async (): Promise<HTMLElement> => {
 
     await loadGoogleScript();
     google.accounts.id.initialize({
-      client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com',
+      client_id: '169232875521-gqilrfir7hpghaadf7rlj8dmg94fmvp4.apps.googleusercontent.com', //This should be an .env variable
       callback: googleCallback
     });
 

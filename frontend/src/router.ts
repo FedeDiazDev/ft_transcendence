@@ -4,6 +4,7 @@ import { Profile, FriendProfile } from "./pages/profile.js";
 import { LogHome } from "./pages/loghome.js";
 import { Login } from "./pages/login.js";
 import { Signup } from "./pages/signup.js";
+import { Tournament } from "./pages/tournament.js"
 import { CreateTournament } from "./pages/create_tournament.js"
 import { Game } from "./pages/game.js"
 import { Online } from "./pages/online.js"
@@ -11,8 +12,11 @@ import { fetchUserData } from "./hooks/fetchUserData.js";
 import { statusSocket } from "./sockets/statusSocket.js";
 import { QRCode } from "./pages/qrcode.js"
 import { TwoFALogin } from "./pages/twofalogin.js"
+import { JoinTournament } from "./pages/join_tournament.js"
+import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
+import { getUserByUsername } from "./api/profile/profileAPI.js";
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -24,35 +28,51 @@ const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/friends": Friend,
   "/local_game": () => Game("local"),
   "/online_game": Online,
-  "/create_tournament": CreateTournament,
+  "/tournament": Tournament,
+  "/tournament/create": CreateTournament,
+  "/tournament/join": JoinTournament,
   "/tournament/waiting_room": Online,
+  "/stats": Stats,
   "/": Home,
 };
 
-export const render = () => {
+export const render = async () => {
   const app = document.getElementById("app");
   if (!app) return;
   app.innerHTML = "";
 
   const existingNavbar = document.getElementById("navbar");
-  if (existingNavbar){
+  if (existingNavbar) {
     existingNavbar.remove();
   }
 
-	document.body.insertBefore(Navbar(), app);
+  document.body.insertBefore(Navbar(), app);
 
   const path = window.location.pathname;
   const pathParts = path.split("/");
 
-  //navigates to a user´s friend profile (the logged user profile is at url /profile while the friend profile is at url /profile/id)
   if (pathParts[1] === "profile" && pathParts.length === 3) {
-    app.innerHTML = "";
-    const id = pathParts[2];
+    const identifier = pathParts[2];
     const div = document.createElement("div");
-    div.appendChild(FriendProfile(id));
+  
+    if (/^\d+$/.test(identifier)) {      
+      const profileComponent = FriendProfile(identifier);
+      div.appendChild(profileComponent);
+    } else {      
+      try {
+        const user = await getUserByUsername(identifier);
+        const profileElement = FriendProfile(user.id);
+        div.appendChild(profileElement);
+      } catch (error) {
+        div.innerHTML = "<h2 class='text-white'>Usuario no encontrado</h2>";
+      }
+    }
+  
     app.appendChild(div);
     return;
   }
+  
+
   const component = routes[path] || (() => {
     if (path !== '/') {
       const div = document.createElement("div");
@@ -92,36 +112,39 @@ export const authToken = () => {
 
 
 export const navigateTo = (path: string) => {
+  if (window.location.pathname === path && authToken()) {
+    return;
+  }
 
-	const publicRoutes = ["/loghome", "/login", "/signup"];
-	const twoFARoutes = ["/qrcode", "/twofalogin"];
+  const publicRoutes = ["/loghome", "/login", "/signup"];
+  const twoFARoutes = ["/qrcode", "/twofalogin"];
 
-	const username = localStorage.getItem("username");
-	const token = authToken(); 
+  const username = localStorage.getItem("username");
+  const token = authToken();
 
-	if (publicRoutes.includes(path)) {
-		window.history.pushState({}, "", path);
-		render();
-		return;
-	}
+  if (publicRoutes.includes(path)) {
+    window.history.pushState({}, "", path);
+    render();
+    return;
+  }
 
-	if (twoFARoutes.includes(path)) {
-		if (username && !token) {
-			window.history.pushState({}, "", path);
-			render();
-			return;
-		} else {
-			window.history.pushState({}, "", "/loghome");
-			render();
-			return;
-		}
-	}
+  if (twoFARoutes.includes(path)) {
+    if (username && !token) {
+      window.history.pushState({}, "", path);
+      render();
+      return;
+    } else {
+      window.history.pushState({}, "", "/loghome");
+      render();
+      return;
+    }
+  }
 
-	if (token) {
-		window.history.pushState({}, "", path);
-		render();
-	} else {
-		window.history.pushState({}, "", "/loghome");
-		render();
-	}
+  if (token) {
+    window.history.pushState({}, "", path);
+    render();
+  } else {
+    window.history.pushState({}, "", "/loghome");
+    render();
+  }
 };
