@@ -2,6 +2,7 @@ import { GameStatus } from "./GameStatus.js";
 import { Paddle } from "./Paddle.js";
 import { Ball } from "./Ball.js";
 
+
 export class Game {
 	constructor(player1Id, player2Id) {
 		this.date = new Date();
@@ -11,6 +12,10 @@ export class Game {
 			left: new Paddle("left", 0, 225, player1Id),
 			right: new Paddle("right", 1185, 225, player2Id),
 		};
+		this.lastTime = performance.now();
+		this.ballSpeed = 500;
+		this.currentTime = performance.now();
+		this.deltaTime = 0;
 		this.delayTime = 1000;
 		this.points = 10;
 		this.leftPoints = 0;
@@ -26,8 +31,8 @@ export class Game {
 		this.ball.vy = 0;
 
 		setTimeout(() => {
-			this.ball.vy = Math.random() > 0.5 ? 5 : -5;
-			this.ball.vx = Math.random() > 0.5 ? 5 : -5;
+			this.ball.vy = Math.random() > 0.5 ? this.ballSpeed : - this.ballSpeed;
+			this.ball.vx = Math.random() > 0.5 ? this.ballSpeed : - this.ballSpeed;
 		}, this.delayTime);
 	}
 
@@ -38,8 +43,11 @@ export class Game {
 	}
 
 	update() {
+		this.currentTime = performance.now();
+		this.deltaTime = (this.currentTime - this.lastTime) / 1000;
+		this.lastTime = this.currentTime;
 		if (this.status === GameStatus.PLAYING) {
-			this.ball.move();
+			this.ball.move(this.deltaTime);
 			this.paddleColision();			
 		}
 		if (this.ball.x <= 0) {
@@ -50,8 +58,13 @@ export class Game {
 			this.resetBall();
 			this.checkScore("left");
 		}
-		if (this.ball.y <= 0 || this.ball.y + this.ball.height >= 600) {
-			this.ball.vy *= -1;
+		if (this.ball.y <= 0) {
+			this.ball.y = 0;
+			this.ball.vy = Math.abs(this.ball.vy);
+		}
+		else if (this.ball.y + this.ball.height >= 600) {
+			this.ball.y = 600 - this.ball.height;
+			this.ball.vy = -Math.abs(this.ball.vy);
 		}
 	}
 
@@ -63,8 +76,8 @@ export class Game {
 		this.ball.vy = 0;
 		if (this.status === GameStatus.PLAYING) {			
 			setTimeout(() => {
-				this.ball.vy = Math.random() > 0.5 ? 5 : -5;
-				this.ball.vx = Math.random() > 0.5 ? 5 : -5;
+				this.ball.vy = Math.random() > 0.5 ? 300 : -300;
+				this.ball.vx = Math.random() > 0.5 ? 300 : -300;
 			}, this.delayTime);
 		}
 	}
@@ -85,12 +98,12 @@ export class Game {
 		if (this.ball.x <= paddleLeft.x + paddleLeft.width && this.ball.y + this.ball.height > paddleLeft.y && this.ball.y < paddleLeft.y + paddleLeft.height) {
 			let hitZone = (this.ball.y - paddleLeft.y) / (paddleLeft.height / 8);
 			this.ball.vx *= -1;
-			this.ball.vy = (hitZone - 0.5) * 5 * (Math.abs(this.ball.vx) / 20);
+			this.ball.vy = (hitZone - 0.5) * this.ballSpeed * (Math.abs(this.ball.vx) / (this.ballSpeed * 4));
 		}
 		else if (this.ball.x + this.ball.width >= paddleRight.x && this.ball.y + this.ball.height > paddleRight.y && this.ball.y < paddleRight.y + paddleRight.height) {
 			let hitZone = (this.ball.y - paddleRight.y) / (paddleRight.height / 8);
 			this.ball.vx *= -1;
-			this.ball.vy = (hitZone - 0.5) * 5 * (Math.abs(this.ball.vx) / 20);
+			this.ball.vy = (hitZone - 0.5) * this.ballSpeed * (Math.abs(this.ball.vx) / (this.ballSpeed * 4));
 		}
 	}
 }
