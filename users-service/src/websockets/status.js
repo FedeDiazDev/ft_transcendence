@@ -28,7 +28,7 @@ export async function friendsStatus(fastify, opts) {
                 //console.log("ACtION", action);
                 if (action === 'getOnlineUsers') {
                     //console.log("USEEEEEERE ONLINE");
-                    console.log("QUEUE: ", queue);
+                    //console.log("QUEUE: ", queue);
                     const onlineUsers = queue.map(({ id, username }) => ({ id, username }));
                     //console.log("ACTION: ", onlineUsers);
                     socket.send(JSON.stringify({ action: 'onlineUsers', users: onlineUsers }));

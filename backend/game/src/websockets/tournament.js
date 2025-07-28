@@ -1,7 +1,7 @@
 import { closeTournament } from "../controllers/tournamentController.js";
 
 function deletePlayerFromTournament(username, tournamentId, db) {
-    console.log("Intentando borrar:", username, tournamentId);
+    //console.log("Intentando borrar:", username, tournamentId);
     try {
         const query = db.prepare(`
             DELETE FROM tournament_players 
@@ -68,10 +68,14 @@ async function tournamentLogic(fastify, opts) {
                 if (data.action === "join") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament) return;
-                    tournament.players.push({ username: data.username, socket });
-                    console.log("Torneo:", tournamentId);
-                    console.log("Jugadores actuales:", tournament.players.map(p => p.username));
-                    console.log("Esperados:", tournament.number_players);
+                    const existingPlayer = tournament.players.find(p => p.username === data.username);
+                    if (existingPlayer) {                        
+                        existingPlayer.socket = socket;
+                    } else {                     
+                        tournament.players.push({ username: data.username, socket });
+                    }                    // console.log("Torneo:", tournamentId);
+                    // console.log("Jugadores actuales:", tournament.players.map(p => p.username));
+                    // console.log("Esperados:", tournament.number_players);
 
                     if (tournament.players.length < tournament.number_players) {
                         tournament.players.forEach(p => {
@@ -134,7 +138,7 @@ async function tournamentLogic(fastify, opts) {
                     }
 
                     return;
-                }                
+                }
                 if (data.action === "report_winner" || data.action === "tournament_match_finished") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament || tournament.status === "finished") return;
@@ -180,7 +184,7 @@ async function tournamentLogic(fastify, opts) {
                             }));
                             p.socket.close();
                         });
-                        closeTournament(tournamentId);
+                        closeTournament(fastify.db, tournamentId);
                         return;
                     }
                     tournament.round += 1;

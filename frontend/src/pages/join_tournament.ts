@@ -1,4 +1,4 @@
-import { openTournaments, registerPlayer } from "../api/game/tournamentAPI.js";
+import { openTournaments, registerPlayer, checkPlayer } from "../api/game/tournamentAPI.js";
 import { fetchUserData } from "../hooks/fetchUserData.js";
 import { joinSocket } from "../sockets/tournamentSocket.js"
 
@@ -67,7 +67,7 @@ export const JoinTournament = () => {
 					return;
 				}
 
-				try {					
+				try {
 					const response = await registerPlayer(tournament.id, alias);
 					if (response.error) {
 						showError(response.error);
@@ -101,13 +101,10 @@ export const JoinTournament = () => {
 					joinButton.textContent = "Unirse";
 				}
 			});
-
-
 			tournamentCard.appendChild(name);
 			tournamentCard.appendChild(players);
 			tournamentCard.appendChild(status);
 			tournamentCard.appendChild(joinButton);
-
 			tournamentsContainer.appendChild(tournamentCard);
 		});
 	};
@@ -119,11 +116,51 @@ export const JoinTournament = () => {
 				showError(response.error);
 				return;
 			}
+			tournamentsContainer.innerHTML = "";
 			renderTournaments(response.tournaments);
 		} catch (error) {
 			showError("Error al obtener torneos");
 		}
 	})();
 
+	(async () => {
+		try {
+			const tournamentStatus = await checkPlayer();			
+			if (tournamentStatus?.result) {
+				const { tournament_id } = tournamentStatus.result;
+				const alias = localStorage.getItem("lastTournamentAlias") || "default :(";
+
+				const gameContainer = document.createElement("div");
+				gameContainer.className = "flex flex-col items-center justify-center h-screen text-white";
+				parentContainer.innerHTML = "";
+				parentContainer.appendChild(gameContainer);
+
+				const queueList = document.createElement("ul");
+				queueList.id = "queue-list";
+				gameContainer.appendChild(queueList);
+
+				fetchUserData((user) => {
+					window.tournamentSocket = joinSocket(
+						user.username,
+						"join",
+						tournament_id,
+						gameContainer,
+						alias
+					);
+				});
+				return;
+			}
+
+			const response = await openTournaments();
+			if (response?.error) {
+				showError(response.error);
+				return;
+			}
+			tournamentsContainer.innerHTML = "";
+			renderTournaments(response.tournaments);
+		} catch (error) {
+			showError("Error al obtener torneos");
+		}
+	})();
 	return container;
 };

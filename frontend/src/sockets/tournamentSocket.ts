@@ -6,7 +6,7 @@ let interval: number | null = null;
 export const joinSocket = (username: string, action: string, tournamentId: number, container: any, alias?: string, nb_players?: number) => {
     let socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/tournament_logic");
     socket.onopen = function () {
-        console.log("✅ WebSocket conectado");
+        // console.log("✅ WebSocket conectado");
         interval = setInterval(() => {
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({ action: "ping" }));

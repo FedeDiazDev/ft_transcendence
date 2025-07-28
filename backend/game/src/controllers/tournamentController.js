@@ -41,7 +41,6 @@ function validateAuthorizationHeader(request) {
     }
 }
 
-//? Si pasa x tiempo sin que el torneo se inice, se cierra cambiando el status?
 
 export async function createTournament(request, reply) {
     const { name, players } = request.body;
@@ -90,13 +89,10 @@ export async function listOpenTournaments(request, reply) {
     }
 }
 
-export async function closeTournament(request, reply) {
-  
-    const db = request.server.db;
-    const { tournamentId } = request.body;
 
+export async function closeTournament(db, tournamentId) {
     if (!tournamentId) {
-        return reply.status(400).send({ error: "ID de torneo no proporcionado" });
+        throw new Error("ID de torneo no proporcionado");
     }
 
     try {
@@ -104,13 +100,13 @@ export async function closeTournament(request, reply) {
         const result = query.run(tournamentId);
 
         if (result.changes === 0) {
-            return reply.status(404).send({ error: "Torneo no encontrado" });
+            throw new Error("Torneo no encontrado");
         }
 
-        return reply.status(200).send({ message: "Torneo cerrado correctamente" });
+        return { message: "Torneo cerrado correctamente" };
     } catch (error) {
         console.error("Error al cerrar el torneo:", error);
-        return reply.status(500).send({ error: "Error al cerrar el torneo" });
+        throw new Error("Error al cerrar el torneo");
     }
 }
 
@@ -121,7 +117,6 @@ export async function addPlayerToTournament(request, reply) {
     if (!username) {
         return reply.status(400).send({ error: "Falta el username" });
     }
-    console.log("BODYYYYY: ", request.body);
     const { tournamentId, alias } = request.body;
     if (!tournamentId || !alias) {
         return reply.status(400).send({ error: "Faltan datos" });
@@ -158,4 +153,28 @@ export async function addPlayerToTournament(request, reply) {
         }
         return reply.status(500).send({ error: "Error al añadir jugador al torneo" });
     }
+}
+
+export async function checkPlayerTournament(request, reply) {
+    const username = getUsername(request, reply);
+    if (!username) {
+        return reply.status(400).send({ error: "Falta el username" });
+    }
+    const db = request.server.db;
+    try {
+        const query = db.prepare(`SELECT tp.tournament_id, t.status
+		FROM tournament_players tp
+		JOIN tournaments t ON tp.tournament_id = t.id
+		WHERE tp.username = ? AND t.status IN ('open')
+		LIMIT 1`);
+        const result = query.get(username);
+        console.log("USERNAME:", username);
+        console.log("RESULTADO:", result);
+        reply.status(200).send({ message: "Checkeo Player", result });
+
+    } catch (error) {
+        return reply.status(500).send({ error: "Error al checkear el jugador" });
+
+    }
+
 }

@@ -99,3 +99,23 @@ export const closeTournament = async (tournamentId: number): Promise<any> => {
         throw error;
     }
 };
+
+
+export const checkPlayer = async () => {
+    try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(`${API_URLS.game}/tournament/user`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch stats: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error en /tournament/open:", error)
+    }
+}
