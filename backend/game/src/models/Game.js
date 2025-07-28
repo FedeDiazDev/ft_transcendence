@@ -11,12 +11,24 @@ export class Game {
 			left: new Paddle("left", 0, 225, player1Id),
 			right: new Paddle("right", 1185, 225, player2Id),
 		};
+		this.delayTime = 1000;
 		this.points = 10;
 		this.leftPoints = 0;
 		this.rightPoints = 0;
 	}
 	start() {
 		this.status = GameStatus.PLAYING;
+
+		this.ball.x = 600;
+		this.ball.y = 300;
+
+		this.ball.vx = 0;
+		this.ball.vy = 0;
+
+		setTimeout(() => {
+			this.ball.vy = Math.random() > 0.5 ? 5 : -5;
+			this.ball.vx = Math.random() > 0.5 ? 5 : -5;
+		}, this.delayTime);
 	}
 
 	movePaddle(player, direction) {
@@ -46,13 +58,14 @@ export class Game {
 	resetBall() {
 		this.ball.x = 600;
 		this.ball.y = 300;
+
+		this.ball.vx = 0;
+		this.ball.vy = 0;
 		if (this.status === GameStatus.PLAYING) {			
-			this.ball.vy = Math.random() > 0.5 ? 5 : -5;
-		}
-		else
-		{
-			this.ball.vx = 0;
-			this.ball.vy = 0;
+			setTimeout(() => {
+				this.ball.vy = Math.random() > 0.5 ? 5 : -5;
+				this.ball.vx = Math.random() > 0.5 ? 5 : -5;
+			}, this.delayTime);
 		}
 	}
 
