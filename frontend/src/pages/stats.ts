@@ -36,12 +36,18 @@ export const Stats = async (): Promise<HTMLElement> => {
     const games: GameStats[] = await getAllGames();
 
     if (!players || players.length === 0) {
-      wrapper.appendChild(document.createTextNode("No player stats found."));
+      const noPlayersMsg = document.createElement("p");
+      noPlayersMsg.textContent = "No player stats found... Play some games to create them!";
+      noPlayersMsg.className = "text-white";
+      wrapper.appendChild(noPlayersMsg);
       return wrapper;
     }
 
     if (!games || games.length === 0) {
-      wrapper.appendChild(document.createTextNode("No game history found."));
+      const noGamesMsg = document.createElement("p");
+      noGamesMsg.textContent = "No game history found... Play some games to create it!";
+      noGamesMsg.className = "text-white";
+      wrapper.appendChild(noGamesMsg);
       return wrapper;
     }
 
