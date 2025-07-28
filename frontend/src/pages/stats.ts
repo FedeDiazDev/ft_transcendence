@@ -9,124 +9,153 @@ declare global {
 }
 export const Chart = window.Chart;
 
+const colorScale = [
+  "#488f31",
+  "#de425b",
+  "#6ca257",
+  "#e76b77",
+  "#8eb67c",
+  "#ee8e94",
+  "#afc9a2",
+  "#f2afb2",
+  "#d0ddc9",
+  "#f3d0d1"
+];
 
-export const Stats = async () => {
-
+export const Stats = async (): Promise<HTMLElement> => {
   try {
-    const container = document.createElement("div");
-    container.className = "flex flex-col gap-6 items-center w-full p-4";
+    const wrapper: HTMLDivElement = document.createElement("div");
+    wrapper.className = "flex flex-col items-center gap-6 w-full max-w-5xl mx-auto";
 
-    const title = document.createElement("h2");
-    title.textContent = "📊 Estadísticas Generales";
-    title.className = "text-2xl font-bold text-center";
-    container.appendChild(title);
+    const title: HTMLHeadingElement = document.createElement("h2");
+    title.textContent = "Stats";
+    title.className = "text-2xl font-bold text-white text-center";
+    wrapper.appendChild(title);
 
-    const players = await getAllPlayers();
+    const players: PlayerStats[] = await getAllPlayers();
+    const games: GameStats[] = await getAllGames();
+
     if (!players || players.length === 0) {
-      container.appendChild(document.createTextNode("No player stats found."));
-      return container;
+      const noPlayersMsg = document.createElement("p");
+      noPlayersMsg.textContent = "No player stats found... Play some games to create them!";
+      noPlayersMsg.className = "text-white";
+      wrapper.appendChild(noPlayersMsg);
+      return wrapper;
+    }
+
+    if (!games || games.length === 0) {
+      const noGamesMsg = document.createElement("p");
+      noGamesMsg.textContent = "No game history found... Play some games to create it!";
+      noGamesMsg.className = "text-white";
+      wrapper.appendChild(noGamesMsg);
+      return wrapper;
     }
 
     // Leaderboard
-    const leaderboard = document.createElement("div");
-    leaderboard.className = "w-full max-w-2xl";
+    const leaderboardCard: HTMLDivElement = document.createElement("div");
+    leaderboardCard.className = "w-full bg-base-black2 rounded-lg shadow-md p-4";
 
-    const heading = document.createElement("h3");
-    heading.textContent = "🏆 Ranking Global";
-    heading.className = "text-xl font-semibold mb-2";
-    leaderboard.appendChild(heading);
+    const leaderboardTitle: HTMLHeadingElement = document.createElement("h3");
+    leaderboardTitle.className = "text-xl font-semibold text-white mb-4";
+    leaderboardTitle.textContent = "Global Ranking";
+    leaderboardCard.appendChild(leaderboardTitle);
 
-    const list = document.createElement("ul");
-    list.className = "bg-gradient-to-r from-[#0D1013] to-[#101115] rounded p-4 divide-y divide-gray-700 shadow-md";
+    const ul: HTMLUListElement = document.createElement("ul");
+    ul.className = "divide-y divide-gray-700";
 
     players
-      .sort((a: PlayerStats, b: PlayerStats) => b.elo - a.elo)
+      .sort((a, b) => b.elo - a.elo)
       .forEach((player: PlayerStats) => {
-        const li = document.createElement("li");
-        li.className = "py-2 flex justify-between";
-        li.innerHTML = `<span class="text-white hover:underline cursor-pointer">👤 ${player.username}</span><span class="font-bold text-yellow-400">${player.elo}</span>`;
-        const usernameSpan = li.querySelector("span");
-        if (usernameSpan) {
-          usernameSpan.addEventListener("click", () => {
-            navigateTo(`/profile/${player.username}`);
-          });
-        }
+        const li: HTMLLIElement = document.createElement("li");
+        li.className = "flex justify-between py-2 text-white hover:bg-gray-800 px-2 rounded cursor-pointer";
 
-        list.appendChild(li);
+        const usernameSpan: HTMLSpanElement = document.createElement("span");
+        usernameSpan.textContent = `👤 ${player.username}`;
+        usernameSpan.addEventListener("click", () => navigateTo(`/profile/${player.username}`));
+
+        const eloSpan: HTMLSpanElement = document.createElement("span");
+        eloSpan.className = "font-bold text-yellow-400";
+        eloSpan.textContent = `${player.elo}`;
+
+        li.appendChild(usernameSpan);
+        li.appendChild(eloSpan);
+        ul.appendChild(li);
       });
 
-    leaderboard.appendChild(list);
-    container.appendChild(leaderboard);
+    leaderboardCard.appendChild(ul);
+    wrapper.appendChild(leaderboardCard);
 
-    const games = await getAllGames();
-    if (!games || games.length === 0) {
-      container.appendChild(document.createTextNode("No game history found."));
-      return container;
-    }
+    // Wins Average
+    const statsCard: HTMLDivElement = document.createElement("div");
+    statsCard.className = "w-full bg-base-black2 text-white p-4 rounded-lg shadow-md";
+    const avgWins: number = games.length / players.length;
+    statsCard.innerHTML = `
+      <p class="text-center">Average Wins per Player: <strong>${avgWins.toFixed(2)}</strong></p>
+    `;
+    wrapper.appendChild(statsCard);
 
-    // Average wins per player
-    const totalWins = games.length;
-    const averageWins = totalWins / players.length;
+    // Chart Container
+    const chartContainer: HTMLDivElement = document.createElement("div");
+    chartContainer.className = "flex flex-col md:flex-row gap-4 w-full";
 
-    const avgDiv = document.createElement("div");
-    avgDiv.className = "text-center mt-4 text-gray-300";
-    avgDiv.textContent = `🏆 Promedio de victorias por jugador: ${averageWins.toFixed(2)}`;
-    container.appendChild(avgDiv);
+    // Wins Pie Chart
+    const winsDiv: HTMLDivElement = document.createElement("div");
+    winsDiv.className = "w-full md:w-1/2 bg-base-black2 p-4 rounded-lg shadow-md";
 
-    // Wins per player Pie Chart
-    const winsChartDiv = document.createElement("div");
-    winsChartDiv.className = "w-full max-w-md";
-    const winsCanvas = document.createElement("canvas");
-    winsChartDiv.appendChild(winsCanvas);
-    container.appendChild(winsChartDiv);
+    const winsCanvas: HTMLCanvasElement = document.createElement("canvas");
+    winsDiv.appendChild(winsCanvas);
+    chartContainer.appendChild(winsDiv);
 
-    // Calculate wins per player
     const winsCount: Record<string, number> = {};
     games.forEach((game: GameStats) => {
       winsCount[game.winner_username] = (winsCount[game.winner_username] || 0) + 1;
     });
 
-    const winsLabels = Object.keys(winsCount);
-    const winsData = Object.values(winsCount);
+    const winsLabels: string[] = Object.keys(winsCount);
+    const winsData: number[] = Object.values(winsCount);
 
     new Chart(winsCanvas, {
       type: "pie",
       data: {
         labels: winsLabels,
         datasets: [{
-          label: "Victorias",
+          label: "Wins",
           data: winsData,
-          backgroundColor: [
-            "#FBBF24", "#34D399", "#60A5FA", "#F472B6",
-            "#F87171", "#A78BFA", "#4ADE80", "#FCD34D"
-          ],
+          backgroundColor: colorScale,
         }],
       },
       options: {
         plugins: {
           title: {
             display: true,
-            text: "🏆 Distribución de Victorias por Jugador",
-            color: "#e5e7eb"
+            text: "Wins Distribution",
+            color: "#e5e7eb",
           },
           legend: {
             labels: {
-              color: "#e5e7eb"
-            }
-          }
-        }
-      }
+              color: "#e5e7eb",
+            },
+          },
+        },
+      },
     });
 
     // ELO Bar Chart
-    const eloChartDiv = document.createElement("div");
-    eloChartDiv.className = "w-full max-w-md";
-    const eloCanvas = document.createElement("canvas");
-    eloChartDiv.appendChild(eloCanvas);
-    container.appendChild(eloChartDiv);
+    const eloDiv: HTMLDivElement = document.createElement("div");
+    eloDiv.className = "w-full md:w-1/2 bg-base-black2 p-4 rounded-lg shadow-md";
 
-    const eloLabels = players.map((p: PlayerStats) => p.username);
-    const eloData = players.map((p: PlayerStats) => p.elo);
+    const scrollWrapper: HTMLDivElement = document.createElement("div");
+    scrollWrapper.className = "overflow-x-auto";
+
+    const eloCanvas: HTMLCanvasElement = document.createElement("canvas");
+    eloCanvas.height = 300;
+    scrollWrapper.appendChild(eloCanvas);
+    eloDiv.appendChild(scrollWrapper);
+    chartContainer.appendChild(eloDiv);
+
+    const eloLabels: string[] = players.map((p) => p.username);
+    const eloData: number[] = players.map((p) => p.elo);
+
 
     new Chart(eloCanvas, {
       type: "bar",
@@ -135,100 +164,85 @@ export const Stats = async () => {
         datasets: [{
           label: "ELO",
           data: eloData,
-          backgroundColor: "#3B82F6", // Tailwind blue-500
+          backgroundColor: "#ee8e94",
         }],
       },
       options: {
         plugins: {
           title: {
             display: true,
-            text: "📊 ELO de Jugadores",
-            color: "#e5e7eb"
+            text: "Players' ELO",
+            color: "#e5e7eb",
           },
           legend: {
             labels: {
-              color: "#e5e7eb"
-            }
-          }
+              color: "#e5e7eb",
+            },
+          },
         },
         scales: {
           x: {
             ticks: {
-              color: "#e5e7eb"
-            }
+              color: "#e5e7eb",
+            },
           },
           y: {
+            beginAtZero: true,
             ticks: {
-              color: "#e5e7eb"
+              color: "#e5e7eb",
             },
-            beginAtZero: true
-          }
-        }
-      }
+          },
+        },
+      },
     });
+
+    // Add chart container to DOM
+    wrapper.appendChild(chartContainer);
 
     // Game History
-    const gameHistory = document.createElement("div");
-    gameHistory.className = "w-full max-w-2xl";
+    const historyCard: HTMLDivElement = document.createElement("div");
+    historyCard.className = "w-full bg-base-black2 rounded-lg p-4 shadow-md";
 
-    const gameTitle = document.createElement("h3");
-    gameTitle.textContent = "📅 Historial de Partidas";
-    gameTitle.className = "text-xl font-semibold mt-6 mb-2";
-    gameHistory.appendChild(gameTitle);
+    const historyTitle: HTMLHeadingElement = document.createElement("h3");
+    historyTitle.textContent = "Game History";
+    historyTitle.className = "text-xl font-semibold text-white mb-4";
+    historyCard.appendChild(historyTitle);
 
-    const gameList = document.createElement("ul");
-    gameList.className = "bg-gradient-to-r from-[#0D1013] to-[#101115] rounded p-4 divide-y divide-gray-700 shadow-md";
+    const historyList: HTMLUListElement = document.createElement("ul");
+    historyList.className = "space-y-2 text-white max-h-64 overflow-y-auto";
 
     games.forEach((game: GameStats) => {
-      const li = document.createElement("li");
-      li.className = "py-2";
+      const li: HTMLLIElement = document.createElement("li");
+      li.className = "text-sm";
 
-      const date = new Date(game.game_date).toLocaleString();
+      const date: string = new Date(game.game_date).toLocaleString();
 
-      const winnerLink = document.createElement("span");
-      winnerLink.textContent = game.winner_username;
-      winnerLink.className = "text-white hover:underline cursor-pointer";
-      winnerLink.addEventListener("click", () => navigateTo(`/profile/${game.winner_username}`));
+      li.innerHTML = `
+        <strong class="hover:underline cursor-pointer text-white" data-user="${game.winner_username}">${game.winner_username}</strong>
+        won 
+        <strong class="hover:underline cursor-pointer" data-user="${game.looser_username}">${game.looser_username}</strong>
+        (${game.looser_points} points) — <span class="text-gray-400"> on ${date}</span>
+      `;
 
-      const looserLink = document.createElement("span");
-      looserLink.textContent = game.looser_username;
-      looserLink.className = "hover:underline cursor-pointer";
-      looserLink.addEventListener("click", () => navigateTo(`/profile/${game.looser_username}`));
+      li.querySelectorAll<HTMLElement>("[data-user]").forEach((el) => {
+        el.addEventListener("click", () => {
+          const username = el.getAttribute("data-user");
+          if (username) navigateTo(`/profile/${username}`);
+        });
+      });
 
-      const strongWinner = document.createElement("strong");
-      strongWinner.appendChild(winnerLink);
-
-      const strongLooser = document.createElement("strong");
-      strongLooser.appendChild(looserLink);
-
-      const text1 = document.createTextNode("🏁 ");
-      const text2 = document.createTextNode(" venció a ");
-      const text3 = document.createTextNode(` (${game.looser_points} pts) `);
-
-      const dateSpan = document.createElement("span");
-      dateSpan.className = "text-sm text-gray-400 ml-2";
-      dateSpan.textContent = `📆 ${date}`;
-
-      li.appendChild(text1);
-      li.appendChild(strongWinner);
-      li.appendChild(text2);
-      li.appendChild(strongLooser);
-      li.appendChild(text3);
-      li.appendChild(dateSpan);
-
-      gameList.appendChild(li);
+      historyList.appendChild(li);
     });
 
-    gameHistory.appendChild(gameList);
-    container.appendChild(gameHistory);
+    historyCard.appendChild(historyList);
+    wrapper.appendChild(historyCard);
 
+    return wrapper;
 
-    return container;
   } catch (error) {
     console.error("Error loading stats page:", error);
-    const container = document.createElement("div");
-    container.textContent = "Error al cargar las estadísticas.";
-    return container;
+    const errDiv: HTMLDivElement = document.createElement("div");
+    errDiv.textContent = "Error while loading stats!";
+    return errDiv;
   }
 };
-
