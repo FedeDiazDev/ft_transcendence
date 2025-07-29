@@ -133,7 +133,7 @@ services:
   # Other services here
   elasticsearch:
     container_name: elasticsearch
-    image: elasticsearch:8.18.0
+    image: elasticsearch:7.17.28
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data
       - ./monitoring/elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -141,19 +141,22 @@ services:
       - discovery.type=single-node
       - http.host=0.0.0.0
       - transport.host=0.0.0.0
-      - xpack.security.enabled=false
+      - xpack.ml.enabled=false
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=changeme
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     networks:
       - transcendence-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9200"]
-      interval: 30s
+      test: ["CMD", "curl", "-u", "elastic:changeme", "-f", "http://localhost:9200"]
+      interval: 15s
       timeout: 10s
       retries: 5
     mem_limit: 1gb
   
   logstash:
     container_name: logstash
-    image: logstash:8.18.0
+    image: logstash:7.17.28
     volumes:
       - ./monitoring/elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./monitoring/elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
@@ -169,7 +172,7 @@ services:
 # docker-compose restart kibana
   kibana:
     container_name: kibana
-    image: kibana:8.18.0
+    image: kibana:7.17.28
     volumes:
       - ./monitoring/elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
       - kibana:/usr/share/kibana/data
@@ -180,11 +183,8 @@ services:
       - "5601:5601"
     networks:
       - transcendence-network
-    logging:
-      driver: gelf
-      options:
-        gelf-address: "udp://localhost:12201"
-        tag: "transcendence"
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=768
 
 volumes:
   front-spa:
