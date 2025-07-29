@@ -69,24 +69,25 @@ async function tournamentLogic(fastify, opts) {
                     const tournament = tournaments[tournamentId];
                     if (!tournament) return;
                     const existingPlayer = tournament.players.find(p => p.username === data.username);
-                    if (existingPlayer) {                        
+                    if (existingPlayer) {
                         existingPlayer.socket = socket;
-                    } else {                     
+                    } else {
                         tournament.players.push({ username: data.username, socket });
                     }                    // console.log("Torneo:", tournamentId);
                     // console.log("Jugadores actuales:", tournament.players.map(p => p.username));
                     // console.log("Esperados:", tournament.number_players);
-
                     if (tournament.players.length < tournament.number_players) {
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
                                 action: "update_queue",
                                 players: tournament.players.map(pl => pl.username),
-                                tournamentId
+                                tournamentId,
+                                numberPlayers: tournament.number_players
                             }));
                         });
                         return;
                     }
+
                     shuffle(tournament.players);
                     if (tournament.players.length === tournament.number_players) {
                         console.log("Se alcanzó el número de jugadores. Empezando torneo...");

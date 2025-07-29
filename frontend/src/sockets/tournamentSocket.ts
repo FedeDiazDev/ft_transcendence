@@ -40,7 +40,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     const score = document.createElement("p");
                     score.innerText = "0 - 0";
                     score.className = "text-[#C4C4C4]"
-                    container.appendChild(score);                    
+                    container.appendChild(score);
                     container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo, alias));
                 }
                 break;
@@ -48,23 +48,50 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 const queueList = document.getElementById("queue-list");
                 if (queueList) {
                     queueList.innerHTML = "";
+
+                    const currentCount = data.players.length;
+                    const maxCount = data.numberPlayers || "?";
+
+                    const title = document.createElement("h2");
+                    title.textContent = `Jugadores en cola (${currentCount}/${maxCount})`;
+                    title.className = "text-2xl font-semibold mb-6 text-white";
+                    queueList.appendChild(title);
+
+                    const cardContainer = document.createElement("div");
+                    cardContainer.className = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4";
+
                     data.players.forEach((username: string) => {
-                        const li = document.createElement("li");
-                        li.textContent = username;
-                        queueList.appendChild(li);
+                        const card = document.createElement("div");
+                        card.className = "bg-[#1A1D21] rounded-xl p-4 shadow-md border border-gray-700 flex items-center gap-4 opacity-0 animate-fade-in";
+
+                        const avatar = document.createElement("div");
+                        avatar.className = "w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm";
+                        avatar.textContent = username.charAt(0).toUpperCase();
+
+                        const name = document.createElement("p");
+                        name.textContent = username;
+                        name.className = "text-white text-md";
+
+                        card.appendChild(avatar);
+                        card.appendChild(name);
+                        cardContainer.appendChild(card);
                     });
+
+                    queueList.appendChild(cardContainer);
                 }
                 break;
+
+
             case "tournament_match_finished":
                 container.innerHTML = "";
                 const waitMsg = document.createElement("p");
                 waitMsg.innerText = "Esperando siguiente ronda...";
                 container.appendChild(waitMsg);
                 break;
-            case "report_winner":
-                const { winner, round, tournamentId } = data;
-                console.log("WINNER: ", data);
-                break;
+            // case "report_winner":
+            //     const { winner, round, tournamentId } = data;
+            //     console.log("WINNER: ", data);
+            //     break;
             case "tournament_ended":
                 container.innerHTML = "";
                 const resultMsg = document.createElement("h2");
@@ -75,12 +102,12 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     navigateTo("/");
                 }, 3000);
                 break;
-            case "waiting_players":
-                container.innerHTML = "";
-                const waiting = document.createElement("p");
-                waiting.innerText = `Jugadores unidos: ${data.joined}/${data.required}`;
-                container.appendChild(waiting);
-                break;
+            // case "waiting_players":
+            //     container.innerHTML = "";
+            //     const waiting = document.createElement("p");
+            //     waiting.innerText = `Jugadores unidos: ${data.joined}/${data.required}`;
+            //     container.appendChild(waiting);
+            //     break;
             case "pong":
                 break;
             case "eliminated_from_tournament":
