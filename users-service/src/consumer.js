@@ -8,7 +8,7 @@ function registerUserInDatabase(username, db){
 	const avatarBlob = fs.readFileSync("/data/pics/defaultAvatar.png");
 
 	const query = db.prepare("INSERT INTO users (username, avatar_blob, presentacion) VALUES (?, ?, ?)");
-	query.run(username,  avatarBlob, "Hola soy un nuevo usuario");
+	query.run(username,  avatarBlob, "Hi! I'm a new user, how are you doing?");
 	console.log("User created in database");
 }
 
