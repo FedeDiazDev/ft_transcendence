@@ -53,11 +53,23 @@ export async function createTournament(request, reply) {
     } catch (error) {
         return reply.status(401).send({ error: error.message });
     }
-    const db = request.server.db;
-    try {
 
-        const query = db.prepare("INSERT INTO tournaments(name, status,number_players, created_at) VALUES(?, ?, ?, ?)");
-        const info = query.run(name, "open", players, new Date().toISOString());
+    const db = request.server.db;
+
+    try {
+        const checkQuery = db.prepare("SELECT id, status FROM tournaments WHERE name = ?");
+        const existing = checkQuery.get(name);
+
+        if (existing) {
+            return reply.status(409).send({
+                message: "El torneo ya existe",
+                tournamentId: existing.id,
+                status: existing.status,
+            });
+        }
+        const insertQuery = db.prepare("INSERT INTO tournaments(name, status, number_players, created_at) VALUES (?, ?, ?, ?)");
+        const info = insertQuery.run(name, "open", players, new Date().toISOString());
+
         const tournament = {
             id: info.lastInsertRowid,
             name,
@@ -65,11 +77,18 @@ export async function createTournament(request, reply) {
             number_participants: players,
             created_at: new Date().toISOString(),
         };
-        return reply.status(200).send({ message: "Juego creado", tournamentState: tournament });
+
+        return reply.status(200).send({
+            message: "Torneo creado",
+            tournamentState: tournament,
+        });
+
     } catch (error) {
         return reply.status(500).send({ error: "Error al crear el torneo" });
     }
 }
+
+
 
 export async function listOpenTournaments(request, reply) {
     let payload;

@@ -1,7 +1,6 @@
 import { API_URLS } from "../apiConfig.js"
 
 export const createTournament = async (name: string, players: number) => {
-
     try {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.game}/tournament/create`, {
@@ -10,21 +9,34 @@ export const createTournament = async (name: string, players: number) => {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ name: name, players: players })
+            body: JSON.stringify({ name, players })
         });
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
+
         const data = await response.json();
+
+        if (response.status === 409) {
+            throw new Error("409");
+        }
+
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(`Error ${response.status}: ${err.error}`);
+        }
         if (!data || !data.tournamentState) {
             throw new Error("Respuesta inválida del servidor");
         }
-        return data;
+
+        return {
+            exists: false,
+            tournamentState: data.tournamentState
+        };
+
     } catch (error) {
         console.error("Error en /tournament/create: ", error);
         throw error;
     }
-}
+};
 
 export const registerPlayer = async (tournamentId: number, alias: string) => {
     console.log("DATOS: ", tournamentId, alias);
