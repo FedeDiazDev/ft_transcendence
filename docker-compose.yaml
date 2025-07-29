@@ -129,8 +129,12 @@ services:
       retries: 5
       start_period: 30s
       timeout: 5s
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
 
-  # Other services here
   elasticsearch:
     container_name: elasticsearch
     image: elasticsearch:7.17.28
@@ -143,12 +147,12 @@ services:
       - transport.host=0.0.0.0
       - xpack.ml.enabled=false
       - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=changeme
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
     networks:
       - transcendence-network
     healthcheck:
-      test: ["CMD", "curl", "-u", "elastic:changeme", "-f", "http://localhost:9200"]
+      test: ["CMD", "curl", "-u", "elastic:$ELASTIC_PASSWORD", "-f", "http://localhost:9200"]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -167,6 +171,8 @@ services:
       - 12201:12201/udp
     networks:
       - transcendence-network
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
 
 # Generate keys: docker exec -it kibana /bin/bash /usr/share/kibana/bin/kibana-encryption-keys generate
 # docker-compose restart kibana
@@ -185,6 +191,8 @@ services:
       - transcendence-network
     environment:
       - NODE_OPTIONS=--max-old-space-size=768
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
 
 volumes:
   front-spa:

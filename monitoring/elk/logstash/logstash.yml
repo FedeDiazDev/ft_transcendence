@@ -1,8 +1,11 @@
 http.host: 0.0.0.0
-xpack.monitoring.elasticsearch.hosts: ["http://elastic:changeme@elasticsearch:9200"]
+xpack.monitoring.elasticsearch.hosts: ["http://elasticsearch:9200"]
 
 pipeline.workers: 1
 pipeline.batch.size: 50
 pipeline.batch.delay: 50
 
 xpack.monitoring.enabled: false
+pipeline.ecs_compatibility: disabled
+
+config.reload.automatic: true
