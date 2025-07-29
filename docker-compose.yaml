@@ -5,8 +5,6 @@ services:
       context: ./reverse-proxy
       dockerfile: Dockerfile
     ports:
-    # Port 8080:443 mapping means: 1. host machine exposes port 8080, 2. nginx listens on port 443
-    # Useful when you can't expose a priviledged port but want to run the service as priviledged
       - "8080:443"
     volumes:
       - front-spa:/var/www/html
@@ -19,6 +17,12 @@ services:
       - rabbitmq
     networks:
       - transcendence-network
+    profiles: ["app"]
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
 
   frontend:
     container_name: frontend-spa
@@ -29,6 +33,7 @@ services:
       - front-spa:/usr/src/app/
     networks:
       - transcendence-network
+    profiles: ["app"]
 
   auth-service:
     container_name: auth-service
@@ -44,6 +49,7 @@ services:
         condition: service_healthy
     networks:
       - transcendence-network
+    profiles: ["app"]
 
   stats-service:
     container_name: stats-service
@@ -59,6 +65,12 @@ services:
         condition: service_healthy
     networks:
       - transcendence-network
+    profiles: ["app"]
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
 
   game-service:
     container_name: game-service
@@ -66,7 +78,7 @@ services:
       context: ./backend/game
       dockerfile: Dockerfile
     volumes:
-      - game-data-db:/data    # SQLite
+      - game-data-db:/data
     env_file:
       - .env
     depends_on:
@@ -74,6 +86,12 @@ services:
         condition: service_healthy
     networks:
       - transcendence-network
+    profiles: ["app"]
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
 
   users-service:
     container_name: users-service
@@ -89,7 +107,13 @@ services:
       - transcendence-network
     env_file:
       - .env
-  
+    profiles: ["app"]
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
+
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3.13.7-management
@@ -102,12 +126,78 @@ services:
       - transcendence-network
     env_file:
       - .env
+    profiles: ["app"]
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"] 
       interval: 10s 
       retries: 5
       start_period: 30s
       timeout: 5s
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "transcendence"
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:7.17.28
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+      - ./monitoring/elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    environment:
+      - discovery.type=single-node
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - xpack.ml.enabled=false
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    networks:
+      - transcendence-network
+    profiles: ["elk"]
+    healthcheck:
+      test: ["CMD", "curl", "-u", "elastic:$ELASTIC_PASSWORD", "-f", "http://localhost:9200"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    mem_limit: 1gb
+
+  logstash:
+    container_name: logstash
+    image: logstash:7.17.28
+    volumes:
+      - ./monitoring/elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./monitoring/elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - 12201:12201/udp
+    networks:
+      - transcendence-network
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    profiles: ["elk"]
+
+  kibana:
+    container_name: kibana
+    image: kibana:7.17.28
+    volumes:
+      - ./monitoring/elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - kibana:/usr/share/kibana/data
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "5601:5601"
+    networks:
+      - transcendence-network
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=768
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+    profiles: ["elk"]
 
 volumes:
   front-spa:
@@ -115,6 +205,9 @@ volumes:
   game-data-db:
   users-db:
   stats-db:
+  elasticsearch:
+  logstash:
+  kibana:
   rabbitmq-data:
 
 networks:
