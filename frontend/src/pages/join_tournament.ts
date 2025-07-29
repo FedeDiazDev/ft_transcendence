@@ -1,4 +1,4 @@
-import { openTournaments, registerPlayer, checkPlayer } from "../api/game/tournamentAPI.js";
+import { openTournaments, registerPlayer, checkPlayer, checkNickname } from "../api/game/tournamentAPI.js";
 import { fetchUserData } from "../hooks/fetchUserData.js";
 import { joinSocket } from "../sockets/tournamentSocket.js"
 
@@ -56,18 +56,25 @@ export const JoinTournament = () => {
 				joinButton.textContent = "Uniendo...";
 
 				const saved = localStorage.getItem("lastTournamentAlias") || "";
-				const alias = prompt(
-					"Elige tu nick para este torneo:",
-					saved
-				)?.trim() || "default :(";
+				const alias = prompt("Elige tu nick para este torneo:", saved)?.trim() || "";
 
-				if (alias === null) {
+				if (!alias) {
 					joinButton.disabled = false;
 					joinButton.textContent = "Unirse";
 					return;
 				}
 
 				try {
+					// 1. Compruebo si el alias existe para ese torneo
+					const nicknameExists = await checkNickname(tournament.id, alias);
+					if (nicknameExists.exists) {
+						showError(`El nick "${alias}" ya está en uso en este torneo.`);
+						joinButton.disabled = false;
+						joinButton.textContent = "Unirse";
+						return;
+					}
+
+					// 2. Si no existe, registro el jugador
 					const response = await registerPlayer(tournament.id, alias);
 					if (response.error) {
 						showError(response.error);
@@ -75,17 +82,19 @@ export const JoinTournament = () => {
 						joinButton.textContent = "Unirse";
 						return;
 					}
+
 					if (alias) localStorage.setItem("lastTournamentAlias", alias);
 
+					// Continúa con la lógica para unirse al torneo y abrir socket
 					const gameContainer = document.createElement("div");
-					gameContainer.className =
-						"flex flex-col items-center justify-center h-screen text-white";
+					gameContainer.className = "flex flex-col items-center justify-center h-screen text-white";
 					parentContainer.innerHTML = "";
 					parentContainer.appendChild(gameContainer);
 
 					const queueList = document.createElement("ul");
 					queueList.id = "queue-list";
 					gameContainer.appendChild(queueList);
+
 					fetchUserData((user) => {
 						window.tournamentSocket = joinSocket(
 							user.username,
@@ -95,12 +104,14 @@ export const JoinTournament = () => {
 							alias
 						);
 					});
+
 				} catch (error) {
 					showError("Error al unirse al torneo");
 					joinButton.disabled = false;
 					joinButton.textContent = "Unirse";
 				}
 			});
+
 			tournamentCard.appendChild(name);
 			tournamentCard.appendChild(players);
 			tournamentCard.appendChild(status);
@@ -125,7 +136,7 @@ export const JoinTournament = () => {
 
 	(async () => {
 		try {
-			const tournamentStatus = await checkPlayer();			
+			const tournamentStatus = await checkPlayer();
 			if (tournamentStatus?.result) {
 				const { tournament_id } = tournamentStatus.result;
 				const alias = localStorage.getItem("lastTournamentAlias") || "default :(";

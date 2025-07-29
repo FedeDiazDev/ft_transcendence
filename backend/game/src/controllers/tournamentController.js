@@ -195,5 +195,31 @@ export async function checkPlayerTournament(request, reply) {
         return reply.status(500).send({ error: "Error al checkear el jugador" });
 
     }
+}
 
+
+export async function checkNickname(request, reply) {
+    const username = getUsername(request, reply);
+    if (!username) {
+        return reply.status(400).send({ error: "Falta el username" });
+    }
+    const { tournamentId, alias } = request.query;
+    if (!tournamentId || !alias) {
+        return reply.status(400).send({ error: "Faltan datos en la query" });
+    }
+    const db = request.server.db;
+    try {
+        const query = db.prepare(`
+            SELECT 1 FROM tournament_players
+            WHERE tournament_id = ? AND display_name = ?
+            LIMIT 1
+        `);
+        const result = query.get(tournamentId, alias);
+        return reply.status(200).send({
+            exists: !!result,
+        });
+    } catch (error) {
+        console.error("Error al verificar alias:", error);
+        return reply.status(500).send({ error: "Error al verificar alias" });
+    }
 }

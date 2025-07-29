@@ -131,3 +131,35 @@ export const checkPlayer = async () => {
         console.error("Error en /tournament/open:", error)
     }
 }
+
+export const checkNickname = async (tournamentId: number, alias: string) => {   
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            throw new Error("Token de autenticación no encontrado");
+        }
+
+        const url = new URL(`${API_URLS.game}/tournament/checkNickname`);
+        url.searchParams.append("tournamentId", tournamentId.toString());
+        url.searchParams.append("alias", alias);
+
+        const response = await fetch(url.toString(), {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data?.error || "Error al comprobar el nickname");
+        }
+
+        return data;
+
+    } catch (error) {
+        console.error("Error en /tournament/checkNickname:", error);
+        throw error;
+    }
+};
