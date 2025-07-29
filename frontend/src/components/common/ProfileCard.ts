@@ -259,6 +259,7 @@ async function fetchProfile(container: HTMLDivElement) {
                     editBtn.remove();
 
                     const textarea = document.createElement("textarea");
+                    textarea.maxLength = 300;
                     textarea.value = field.input.value;
                     textarea.rows = 3;
                     textarea.className = "p-2 rounded border w-full text-black";

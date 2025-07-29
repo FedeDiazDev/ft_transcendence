@@ -11,7 +11,7 @@ const signupOpts = {
 		type: "object",
 		properties: {
 			username: { type: "string", minLength : 1, maxLength : 20,  pattern : "^[a-zA-Z0-9\\s.,@!#$%&*()\\-_=+]+$"},
-			email: { type: "string" , format : "email"},
+			email: { type: "string" , format : "email", maxLength : 254},
 			password: { type: "string" , pattern : "^(?=.*[A-Za-z])(?=.*\\d).{8,20}$"},
 			confirmPassword: { type: "string" , pattern : "^(?=.*[A-Za-z])(?=.*\\d).{8,20}$"}
 		},
