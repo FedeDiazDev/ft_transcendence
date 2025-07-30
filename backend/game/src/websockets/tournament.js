@@ -175,12 +175,14 @@ async function tournamentLogic(fastify, opts) {
                         tournament.organizerSocket?.send(JSON.stringify({
                             action: "tournament_ended",
                             winner: champion,
+                            dataTournament: tournaments,
                             tournamentId
                         }));
                         tournament.organizerSocket?.send(JSON.stringify({
                             action: "tournament_summary",
                             tournamentId,
                             winner: champion,
+                            dataTournament: tournaments,
                             matchHistory: tournament.matchHistory || []
                         }));
 

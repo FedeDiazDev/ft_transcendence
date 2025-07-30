@@ -2,6 +2,10 @@ import { GameCanvas } from "../components/game/Canvas.js";
 import { fetchUserData } from "../hooks/fetchUserData.js";
 import { navigateTo } from "../router.js";
 
+//TODO: checkear si estas en un torneo al darle a jugar torneo.
+//TODO: borrar usuario del torneo al salir de la Base de datos
+//TODO: Botón para salir
+
 let interval: number | null = null;
 export const joinSocket = (username: string, action: string, tournamentId: number, container: any, alias?: string, nb_players?: number) => {
     let socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/tournament_logic");
