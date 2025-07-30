@@ -10,8 +10,10 @@ function parseUsername(username: string, errors: string[])
 
 function parseEmail(email: string, errors: string[])
 {
-	if (!/^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/.test(email))
+	if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) 
 		errors.push("*Incorrect email format");
+	if (email.length > 254)
+		errors.push("*Email must be below 254 characters");
 }
 
 function parsePassword(password: string, errors: string[])
