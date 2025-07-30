@@ -55,7 +55,6 @@ export const JoinTournament = () => {
 				const overlay = document.createElement("div");
 				overlay.className = "fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50";
 
-				// Crear el contenedor del modal
 				const modal = document.createElement("div");
 				modal.className = "bg-[#0D1013] p-6 rounded-lg shadow-lg max-w-sm w-full text-white flex flex-col gap-4";
 
@@ -92,7 +91,6 @@ export const JoinTournament = () => {
 				overlay.appendChild(modal);
 				document.body.appendChild(overlay);
 
-				// Cancelar cierra el modal
 				cancelBtn.addEventListener("click", () => {
 					document.body.removeChild(overlay);
 					joinButton.disabled = false;

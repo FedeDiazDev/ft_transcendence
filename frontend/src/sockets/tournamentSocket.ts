@@ -44,6 +44,28 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo, alias));
                 }
                 break;
+            case "tournament_summary":
+                container.innerHTML = "";
+
+                const summaryTitle = document.createElement("h2");
+                summaryTitle.innerText = "Resumen del Torneo";
+                summaryTitle.className = "text-2xl font-bold mb-4 text-white";
+                container.appendChild(summaryTitle);
+
+                const list = document.createElement("ul");
+                list.className = "space-y-2 text-white";
+
+                data.summary?.forEach((match: any, index: number) => {
+                    const item = document.createElement("li");
+                    item.innerText = `Ronda ${match.round} - ${match.player1} vs ${match.player2}`;
+                    list.appendChild(item);
+                });
+
+                container.appendChild(list);
+                setTimeout(() => {
+                    navigateTo("/");
+                }, 6000);
+                break;
             case "update_queue":
                 const queueList = document.getElementById("queue-list");
                 if (queueList) {
@@ -92,16 +114,16 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
             //     const { winner, round, tournamentId } = data;
             //     console.log("WINNER: ", data);
             //     break;
-            case "tournament_ended":
-                container.innerHTML = "";
-                const resultMsg = document.createElement("h2");
-                resultMsg.innerText = data.message || "¡El torneo ha terminado! Has ganado";
-                container.appendChild(resultMsg);
-                socket.close();
-                setTimeout(() => {
-                    navigateTo("/");
-                }, 3000);
-                break;
+            // case "tournament_ended":
+            //     container.innerHTML = "";
+            //     const resultMsg = document.createElement("h2");
+            //     resultMsg.innerText = data.message || "¡El torneo ha terminado! Has ganado";
+            //     container.appendChild(resultMsg);
+            //     socket.close();
+            //     setTimeout(() => {
+            //         navigateTo("/");
+            //     }, 3000);
+            //     break;
             // case "waiting_players":
             //     container.innerHTML = "";
             //     const waiting = document.createElement("p");

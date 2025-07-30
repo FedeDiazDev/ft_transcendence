@@ -154,6 +154,7 @@ async function tournamentLogic(fastify, opts) {
                     if (!tournament.winners.includes(winner)) {
                         tournament.winners.push(winner);
                     }
+
                     const loserUsername = match.player1 === winner ? match.player2 : match.player1;
                     const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
                     //console.log("LOOOOSER", loserUsername);
@@ -176,6 +177,22 @@ async function tournamentLogic(fastify, opts) {
                             winner: champion,
                             tournamentId
                         }));
+                        tournament.organizerSocket?.send(JSON.stringify({
+                            action: "tournament_summary",
+                            tournamentId,
+                            winner: champion,
+                            matchHistory: tournament.matchHistory || []
+                        }));
+
+                        tournament.players.forEach(p => {
+                            p.socket.send(JSON.stringify({
+                                action: "tournament_summary",
+                                tournamentId,
+                                winner: champion,
+                                matchHistory: tournament.matchHistory || []
+                            }));
+                        });
+
                         //console.log("ELL GANADOR DEL TORNEO ES: ", champion);
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
@@ -222,6 +239,13 @@ async function tournamentLogic(fastify, opts) {
                             socket2: player2.socket,
                             round: tournament.round,
                             gameState
+                        });
+                        if (!tournament.roundHistory) tournament.roundHistory = [];
+                        tournament.roundHistory.push({
+                            round: tournament.round,
+                            player1: match.player1,
+                            player2: match.player2,
+                            winner: winner
                         });
 
                         const basePayload = {
