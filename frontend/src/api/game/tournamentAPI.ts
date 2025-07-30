@@ -39,7 +39,7 @@ export const createTournament = async (name: string, players: number) => {
 };
 
 export const registerPlayer = async (tournamentId: number, alias: string) => {
-    console.log("DATOS: ", tournamentId, alias);
+    //console.log("DATOS: ", tournamentId, alias);
     try {
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.game}/tournament/addPlayer`, {

@@ -16,7 +16,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
             socket.send(JSON.stringify({ action: "create_tournament", username: username, number_players: nb_players, tournamentId: tournamentId }))
         } else if (action === "join") {
             fetchUserData((user) => {
-                console.log("ID:", user.id);
+                //console.log("ID:", user.id);
                 socket.send(JSON.stringify({ action: "join", username: alias, tournamentId: tournamentId, userId: user.id }));
 
             })
@@ -151,11 +151,11 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
             clearInterval(interval);
         }
 
-        console.log(
-            event.wasClean
-                ? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`
-                : "[close] La conexión se cayó en statusSocket"
-        );
+        // console.log(
+        //     event.wasClean
+        //         ? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`
+        //         : "[close] La conexión se cayó en statusSocket"
+        // );
     };
 
     socket.onerror = () => {

@@ -38,10 +38,10 @@ export async function friendsStatus(fastify, opts) {
 
             });            
             socket.on('close', () => {
-                console.log("WebSocket cerrado");
+                //console.log("WebSocket cerrado");
                 queue = queue.filter(player => player.id !== playerId);
                 const onlineUsers = queue.map(({ id, username }) => ({ id, username }));
-                console.log("CLOSE: ", onlineUsers);
+                //console.log("CLOSE: ", onlineUsers);
                 queue.forEach(player => {
                     player.socket.send(JSON.stringify({
                         action: 'onlineUsers',

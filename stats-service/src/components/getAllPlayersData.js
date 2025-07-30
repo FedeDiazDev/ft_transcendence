@@ -2,8 +2,8 @@ export function getAllPlayersData(request, reply) {
   try {
     const db = request.server.db;
 
-    console.log("Calling getAllPlayers...");
-    console.log("Sending token:", request);
+    // console.log("Calling getAllPlayers...");
+    // console.log("Sending token:", request);
 
 
     const players = db.prepare(`
@@ -12,7 +12,7 @@ export function getAllPlayersData(request, reply) {
       ORDER BY elo DESC
     `).all();
     request.log.info("Players returned:");
-    console.log(players)
+    // console.log(players)
 
     return players;
   } catch (error) {

@@ -187,8 +187,8 @@ export async function checkPlayerTournament(request, reply) {
 		WHERE tp.username = ? AND t.status IN ('open')
 		LIMIT 1`);
         const result = query.get(username);
-        console.log("USERNAME:", username);
-        console.log("RESULTADO:", result);
+        // console.log("USERNAME:", username);
+        // console.log("RESULTADO:", result);
         reply.status(200).send({ message: "Checkeo Player", result });
 
     } catch (error) {

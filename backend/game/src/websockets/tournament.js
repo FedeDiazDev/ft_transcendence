@@ -8,7 +8,7 @@ function deletePlayerFromTournament(username, tournamentId, db) {
             WHERE username = ? AND tournament_id = ?
         `);
         const result = query.run(username, tournamentId);
-        console.log("Borrado:", result);
+        //console.log("Borrado:", result);
     } catch (e) {
         console.error("Error borrando de BDD:", e);
     }
@@ -90,7 +90,7 @@ async function tournamentLogic(fastify, opts) {
 
                     shuffle(tournament.players);
                     if (tournament.players.length === tournament.number_players) {
-                        console.log("Se alcanzó el número de jugadores. Empezando torneo...");
+                        //console.log("Se alcanzó el número de jugadores. Empezando torneo...");
                     }
 
                     tournament.status = "playing";
@@ -100,8 +100,8 @@ async function tournamentLogic(fastify, opts) {
                         const player2 = tournament.players[i + 1];
 
                         const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
-                        console.log(`  Player 1: ${player1?.username || "undefined"}`);
-                        console.log(`  Player 2: ${player2?.username || "undefined"}`);
+                        // console.log(`  Player 1: ${player1?.username || "undefined"}`);
+                        // console.log(`  Player 2: ${player2?.username || "undefined"}`);
                         const gameState = {
                             roomId: matchId,
                             status: "playing",

@@ -6,7 +6,7 @@ async function matchmakingSockets(fastify, opts) {
 			socket.on('message', message => {
 				const playerId = JSON.parse(message).id;
 				if (queue.find(entry => entry.id === playerId)) {
-					console.log(`Jugador ${playerId} ya está en la cola`);
+					//console.log(`Jugador ${playerId} ya está en la cola`);
 					return;
 				}
 				queue.push({ id: playerId, socket });

@@ -26,5 +26,5 @@ export async function saveGameAndUpdateElo(db, {
     ) VALUES (?, ?, ?, ?, ?)
   `).run(winner_username, 10, looser_username, looser_points, formattedDate);
 
-  console.log("✅ Game result saved and ELO updated");
+ // console.log("✅ Game result saved and ELO updated");
 }

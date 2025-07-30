@@ -201,7 +201,7 @@ async function fetchProfile(container: HTMLDivElement) {
                         // No Content-Type header - FormData sets it automatically
                         body: formData
                     });
-                    console.log("Response status:", response.status);
+                   // console.log("Response status:", response.status);
                     if (!response.ok) {
                         const errorText = await response.text();
                         console.error("Server response:", errorText);
