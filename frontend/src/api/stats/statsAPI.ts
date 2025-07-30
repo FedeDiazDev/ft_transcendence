@@ -31,11 +31,11 @@ export async function getFriendStats(id: number) {
 
     try {
         const token = localStorage.getItem("authToken");
-        console.log("Fetching friend data for user ID:", id);
+        //console.log("Fetching friend data for user ID:", id);
         const friendData = await getFriendData(id);
-        console.log("Friend data are:", friendData);
+        //console.log("Friend data are:", friendData);
         const username = friendData.user.username;
-        console.log("friend username is :", username);
+        //console.log("friend username is :", username);
         const response = await fetch("https://" + window.location.hostname + ":8080/api/stats/friend/" + username, {
             method: "GET",
             credentials: "include",
@@ -68,7 +68,7 @@ export async function getAllPlayers() {
             }
         });
 
-        console.log("Player stats response:", response);
+        //console.log("Player stats response:", response);
 
         if (!response.ok)
             throw new Error(`Failed to fetch players: ${response.statusText}`);
