@@ -241,6 +241,7 @@ async function tournamentLogic(fastify, opts) {
                             gameState
                         });
                         if (!tournament.roundHistory) tournament.roundHistory = [];
+                        console.log("HISTORY: ", tournament.roundHistory);
                         tournament.roundHistory.push({
                             round: tournament.round,
                             player1: match.player1,

@@ -46,7 +46,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 break;
             case "tournament_summary":
                 container.innerHTML = "";
-
+                console.log("DATA: ",data);
                 const summaryTitle = document.createElement("h2");
                 summaryTitle.innerText = "Resumen del Torneo";
                 summaryTitle.className = "text-2xl font-bold mb-4 text-white";

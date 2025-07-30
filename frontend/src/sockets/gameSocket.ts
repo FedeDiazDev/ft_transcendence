@@ -2,7 +2,7 @@ import { fetchUserData } from "../hooks/fetchUserData.js";
 import { navigateTo } from "../router.js";
 
 let gameSocketInstance: ReturnType<typeof gameSocket> | null = null;
-
+let currrentPlayerName : string | null = null;
 
 export function showCard(winner: boolean) {
 	const overlay = document.createElement("div");
@@ -49,7 +49,7 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 
 	socket.onopen = () => {
 		//console.log("Enviando gameSocket con tournamentInfo:", tournamentInfo);
-
+		currrentPlayerName = name;
 		socket.send(JSON.stringify({
 			id,
 			name,
@@ -66,12 +66,12 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 		if (data.roomId && data.roomId !== roomId) return;
 
 		if (data.type === "game_over") {
-			if (window.location.pathname.endsWith("online_game")) { setTimeout(() => navigateTo("/"), 3000) }
-			//console.log("Partida terminada, ganador:", data.winner);
 			fetchUserData((user) => {
-				if (user.username === data.winner) showCard(true)
+				if (currrentPlayerName === data.winner) showCard(true)
 				else showCard(false)
 			})
+			if (window.location.pathname.endsWith("online_game")) { setTimeout(() => navigateTo("/"), 3000) }
+			//console.log("Partida terminada, ganador:", data.winner);
 			setTimeout(() => {
 				if (
 					tournamentInfo &&
