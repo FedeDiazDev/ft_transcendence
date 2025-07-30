@@ -1,6 +1,5 @@
 import amqp from 'amqplib';
 import fs from 'fs';
-import dotenv from "dotenv";
 
 function registerUserInDatabase(username, db){
 

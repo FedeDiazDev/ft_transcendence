@@ -146,8 +146,13 @@ async function fetchProfile(container: HTMLDivElement) {
   
       const aboutMeValue = document.createElement("p");
       aboutMeValue.className = "text-white whitespace-pre-wrap";
-      aboutMeValue.textContent = data.user.presentacion || "";
-  
+      aboutMeValue.textContent = (data.user.presentacion || "");
+
+      aboutMeValue.style.whiteSpace = "pre-wrap";
+      aboutMeValue.style.wordBreak = "break-word";
+      aboutMeValue.style.maxWidth = "100%";
+      aboutMeValue.style.overflow = "hidden";
+
       container.appendChild(aboutMeLabel);
       container.appendChild(aboutMeValue);
   
@@ -164,7 +169,7 @@ async function fetchProfile(container: HTMLDivElement) {
   
         const textarea = document.createElement("textarea");
         textarea.maxLength = 300;
-        textarea.value = data.user.presentacion || "";
+        textarea.value = aboutMeValue.textContent || "";
         textarea.rows = 5;
         textarea.className = "p-2 rounded border w-full text-black mb-2";
         container.appendChild(textarea);
