@@ -1,8 +1,8 @@
 import { fetchUserData } from "../hooks/fetchUserData.js";
 import { navigateTo } from "../router.js";
 
-let gameSocketInstance: ReturnType<typeof gameSocket> | null = null;
-let currrentPlayerName : string | null = null;
+export let gameSocketInstance: ReturnType<typeof gameSocket> | null = null;
+let currrentPlayerName: string | null = null;
 
 export function showCard(winner: boolean) {
 	const overlay = document.createElement("div");
@@ -109,12 +109,14 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 
 	const instance = {
 		sendMove: (direction: "up" | "down", id: number) => {
-			socket.send(JSON.stringify({
-				action: "move_paddle",
-				direction,
-				id,
-				roomId
-			}));
+			if (socket.readyState === WebSocket.OPEN) {
+				socket.send(JSON.stringify({
+					action: "move_paddle",
+					direction,
+					id,
+					roomId
+				}));
+			}
 		},
 		close: () => socket.close(),
 		socket
@@ -128,3 +130,10 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 window.addEventListener("beforeunload", () => {
 	gameSocketInstance?.close();
 });
+
+window.addEventListener("popstate", () => {
+	if (!window.location.pathname.endsWith("online_game") && !window.location.pathname.endsWith("tournament")) {
+		gameSocketInstance?.close();
+	}
+});
+

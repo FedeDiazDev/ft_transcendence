@@ -17,12 +17,18 @@ export const createTournament = async (name: string, players: number) => {
         if (response.status === 409) {
             throw new Error("409");
         }
-
+        if (response.status === 400) {
+            if (data?.error?.includes("No se pueden crear más de 5 torneos abiertos")) {
+                throw new Error("MAX_TOURNAMENTS_OPEN");
+            } else {
+                throw new Error(`Error 400: ${data.error}`);
+            }
+        }
 
         if (!response.ok) {
-            const err = await response.json();
-            throw new Error(`Error ${response.status}: ${err.error}`);
+            throw new Error(`Error ${response.status}: ${data.error}`);
         }
+
         if (!data || !data.tournamentState) {
             throw new Error("Respuesta inválida del servidor");
         }
@@ -132,7 +138,7 @@ export const checkPlayer = async () => {
     }
 }
 
-export const checkNickname = async (tournamentId: number, alias: string) => {   
+export const checkNickname = async (tournamentId: number, alias: string) => {
     try {
         const token = localStorage.getItem("authToken");
         if (!token) {

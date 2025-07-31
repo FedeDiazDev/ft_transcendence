@@ -95,6 +95,8 @@ export const CreateTournament = () => {
 			if (error instanceof Error) {
 				if (error.message.includes("409")) {
 					message = "Ya existe un torneo con ese nombre.";
+				} else if (error.message === "MAX_TOURNAMENTS_OPEN") {
+					message = "Solo puedes tener hasta 5 torneos abiertos a la vez.";
 				} else {
 					console.error("Error creando torneo:", error);
 					message = error.message;
