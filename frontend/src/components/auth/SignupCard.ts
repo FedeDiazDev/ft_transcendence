@@ -99,7 +99,10 @@ async function fetchSignup(sendData: { username: string, email: string, password
 			return;
 		}
 		const data = await response.json();
+		data.username = sendData.username;
+		data.password = sendData.password;
 		localStorage.setItem("QRCode", data.QR);
+		localStorage.setItem("tempToken", data.tempToken);
 		navigateTo("/qrcode");
 	} catch (error) {
 		console.error("Fetch error:", error);
