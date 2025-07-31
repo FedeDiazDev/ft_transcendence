@@ -9,13 +9,22 @@ export const useKeyPress = (): PressedKeys => {
     w: false,
     s: false,
   };
-   const handleKeyDown = (event: KeyboardEvent): void => {
+  
+  const handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+    }
+    
     if (pressedKeys.hasOwnProperty(event.key)) {
       pressedKeys[event.key] = true;
     }
   };
 
   const handleKeyUp = (event: KeyboardEvent): void => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+    }
+    
     if (pressedKeys.hasOwnProperty(event.key)) {
       pressedKeys[event.key] = false;
     }
@@ -24,11 +33,5 @@ export const useKeyPress = (): PressedKeys => {
   document.addEventListener("keydown", handleKeyDown);
   document.addEventListener("keyup", handleKeyUp);
 
-
   return pressedKeys;
-  // Cleanup
-//   return () => {
-//     document.removeEventListener("keydown", handleKeyDown);
-//     document.removeEventListener("keyup", handleKeyUp);
-//   };
 };
