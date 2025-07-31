@@ -4,7 +4,6 @@ import { saveGameAndUpdateElo } from '../components/postGame.js'; // adjust path
 
 export default async function consumeGameResultEvents(server) {
   const db = server.db;
-
   const RABBITMQ_USER = process.env.RABBITMQ_DEFAULT_USER;
   const RABBITMQ_PASS = process.env.RABBITMQ_DEFAULT_PASS;
   const RABBITMQ_HOST = 'rabbitmq';
@@ -21,6 +20,7 @@ export default async function consumeGameResultEvents(server) {
         const gameResult = JSON.parse(msg.content.toString());
         console.log(" [x] Received game result:", gameResult);
 
+        // Save game result and update ELO with real usernames
         await saveGameAndUpdateElo(db, gameResult);
 
         channel.ack(msg);
