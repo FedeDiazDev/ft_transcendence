@@ -92,7 +92,6 @@ export const render = async () => {
     return;
   }
 
-
   const component = routes[path] || (() => {
     if (path !== '/') {
       const div = document.createElement("div");
@@ -130,12 +129,9 @@ export const authToken = () => {
         statusSocket(null, user, "login");
       }
     });
-
-
     return true;
   }
 }
-
 
 export const navigateTo = (path: string) => {
   if (window.location.pathname === path) {

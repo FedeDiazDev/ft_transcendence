@@ -67,6 +67,15 @@ export async function createTournament(request, reply) {
                 status: existing.status,
             });
         }
+
+        const countOpenQuery = db.prepare("SELECT COUNT(*) as count FROM tournaments WHERE status = 'open'");
+        const { count } = countOpenQuery.get();
+        if (count >= 5) {
+            return reply.status(400).send({
+                error: "No se pueden crear más de 5 torneos abiertos. Espera a que uno termine.",
+            });
+        }
+
         const insertQuery = db.prepare("INSERT INTO tournaments(name, status, number_players, created_at) VALUES (?, ?, ?, ?)");
         const info = insertQuery.run(name, "open", players, new Date().toISOString());
 
@@ -86,6 +95,7 @@ export async function createTournament(request, reply) {
     } catch (error) {
         return reply.status(500).send({ error: "Error al crear el torneo" });
     }
+
 }
 
 export async function listOpenTournaments(request, reply) {
