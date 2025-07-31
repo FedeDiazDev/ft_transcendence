@@ -22,6 +22,8 @@ import { gameSocketInstance } from "./sockets/gameSocket.js";
 export const cleanupLocalStorage = () => {
   const tempToken = localStorage.getItem("tempToken");
   const authToken = localStorage.getItem("authToken");
+  const username = localStorage.getItem("username");
+  const email = localStorage.getItem("email");
   const hasRefreshToken = document.cookie.includes("refreshToken=") && !document.cookie.includes("refreshToken=;");
   
   if (tempToken) {
@@ -40,7 +42,7 @@ export const cleanupLocalStorage = () => {
     return;
   }
   
-  if (authToken) {
+  if (authToken && hasRefreshToken) {
     const allowedKeys = ["username", "email", "authToken"];
     
     localStorage.removeItem("tempToken");
@@ -54,12 +56,21 @@ export const cleanupLocalStorage = () => {
     }
     return;
   }
-
-  if (authToken && !hasRefreshToken) {
-    localStorage.clear();
-    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  }
   
+  if (!authToken && !tempToken && (username || email)) {
+    const allowedKeys = ["username", "email"];
+    
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && !allowedKeys.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    }
+    
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    return;
+  }
+
   localStorage.clear();
   document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 };
@@ -111,7 +122,7 @@ export const render = async () => {
   }
 
   if (twoFARoutes.includes(path)) {
-    if (!username || token) {
+    if ((!username && !localStorage.getItem("email")) || token) {
       cleanupLocalStorage();
       window.history.pushState({}, "", "/loghome");
       render();
@@ -168,10 +179,8 @@ document.addEventListener("DOMContentLoaded", () => {
 export const authToken = () => {
   const token = localStorage.getItem("authToken");
   if (!token || token === "") {
-    cleanupLocalStorage();
     return false;
   } else {
-    cleanupLocalStorage();
     fetchUserData((user) => {
       if (typeof user === "object" && user.username) {
         statusSocket(user.id || null, user.username, "login");
@@ -193,4 +202,3 @@ export const navigateTo = (path: string) => {
   window.history.pushState({}, "", path);
   render();
 }
-
