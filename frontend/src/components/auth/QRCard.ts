@@ -59,7 +59,8 @@ async function fetchVerify(verifyInput : string)
 		body: JSON.stringify({ 
 			verification : verifyInput,
 			username : localStorage.getItem("username"),
-			email : localStorage.getItem("email")
+			email : localStorage.getItem("email"),
+			tempToken : localStorage.getItem("tempToken")
 		})
 	});
 
@@ -71,6 +72,7 @@ async function fetchVerify(verifyInput : string)
 			statusSocket(user.id, user.name, "login");
 		});
 		localStorage.removeItem("QRCode");
+		localStorage.removeItem("tempToken");
 		navigateTo("/");
 		return true;
 	}
