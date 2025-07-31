@@ -10,14 +10,13 @@ export const getUserById = async (id: any) => {
     return data.user;
 };
 
-
 export const WaitingRoom = () => {
     const container = document.createElement("div");
     container.className = "flex flex-col items-center justify-center h-screen text-white";
 
     const text = document.createElement("p");
     text.className = "text-2xl font-semibold";
-    text.textContent = "Esperando a un jugador";
+    text.textContent = "Waiting for a player";
 
     const dots = document.createElement("span");
     dots.className = "text-2xl";
@@ -33,35 +32,37 @@ export const WaitingRoom = () => {
 
     fetchUserData((user) => {
         const matchmakingSocket = createMatchmakingSocket(async (gameState, roomId, opponentId) => {
-			clearInterval(intervalId);
-			matchmakingSocket.close();
+            clearInterval(intervalId);
+            matchmakingSocket.close();
 
-			// Fetch opponent username before proceeding
-			let opponentUsername = "Unknown";
-			try {
-				const res = await getUserById(opponentId);
-				opponentUsername = res.username;
-			} catch (err) {
-				console.error("Could not fetch opponent username", err);
-			}
+            // Fetch opponent username before proceeding
+            let opponentUsername = "Unknown";
+            try {
+                const res = await getUserById(opponentId);
+                opponentUsername = res.username;
+            } catch (err) {
+                console.error("Could not fetch opponent username", err);
+            }
 
-			// Show banner
-			container.innerHTML = "";
-			container.className = "flex flex-col items-center justify-center text-white";
+            // Show banner with opponent's name
+            container.innerHTML = "";
+            container.className = "flex flex-col items-center justify-center text-white";
 
-			const banner = document.createElement("p");
-			banner.className = "text-2xl font-bold mb-4";
-			banner.textContent = `Get ready... You're playing against ${opponentUsername}!`
+            const banner = document.createElement("p");
+            banner.className = "text-2xl font-bold mb-4";
+            banner.textContent = `Get ready! You're playing against ${opponentUsername}!`;
 
-			// After delay, start game
-			setTimeout(() => {
-				container.innerHTML = "";
+            container.appendChild(banner);
 
-				const score = document.createElement("p");
-				score.innerHTML = '0 - 0';
-				container.appendChild(score);
-				container.appendChild(GameCanvas(gameState, "online", score, roomId));
-			}, 2500);
+            // After delay, start game
+            setTimeout(() => {
+                container.innerHTML = "";
+
+                const score = document.createElement("p");
+                score.innerHTML = '0 - 0';
+                container.appendChild(score);
+                container.appendChild(GameCanvas(gameState, "online", score, roomId));
+            }, 2500);
         }, user.id);
     });
 
