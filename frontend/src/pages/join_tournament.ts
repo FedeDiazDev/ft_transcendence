@@ -188,7 +188,7 @@ export const JoinTournament = () => {
 			const tournamentStatus = await checkPlayer();
 			if (tournamentStatus?.result) {
 				const { tournament_id } = tournamentStatus.result;
-				const alias = localStorage.getItem("lastTournamentAlias") || "default :(";
+				const alias = localStorage.getItem("lastTournamentAlias") || "Jugador";
 
 				const gameContainer = document.createElement("div");
 				gameContainer.className = "flex flex-col items-center justify-center h-screen text-white";

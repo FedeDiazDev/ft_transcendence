@@ -88,8 +88,6 @@ export async function createTournament(request, reply) {
     }
 }
 
-
-
 export async function listOpenTournaments(request, reply) {
     let payload;
 
@@ -187,8 +185,6 @@ export async function checkPlayerTournament(request, reply) {
 		WHERE tp.username = ? AND t.status IN ('open')
 		LIMIT 1`);
         const result = query.get(username);
-        // console.log("USERNAME:", username);
-        // console.log("RESULTADO:", result);
         reply.status(200).send({ message: "Checkeo Player", result });
 
     } catch (error) {
@@ -196,7 +192,6 @@ export async function checkPlayerTournament(request, reply) {
 
     }
 }
-
 
 export async function checkNickname(request, reply) {
     const username = getUsername(request, reply);

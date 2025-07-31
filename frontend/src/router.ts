@@ -17,6 +17,7 @@ import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
 import { getUserByUsername } from "./api/profile/profileAPI.js";
+import { gameSocketInstance } from "./sockets/gameSocket.js";
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -140,7 +141,9 @@ export const navigateTo = (path: string) => {
   if (window.location.pathname === path) {
     return;
   }
-
+  if (!path.endsWith("online_game")) {
+    gameSocketInstance?.close();
+  }
   window.history.pushState({}, "", path);
   render();
 };

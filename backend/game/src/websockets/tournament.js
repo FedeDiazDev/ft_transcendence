@@ -1,7 +1,6 @@
 import { closeTournament } from "../controllers/tournamentController.js";
 
 function deletePlayerFromTournament(username, tournamentId, db) {
-    //console.log("Intentando borrar:", username, tournamentId);
     try {
         const query = db.prepare(`
             DELETE FROM tournament_players 
@@ -281,16 +280,17 @@ async function tournamentLogic(fastify, opts) {
 
                 const tournament = tournaments[tournamentId];
                 const player = tournament.players.find(p => p.socket === socket);
-
                 if (!player) return;
 
                 try {
+                    console.log("PLAYER:", player);
                     deletePlayerFromTournament(player.username, tournamentId, fastify.db);
                 } catch (err) {
                     console.error("Error al eliminar jugador de BDD:", err);
                 }
 
                 tournament.players = tournament.players.filter(p => p.socket !== socket);
+                console.log("PLAYER:", player);
                 tournament.players.forEach(p => {
                     p.socket.send(JSON.stringify({
                         action: "update_queue",
