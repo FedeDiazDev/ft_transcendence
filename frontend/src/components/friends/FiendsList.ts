@@ -12,7 +12,7 @@ export const FriendList = async () => {
 
 	try {
 		const response = await getFriendsList();
-		console.log("Friends: ", response);
+		//console.log("Friends: ", response);
 
 		if (!response || response.length === 0) {
 			const noFriendsMessage = document.createElement("p");

@@ -17,6 +17,7 @@ import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
 import { getUserByUsername } from "./api/profile/profileAPI.js";
+import { gameSocketInstance } from "./sockets/gameSocket.js";
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -73,11 +74,11 @@ export const render = async () => {
   if (pathParts[1] === "profile" && pathParts.length === 3) {
     const identifier = pathParts[2];
     const div = document.createElement("div");
-  
-    if (/^\d+$/.test(identifier)) {      
+
+    if (/^\d+$/.test(identifier)) {
       const profileComponent = FriendProfile(identifier);
       div.appendChild(profileComponent);
-    } else {      
+    } else {
       try {
         const user = await getUserByUsername(identifier);
         const profileElement = FriendProfile(user.id);
@@ -86,11 +87,10 @@ export const render = async () => {
         div.innerHTML = "<h2 class='text-white'>Usuario no encontrado</h2>";
       }
     }
-  
+
     app.appendChild(div);
     return;
   }
-  
 
   const component = routes[path] || (() => {
     if (path !== '/') {
@@ -123,18 +123,23 @@ export const authToken = () => {
     return false;
   } else {
     fetchUserData((user) => {
-      statusSocket(user.id, user.username, "login");
+      if (typeof user === "object" && user.username) {
+        statusSocket(user.id || null, user.username, "login");
+      } else if (typeof user === "string") {
+        statusSocket(null, user, "login");
+      }
     });
     return true;
   }
 }
 
-
 export const navigateTo = (path: string) => {
   if (window.location.pathname === path) {
     return;
   }
-
+  if (!path.endsWith("online_game")) {
+    gameSocketInstance?.close();
+  }
   window.history.pushState({}, "", path);
   render();
 };

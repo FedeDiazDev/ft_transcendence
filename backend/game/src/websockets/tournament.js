@@ -1,14 +1,13 @@
 import { closeTournament } from "../controllers/tournamentController.js";
 
 function deletePlayerFromTournament(username, tournamentId, db) {
-    console.log("Intentando borrar:", username, tournamentId);
     try {
         const query = db.prepare(`
             DELETE FROM tournament_players 
             WHERE username = ? AND tournament_id = ?
         `);
         const result = query.run(username, tournamentId);
-        console.log("Borrado:", result);
+        //console.log("Borrado:", result);
     } catch (e) {
         console.error("Error borrando de BDD:", e);
     }
@@ -68,24 +67,29 @@ async function tournamentLogic(fastify, opts) {
                 if (data.action === "join") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament) return;
-                    tournament.players.push({ username: data.username, socket });
-                    console.log("Torneo:", tournamentId);
-                    console.log("Jugadores actuales:", tournament.players.map(p => p.username));
-                    console.log("Esperados:", tournament.number_players);
-
+                    const existingPlayer = tournament.players.find(p => p.username === data.username);
+                    if (existingPlayer) {
+                        existingPlayer.socket = socket;
+                    } else {
+                        tournament.players.push({ username: data.username, socket });
+                    }                    // console.log("Torneo:", tournamentId);
+                    // console.log("Jugadores actuales:", tournament.players.map(p => p.username));
+                    // console.log("Esperados:", tournament.number_players);
                     if (tournament.players.length < tournament.number_players) {
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
                                 action: "update_queue",
                                 players: tournament.players.map(pl => pl.username),
-                                tournamentId
+                                tournamentId,
+                                numberPlayers: tournament.number_players
                             }));
                         });
                         return;
                     }
+
                     shuffle(tournament.players);
                     if (tournament.players.length === tournament.number_players) {
-                        console.log("Se alcanzó el número de jugadores. Empezando torneo...");
+                        //console.log("Se alcanzó el número de jugadores. Empezando torneo...");
                     }
 
                     tournament.status = "playing";
@@ -95,8 +99,8 @@ async function tournamentLogic(fastify, opts) {
                         const player2 = tournament.players[i + 1];
 
                         const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
-                        console.log(`  Player 1: ${player1?.username || "undefined"}`);
-                        console.log(`  Player 2: ${player2?.username || "undefined"}`);
+                        // console.log(`  Player 1: ${player1?.username || "undefined"}`);
+                        // console.log(`  Player 2: ${player2?.username || "undefined"}`);
                         const gameState = {
                             roomId: matchId,
                             status: "playing",
@@ -134,7 +138,7 @@ async function tournamentLogic(fastify, opts) {
                     }
 
                     return;
-                }                
+                }
                 if (data.action === "report_winner" || data.action === "tournament_match_finished") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament || tournament.status === "finished") return;
@@ -149,6 +153,7 @@ async function tournamentLogic(fastify, opts) {
                     if (!tournament.winners.includes(winner)) {
                         tournament.winners.push(winner);
                     }
+
                     const loserUsername = match.player1 === winner ? match.player2 : match.player1;
                     const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
                     //console.log("LOOOOSER", loserUsername);
@@ -169,8 +174,26 @@ async function tournamentLogic(fastify, opts) {
                         tournament.organizerSocket?.send(JSON.stringify({
                             action: "tournament_ended",
                             winner: champion,
+                            dataTournament: tournaments,
                             tournamentId
                         }));
+                        tournament.organizerSocket?.send(JSON.stringify({
+                            action: "tournament_summary",
+                            tournamentId,
+                            winner: champion,
+                            dataTournament: tournaments,
+                            matchHistory: tournament.matchHistory || []
+                        }));
+
+                        tournament.players.forEach(p => {
+                            p.socket.send(JSON.stringify({
+                                action: "tournament_summary",
+                                tournamentId,
+                                winner: champion,
+                                matchHistory: tournament.matchHistory || []
+                            }));
+                        });
+
                         //console.log("ELL GANADOR DEL TORNEO ES: ", champion);
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
@@ -180,7 +203,7 @@ async function tournamentLogic(fastify, opts) {
                             }));
                             p.socket.close();
                         });
-                        closeTournament(tournamentId);
+                        closeTournament(fastify.db, tournamentId);
                         return;
                     }
                     tournament.round += 1;
@@ -218,6 +241,14 @@ async function tournamentLogic(fastify, opts) {
                             round: tournament.round,
                             gameState
                         });
+                        if (!tournament.roundHistory) tournament.roundHistory = [];
+                        console.log("HISTORY: ", tournament.roundHistory);
+                        tournament.roundHistory.push({
+                            round: tournament.round,
+                            player1: match.player1,
+                            player2: match.player2,
+                            winner: winner
+                        });
 
                         const basePayload = {
                             action: "start_match",
@@ -249,16 +280,17 @@ async function tournamentLogic(fastify, opts) {
 
                 const tournament = tournaments[tournamentId];
                 const player = tournament.players.find(p => p.socket === socket);
-
                 if (!player) return;
 
                 try {
+                    console.log("PLAYER:", player);
                     deletePlayerFromTournament(player.username, tournamentId, fastify.db);
                 } catch (err) {
                     console.error("Error al eliminar jugador de BDD:", err);
                 }
 
                 tournament.players = tournament.players.filter(p => p.socket !== socket);
+                console.log("PLAYER:", player);
                 tournament.players.forEach(p => {
                     p.socket.send(JSON.stringify({
                         action: "update_queue",

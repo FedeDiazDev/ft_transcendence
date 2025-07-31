@@ -11,7 +11,7 @@ async function googleCallback(response : any)
 			body: JSON.stringify({ "credential" : response.credential})
 		});
 		const data = await newResponse.json();
-    console.log("Data: ", data);
+    //console.log("Data: ", data);
 
 		localStorage.setItem("username", data.username);
 		localStorage.setItem("email", data.email);

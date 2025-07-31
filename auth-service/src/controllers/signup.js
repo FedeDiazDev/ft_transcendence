@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import createQR from "./createQR.js";
-import publishUserRegisteredEvent from "./publishQueue.js"
+import { pendingUsers } from "./PendingUsers.js";
 
 function confirmPassword(password, confirmPassword){	
 	if (password != confirmPassword){
@@ -36,14 +36,16 @@ export default async function postSignup(request, reply){
 	confirmPassword(request.body.password, request.body.confirmPassword);
 	const passStruct = hashPassword(request.body.password);
 
-	const query = db.prepare("INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)");
-	query.run(request.body.username, request.body.email, passStruct.hash, passStruct.salt);
-
 	const data = await createQR();
 
-	const queryQr = db.prepare("UPDATE users SET qrSecret = ? WHERE username = ?");
-	queryQr.run(data.sr.base32, request.body.username);
+	const userData = {
+		username: request.body.username,
+		email: request.body.email,
+		hashedPassword: passStruct.hash,
+		salt: passStruct.salt,
+		qrSecret: data.sr.base32
+	};
+	const tempToken = pendingUsers.add(userData);
 
-	publishUserRegisteredEvent(request.body.username);
-	reply.send({ message: "Generate QR", QR: data.qr});
+	reply.send({ message: "Generate QR", QR: data.qr, tempToken: tempToken});
 }
