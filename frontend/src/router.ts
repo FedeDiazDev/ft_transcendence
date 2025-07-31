@@ -19,6 +19,52 @@ import "./interceptFetch.js"
 import { getUserByUsername } from "./api/profile/profileAPI.js";
 import { gameSocketInstance } from "./sockets/gameSocket.js";
 
+export const cleanupLocalStorage = () => {
+  const tempToken = localStorage.getItem("tempToken");
+  const authToken = localStorage.getItem("authToken");
+  const hasRefreshToken = document.cookie.includes("refreshToken=") && !document.cookie.includes("refreshToken=;");
+  
+  if (tempToken) {
+    const allowedKeys = ["username", "email", "QRCode", "tempToken"];
+    
+    localStorage.removeItem("authToken");
+    
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && !allowedKeys.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    }
+    
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    return;
+  }
+  
+  if (authToken) {
+    const allowedKeys = ["username", "email", "authToken"];
+    
+    localStorage.removeItem("tempToken");
+    localStorage.removeItem("QRCode");
+    
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && !allowedKeys.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    }
+    return;
+  }
+
+  if (authToken && !hasRefreshToken) {
+    localStorage.clear();
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  }
+  
+  localStorage.clear();
+  document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+};
+
+
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
   "/login": Login,
@@ -58,6 +104,7 @@ export const render = async () => {
   const token = authToken();
 
   if (!publicRoutes.includes(path) && !twoFARoutes.includes(path) && !token) {
+    cleanupLocalStorage();
     window.history.pushState({}, "", "/loghome");
     render();
     return;
@@ -65,6 +112,7 @@ export const render = async () => {
 
   if (twoFARoutes.includes(path)) {
     if (!username || token) {
+      cleanupLocalStorage();
       window.history.pushState({}, "", "/loghome");
       render();
       return;
@@ -120,8 +168,10 @@ document.addEventListener("DOMContentLoaded", () => {
 export const authToken = () => {
   const token = localStorage.getItem("authToken");
   if (!token || token === "") {
+    cleanupLocalStorage();
     return false;
   } else {
+    cleanupLocalStorage();
     fetchUserData((user) => {
       if (typeof user === "object" && user.username) {
         statusSocket(user.id || null, user.username, "login");
@@ -142,4 +192,5 @@ export const navigateTo = (path: string) => {
   }
   window.history.pushState({}, "", path);
   render();
-};
+}
+

@@ -1,4 +1,4 @@
-export default function logout(request, reply)
+export default function logout(reply)
 {
 	reply.clearCookie('refreshToken', {
 		path: '/',
