@@ -18,6 +18,7 @@ import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
 import { getUserByUsername } from "./api/profile/profileAPI.js";
 import { gameSocketInstance } from "./sockets/gameSocket.js";
+import fetchLogout from "./components/common/Navbar.js";
 
 export const cleanupLocalStorage = () => {
   const tempToken = localStorage.getItem("tempToken");
@@ -38,7 +39,6 @@ export const cleanupLocalStorage = () => {
       }
     }
     
-    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     return;
   }
   
@@ -66,13 +66,11 @@ export const cleanupLocalStorage = () => {
         localStorage.removeItem(key);
       }
     }
-    
-    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     return;
   }
 
   localStorage.clear();
-  document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  fetchLogout();
 };
 
 
