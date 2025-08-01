@@ -48,28 +48,55 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo, alias));
                 }
                 break;
-            case "tournament_summary":
+            case "tournament_ended":
+                console.log(data);
                 container.innerHTML = "";
-                console.log("DATA: ",data);
+
                 const summaryTitle = document.createElement("h2");
-                summaryTitle.innerText = "Resumen del Torneo";
+                summaryTitle.innerText = `🏆 Ganador del Torneo: ${data.winner}`;
                 summaryTitle.className = "text-2xl font-bold mb-4 text-white";
                 container.appendChild(summaryTitle);
 
-                const list = document.createElement("ul");
-                list.className = "space-y-2 text-white";
+                if (data.matches && Array.isArray(data.matches)) {
+                    const rounds: Record<number, any[]> = {};
 
-                data.summary?.forEach((match: any, index: number) => {
-                    const item = document.createElement("li");
-                    item.innerText = `Ronda ${match.round} - ${match.player1} vs ${match.player2}`;
-                    list.appendChild(item);
-                });
+                    data.matches.forEach((match: any) => {
+                        if (!rounds[match.round]) rounds[match.round] = [];
+                        rounds[match.round].push(match);
+                    });
+                    Object.keys(rounds)
+                        .sort((a, b) => Number(a) - Number(b))
+                        .forEach((roundKey) => {
+                            const round = rounds[Number(roundKey)];
 
-                container.appendChild(list);
+                            const roundTitle = document.createElement("h3");
+                            roundTitle.innerText = `Ronda ${roundKey}`;
+                            roundTitle.className = "text-lg font-semibold mt-4 mb-2 text-yellow-400";
+                            container.appendChild(roundTitle);
+
+                            const matchList = document.createElement("ul");
+                            matchList.className = "ml-4 space-y-1 text-white";
+
+                            round.forEach((match) => {
+                                const item = document.createElement("li");
+                                item.innerText = `${match.player1} vs ${match.player2}`;
+                                matchList.appendChild(item);
+                            });
+
+                            container.appendChild(matchList);
+                        });
+                } else {
+                    const noData = document.createElement("p");
+                    noData.innerText = "No hay partidas registradas.";
+                    noData.className = "text-white";
+                    container.appendChild(noData);
+                }
                 setTimeout(() => {
                     navigateTo("/");
                 }, 6000);
                 break;
+
+
             case "update_queue":
                 const queueList = document.getElementById("queue-list");
                 if (queueList) {

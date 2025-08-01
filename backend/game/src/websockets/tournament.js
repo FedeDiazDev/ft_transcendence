@@ -55,6 +55,7 @@ async function tournamentLogic(fastify, opts) {
                             matches: [],
                             round: 1,
                             winners: [],
+                            matchHistory: [],
                             status: "waiting",
                             organizerSocket: socket
                         };
@@ -93,6 +94,7 @@ async function tournamentLogic(fastify, opts) {
                     }
 
                     tournament.status = "playing";
+                    tournament.matchHistory.push(...tournament.matches);
                     tournament.matches = [];
                     for (let i = 0; i < tournament.players.length; i += 2) {
                         const player1 = tournament.players[i];
@@ -171,12 +173,16 @@ async function tournamentLogic(fastify, opts) {
                     if (expectedWinners === 1) {
                         tournament.status = "finished";
                         const champion = tournament.winners[0];
-                        const fullMatchHistory = tournament.matches.map(match => ({
+                        const fullMatchHistory = [
+                            ...tournament.matchHistory,
+                            ...tournament.matches
+                        ].map(match => ({
                             id: match.id,
                             player1: match.player1,
                             player2: match.player2,
                             round: match.round
                         }));
+                        console.log(tournament.matches);
                         tournament.organizerSocket?.send(JSON.stringify({
                             action: "tournament_ended",
                             winner: champion,
@@ -264,14 +270,12 @@ async function tournamentLogic(fastify, opts) {
                 if (!player) return;
 
                 try {
-                    console.log("PLAYER:", player);
                     deletePlayerFromTournament(player.username, tournamentId, fastify.db);
                 } catch (err) {
                     console.error("Error al eliminar jugador de BDD:", err);
                 }
 
                 tournament.players = tournament.players.filter(p => p.socket !== socket);
-                console.log("PLAYER:", player);
                 tournament.players.forEach(p => {
                     p.socket.send(JSON.stringify({
                         action: "update_queue",
