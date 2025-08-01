@@ -168,12 +168,8 @@ export async function addPlayerToTournament(request, reply) {
             const insertQuery = db.prepare("INSERT INTO tournament_players (tournament_id, username, display_name) VALUES (?, ?, ?)");
             insertQuery.run(tournamentId, username, alias);
 
-            console.log("Getting here")
             const saveAliasToStats = async () => {
                 try {
-                    console.log("Logging debug")
-                    console.log(alias);
-                    console.log(username);
                     const response = await fetch('http://stats-service:3000/api/stats/alias', {
                         method: 'POST',
                         headers: {
