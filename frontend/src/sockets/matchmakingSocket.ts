@@ -1,4 +1,4 @@
-export const createMatchmakingSocket = (onReady: (gameState: any, roomId : string) => void, userId: number) => {
+export const createMatchmakingSocket = (onReady: (gameState: any, roomId : string, opponentId: any) => void, userId: number) => {
 
 	let socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/online_matchmaking")
 	socket.onopen = function (e) {
@@ -13,7 +13,8 @@ export const createMatchmakingSocket = (onReady: (gameState: any, roomId : strin
 			// console.log("¡Partida lista!", data);
 			// console.log(`Jugadores: ${data.players.join(" vs ")}`);
 			// console.log(`Sala: ${data.roomId}`);
-			onReady(data.gameState, data.roomId);
+			const opponentId = data.players.find((id: number) => id !== userId);
+			onReady(data.gameState, data.roomId, opponentId);
 			socket.close();
 		}
 	};
