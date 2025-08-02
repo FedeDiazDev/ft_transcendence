@@ -171,34 +171,24 @@ async function tournamentLogic(fastify, opts) {
                     if (expectedWinners === 1) {
                         tournament.status = "finished";
                         const champion = tournament.winners[0];
+                        const fullMatchHistory = tournament.matches.map(match => ({
+                            id: match.id,
+                            player1: match.player1,
+                            player2: match.player2,
+                            round: match.round
+                        }));
                         tournament.organizerSocket?.send(JSON.stringify({
                             action: "tournament_ended",
                             winner: champion,
-                            dataTournament: tournaments,
+                            matches: fullMatchHistory,
                             tournamentId
                         }));
-                        tournament.organizerSocket?.send(JSON.stringify({
-                            action: "tournament_summary",
-                            tournamentId,
-                            winner: champion,
-                            dataTournament: tournaments,
-                            matchHistory: tournament.matchHistory || []
-                        }));
-
-                        tournament.players.forEach(p => {
-                            p.socket.send(JSON.stringify({
-                                action: "tournament_summary",
-                                tournamentId,
-                                winner: champion,
-                                matchHistory: tournament.matchHistory || []
-                            }));
-                        });
-
                         //console.log("ELL GANADOR DEL TORNEO ES: ", champion);
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
                                 action: "tournament_ended",
                                 winner: champion,
+                                matches: fullMatchHistory,
                                 tournamentId
                             }));
                             p.socket.close();
@@ -241,15 +231,6 @@ async function tournamentLogic(fastify, opts) {
                             round: tournament.round,
                             gameState
                         });
-                        if (!tournament.roundHistory) tournament.roundHistory = [];
-                        console.log("HISTORY: ", tournament.roundHistory);
-                        tournament.roundHistory.push({
-                            round: tournament.round,
-                            player1: match.player1,
-                            player2: match.player2,
-                            winner: winner
-                        });
-
                         const basePayload = {
                             action: "start_match",
                             matchId,

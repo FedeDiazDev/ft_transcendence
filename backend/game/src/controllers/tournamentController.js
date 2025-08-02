@@ -167,6 +167,31 @@ export async function addPlayerToTournament(request, reply) {
 
             const insertQuery = db.prepare("INSERT INTO tournament_players (tournament_id, username, display_name) VALUES (?, ?, ?)");
             insertQuery.run(tournamentId, username, alias);
+
+            const saveAliasToStats = async () => {
+                try {
+                    const response = await fetch('http://stats-service:3000/api/stats/alias', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            alias: alias,
+                            real_username: username,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to save alias: ${response.statusText}`);
+                    }
+
+                    console.log("Alias saved successfully to stats service");
+                } catch (error) {
+                    console.error("Error calling saveAlias endpoint:", error);
+                }
+            }
+
+            saveAliasToStats();
         });
 
         insertTransaction();

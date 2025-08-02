@@ -18,6 +18,7 @@ import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
 import { getUserByUsername } from "./api/profile/profileAPI.js";
 import { gameSocketInstance } from "./sockets/gameSocket.js";
+import { NotFound } from "./pages/not_found.js";
 import fetchLogout from "./components/common/Navbar.js";
 
 function removeNotAllowedKeys(allowedKeys: string[]) {
@@ -55,7 +56,6 @@ export const cleanupLocalStorage = () => {
   removeNotAllowedKeys([])
   fetchLogout();
 };
-
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -124,7 +124,7 @@ export const render = async () => {
         const profileElement = FriendProfile(user.id);
         div.appendChild(profileElement);
       } catch (error) {
-        div.innerHTML = "<h2 class='text-white'>Usuario no encontrado</h2>";
+        app.appendChild(NotFound());
       }
     }
 
@@ -134,9 +134,7 @@ export const render = async () => {
 
   const component = routes[path] || (() => {
     if (path !== '/') {
-      const div = document.createElement("div");
-      div.innerHTML = "<h2>404 - Página no encontrada</h2>";
-      return div;
+      return NotFound();
     }
     return Home();
   });
