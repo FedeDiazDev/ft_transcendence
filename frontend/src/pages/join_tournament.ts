@@ -105,6 +105,15 @@ export const JoinTournament = () => {
 						return;
 					}
 
+					if (alias.length > 20) {
+						errorMsg.textContent = "El nickname no puede tener más de 20 caracteres";
+						errorMsg.classList.remove("hidden");
+						return;
+					}
+
+					submitBtn.disabled = true;
+					submitBtn.textContent = "Comprobando...";
+
 					submitBtn.disabled = true;
 					submitBtn.textContent = "Comprobando...";
 
@@ -137,7 +146,7 @@ export const JoinTournament = () => {
 
 						const queueList = document.createElement("ul");
 						queueList.id = "queue-list";
-						queueList.className ="w-full max-w-4xl mx-auto px-4 mt-8";
+						queueList.className = "w-full max-w-4xl mx-auto px-4 mt-8";
 						gameContainer.appendChild(queueList);
 
 						fetchUserData((user) => {
