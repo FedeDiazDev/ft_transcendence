@@ -20,56 +20,39 @@ import { getUserByUsername } from "./api/profile/profileAPI.js";
 import { gameSocketInstance } from "./sockets/gameSocket.js";
 import fetchLogout from "./components/common/Navbar.js";
 
+function removeNotAllowedKeys(allowedKeys: string[]) {
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && !allowedKeys.includes(key)) {
+      localStorage.removeItem(key);
+    }
+  }
+}
+
 export const cleanupLocalStorage = () => {
   const tempToken = localStorage.getItem("tempToken");
   const authToken = localStorage.getItem("authToken");
   const username = localStorage.getItem("username");
   const email = localStorage.getItem("email");
-  const hasRefreshToken = document.cookie.includes("refreshToken=") && !document.cookie.includes("refreshToken=;");
   
   if (tempToken) {
     const allowedKeys = ["username", "email", "QRCode", "tempToken"];
-    
-    localStorage.removeItem("authToken");
-    
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (key && !allowedKeys.includes(key)) {
-        localStorage.removeItem(key);
-      }
-    }
-    
+    removeNotAllowedKeys(allowedKeys);
     return;
   }
   
-  if (authToken && hasRefreshToken) {
+  if (authToken) {
     const allowedKeys = ["username", "email", "authToken"];
-    
-    localStorage.removeItem("tempToken");
-    localStorage.removeItem("QRCode");
-    
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (key && !allowedKeys.includes(key)) {
-        localStorage.removeItem(key);
-      }
-    }
+    removeNotAllowedKeys(allowedKeys);
     return;
   }
   
-  if (!authToken && !tempToken && (username || email)) {
+  if (!authToken && !tempToken && (username || email) && window.location.pathname === "/twofalogin") {
     const allowedKeys = ["username", "email"];
-    
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (key && !allowedKeys.includes(key)) {
-        localStorage.removeItem(key);
-      }
-    }
+    removeNotAllowedKeys(allowedKeys);
     return;
   }
-
-  localStorage.clear();
+  removeNotAllowedKeys([])
   fetchLogout();
 };
 
@@ -170,6 +153,7 @@ export const render = async () => {
 
 window.addEventListener("popstate", render);
 document.addEventListener("DOMContentLoaded", () => {
+  cleanupLocalStorage();
   render();
   authToken();
 });
@@ -177,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
 export const authToken = () => {
   const token = localStorage.getItem("authToken");
   if (!token || token === "") {
+    cleanupLocalStorage();
     return false;
   } else {
     fetchUserData((user) => {

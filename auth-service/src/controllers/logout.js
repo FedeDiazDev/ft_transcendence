@@ -1,10 +1,13 @@
-export default function logout(reply)
+import cookie from "@fastify/cookie";
+
+export default function logout(request, reply)
 {
 	reply.clearCookie('refreshToken', {
-		path: '/',
-		httpOnly: true,
+      	httpOnly: true,
+      	secure: true,
 		sameSite: 'none',
-		secure: true
+		path: '/',
+      	maxAge: 0
 	})
 	.status(200)
 	.send({ message: 'Logged out' });
