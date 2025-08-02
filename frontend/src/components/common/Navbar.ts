@@ -1,6 +1,6 @@
 import { navigateTo } from "../../router.js";
 
-async function fetchLogout()
+export default async function fetchLogout()
 {
 	await fetch("https://" + window.location.hostname + ":8080/api/auth/logout", {
 	  method: "POST",

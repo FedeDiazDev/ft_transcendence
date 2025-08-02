@@ -19,7 +19,43 @@ import "./interceptFetch.js"
 import { getUserByUsername } from "./api/profile/profileAPI.js";
 import { gameSocketInstance } from "./sockets/gameSocket.js";
 import { NotFound } from "./pages/not_found.js";
+import fetchLogout from "./components/common/Navbar.js";
 
+function removeNotAllowedKeys(allowedKeys: string[]) {
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && !allowedKeys.includes(key)) {
+      localStorage.removeItem(key);
+    }
+  }
+}
+
+export const cleanupLocalStorage = () => {
+  const tempToken = localStorage.getItem("tempToken");
+  const authToken = localStorage.getItem("authToken");
+  const username = localStorage.getItem("username");
+  const email = localStorage.getItem("email");
+  
+  if (tempToken) {
+    const allowedKeys = ["username", "email", "QRCode", "tempToken"];
+    removeNotAllowedKeys(allowedKeys);
+    return;
+  }
+  
+  if (authToken) {
+    const allowedKeys = ["username", "email", "authToken"];
+    removeNotAllowedKeys(allowedKeys);
+    return;
+  }
+  
+  if (!authToken && !tempToken && (username || email) && window.location.pathname === "/twofalogin") {
+    const allowedKeys = ["username", "email"];
+    removeNotAllowedKeys(allowedKeys);
+    return;
+  }
+  removeNotAllowedKeys([])
+  fetchLogout();
+};
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -60,13 +96,15 @@ export const render = async () => {
   const token = authToken();
 
   if (!publicRoutes.includes(path) && !twoFARoutes.includes(path) && !token) {
+    cleanupLocalStorage();
     window.history.pushState({}, "", "/loghome");
     render();
     return;
   }
 
   if (twoFARoutes.includes(path)) {
-    if (!username || token) {
+    if ((!username && !localStorage.getItem("email")) || token) {
+      cleanupLocalStorage();
       window.history.pushState({}, "", "/loghome");
       render();
       return;
@@ -113,6 +151,7 @@ export const render = async () => {
 
 window.addEventListener("popstate", render);
 document.addEventListener("DOMContentLoaded", () => {
+  cleanupLocalStorage();
   render();
   authToken();
 });
@@ -120,6 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 export const authToken = () => {
   const token = localStorage.getItem("authToken");
   if (!token || token === "") {
+    cleanupLocalStorage();
     return false;
   } else {
     fetchUserData((user) => {
@@ -142,4 +182,4 @@ export const navigateTo = (path: string) => {
   }
   window.history.pushState({}, "", path);
   render();
-};
+}

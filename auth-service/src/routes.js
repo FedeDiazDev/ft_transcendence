@@ -4,6 +4,7 @@ import postVerification from './controllers/verification.js'
 import googleRegister from './controllers/googleRegister.js'
 import refreshToken from './controllers/refreshToken.js'
 import logout from './controllers/logout.js'
+import login2FA from './controllers/login2FA.js'
 
 const signupOpts = {
 	schema: {
@@ -34,6 +35,7 @@ const signupOpts = {
   };
 
 export default function routes(fastify) {
+	fastify.post("/api/auth/login2fa", login2FA)
 	fastify.post("/api/auth/verify", postVerification);
 	fastify.post("/api/auth/signup", signupOpts, postSignup);
 	fastify.post("/api/auth/login", loginOpts, postLogin);
