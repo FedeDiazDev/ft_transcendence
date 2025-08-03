@@ -1,4 +1,5 @@
 import { navigateTo } from "../../router.js";
+import { HelpCard } from "./helpCard.js";
 
 export default async function fetchLogout()
 {
@@ -52,6 +53,46 @@ export const Navbar = () => {
 		menu.appendChild(a);
 	  }
 	});
+
+	if (token) {
+		const helpBtn = document.createElement("button");
+		helpBtn.innerText = "?";
+		helpBtn.title = "Help";
+		helpBtn.className = "px-3 py-2 rounded-lg hover:bg-gray-700 transition font-bold text-lg";
+	  
+		let helpVisible = false;
+	  
+		// ✅ Declare handler once
+		function handleOutsideClick(e: any) {
+		  const card = document.getElementById("help-card");
+		  if (card && !card.contains(e.target)) {
+			card.remove();
+			document.removeEventListener("click", handleOutsideClick);
+			helpVisible = false;
+		  }
+		}
+	  
+		helpBtn.addEventListener("click", () => {
+		  const existing = document.getElementById("help-card");
+	  
+		  if (helpVisible && existing) {
+			existing.remove();
+			document.removeEventListener("click", handleOutsideClick);
+			helpVisible = false;
+		  } else {
+			const helpCard = HelpCard();
+			document.body.appendChild(helpCard);
+			helpVisible = true;
+	  
+			setTimeout(() => {
+			  document.addEventListener("click", handleOutsideClick);
+			}, 50);
+		  }
+		});
+	  
+		menu.appendChild(helpBtn);
+	}
+	  
   
 	nav.appendChild(logo);
 	nav.appendChild(menu);
