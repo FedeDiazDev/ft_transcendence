@@ -63,18 +63,20 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
 
                 sortedRounds.forEach((roundNumber, roundIndex) => {
                     const roundMatches = rounds[roundNumber];
+                    const nextRoundMatches = rounds[sortedRounds[roundIndex + 1]] || [];
+
+                    const nextRoundPlayers = new Set<string>();
+                    nextRoundMatches.forEach(nextMatch => {
+                        nextRoundPlayers.add(nextMatch.player1);
+                        nextRoundPlayers.add(nextMatch.player2);
+                    });
+
                     const roundRow = document.createElement("div");
                     roundRow.className = "flex justify-center items-center gap-32 mb-32 relative";
 
-                    roundMatches.forEach((match, matchIndex) => {
+                    roundMatches.forEach((match) => {
                         const matchCardWrapper = document.createElement("div");
                         matchCardWrapper.className = "relative flex flex-col items-center";
-
-                        if (roundIndex !== sortedRounds.length - 1) {
-                            const line = document.createElement("div");
-                            line.className = "absolute bottom-full w-[2px] h-16 bg-yellow-400";
-                            matchCardWrapper.appendChild(line);
-                        }
 
                         const matchCard = document.createElement("div");
                         matchCard.className =
@@ -83,6 +85,9 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                         const p1 = document.createElement("p");
                         p1.innerText = match.player1;
                         p1.className = "text-sm";
+                        if (nextRoundPlayers.has(match.player1)) {
+                            p1.className += " text-yellow-400 font-bold";
+                        }
 
                         const vs = document.createElement("p");
                         vs.innerText = "vs";
@@ -91,6 +96,9 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                         const p2 = document.createElement("p");
                         p2.innerText = match.player2;
                         p2.className = "text-sm";
+                        if (nextRoundPlayers.has(match.player2)) {
+                            p2.className += " text-yellow-400 font-bold";
+                        }
 
                         matchCard.appendChild(p1);
                         matchCard.appendChild(vs);
@@ -102,20 +110,8 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
 
                     bracketWrapper.appendChild(roundRow);
 
-                    if (roundMatches.length === 2 && roundIndex !== sortedRounds.length - 1) {
-                        const connector = document.createElement("div");
-                        connector.className =
-                            "absolute h-[2px] bg-yellow-400";
-                        connector.style.width = "calc(100% - 16rem)";
-                        connector.style.bottom = `-${32}px`;
-                        connector.style.left = "50%";
-                        connector.style.transform = "translateX(-50%)";
-                        bracketWrapper.appendChild(connector);
-                    }
                 });
-
                 container.appendChild(bracketWrapper);
-
 
                 setTimeout(() => {
                     if (data.players.includes(alias)) {
