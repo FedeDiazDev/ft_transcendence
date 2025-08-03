@@ -122,12 +122,8 @@ async function fetchProfile(container: HTMLDivElement) {
         return;
       }
   
-      // Clear container before populating
       container.innerHTML = "";
   
-      // Profile header div for avatar is outside, so no avatar here!
-  
-      // Username label + value (no white box behind)
       const usernameLabel = document.createElement("p");
       usernameLabel.className = "text-sm font-bold text-white mb-1";
       usernameLabel.textContent = "Username:";
