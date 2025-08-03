@@ -95,6 +95,18 @@ export const render = async () => {
   const username = localStorage.getItem("username");
   const token = authToken();
 
+    if (token && publicRoutes.includes(path)) {
+    window.history.pushState({}, "", "/");
+    render();
+    return;
+  }
+
+  if (token && twoFARoutes.includes(path)) {
+    window.history.pushState({}, "", "/");
+    render();
+    return;
+  }
+
   if (!publicRoutes.includes(path) && !twoFARoutes.includes(path) && !token) {
     cleanupLocalStorage();
     window.history.pushState({}, "", "/loghome");
