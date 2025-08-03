@@ -5,6 +5,6 @@ export async function fetchUserData(callback: (user: any) => void) {
         const data = await getUserData();
         callback(data.username || data.user);
     } catch (error) {
-        console.error("Error al obtener los datos del usuario:", error);
+    //     // console.error("Error al obtener los datos del usuario:", error);
     }
 }
