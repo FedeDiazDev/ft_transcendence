@@ -31,9 +31,6 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
         const data = JSON.parse(event.data);
         switch (data.action) {
             case "start_match":
-                console.log("DATA: ", data);
-
-                // Asegurar que tournamentInfo esté definido
                 if (!data.tournamentInfo && data.tournamentId && data.round) {
                     data.tournamentInfo = {
                         tournamentId: data.tournamentId,
@@ -41,12 +38,10 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     };
                 }
 
-                // Obtener el array de matches desde el lugar correcto
                 const matchList = data.matches || data.tournamentInfo?.matches || [];
 
-                // Resetear y preparar el contenedor del bracket
                 container.innerHTML = "";
-                container.className = "p-4 text-white overflow-auto";
+                container.className = "p-4 text-white overflow-auto min-h-screen relative";
 
                 const title = document.createElement("h2");
                 title.innerText = `🏆 Torneo - Ronda ${data.round || data.tournamentInfo?.round}`;
@@ -54,29 +49,36 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 container.appendChild(title);
 
                 const bracketWrapper = document.createElement("div");
-                bracketWrapper.className = "flex gap-12 overflow-x-auto justify-center items-start relative";
+                bracketWrapper.className = "flex flex-col items-center justify-center relative";
 
-                const rounds: Record<number, any[]> = {};
-                matchList.forEach((match: any) => {
+                const rounds: Record<number, { player1: string, player2: string, round: number }[]> = {};
+
+                matchList.forEach((match: { player1: string; player2: string; round: number }) => {
                     if (!rounds[match.round]) rounds[match.round] = [];
                     rounds[match.round].push(match);
                 });
 
-                const sortedRounds = Object.keys(rounds).map(Number).sort((a, b) => a - b);
+
+                const sortedRounds = Object.keys(rounds).map(Number).sort((a, b) => b - a);
 
                 sortedRounds.forEach((roundNumber, roundIndex) => {
-                    const roundColumn = document.createElement("div");
-                    roundColumn.className = `flex flex-col gap-10 relative ${roundIndex % 2 === 0 ? "items-start" : "items-end"}`;
+                    const roundMatches = rounds[roundNumber];
+                    const roundRow = document.createElement("div");
+                    roundRow.className = "flex justify-center items-center gap-32 mb-32 relative";
 
-                    const roundTitle = document.createElement("h3");
-                    roundTitle.innerText = `Ronda ${roundNumber}`;
-                    roundTitle.className = "text-yellow-400 font-semibold mb-6";
-                    roundColumn.appendChild(roundTitle);
+                    roundMatches.forEach((match, matchIndex) => {
+                        const matchCardWrapper = document.createElement("div");
+                        matchCardWrapper.className = "relative flex flex-col items-center";
 
-                    rounds[roundNumber].forEach((match, matchIndex) => {
+                        if (roundIndex !== sortedRounds.length - 1) {
+                            const line = document.createElement("div");
+                            line.className = "absolute bottom-full w-[2px] h-16 bg-yellow-400";
+                            matchCardWrapper.appendChild(line);
+                        }
+
                         const matchCard = document.createElement("div");
                         matchCard.className =
-                            "bg-[#1E1E1E] rounded-lg px-4 py-3 w-48 text-center border border-gray-600 shadow-md relative";
+                            "bg-[#1E1E1E] rounded-lg px-4 py-3 w-48 text-center border border-gray-600 shadow-md";
 
                         const p1 = document.createElement("p");
                         p1.innerText = match.player1;
@@ -93,23 +95,27 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                         matchCard.appendChild(p1);
                         matchCard.appendChild(vs);
                         matchCard.appendChild(p2);
+                        matchCardWrapper.appendChild(matchCard);
 
-                        if (roundIndex < sortedRounds.length - 1) {
-                            const line = document.createElement("div");
-                            line.className = "absolute top-1/2 w-6 h-[2px] bg-yellow-400";
-
-                            if (roundIndex % 2 === 0) {
-                                line.classList.add("right-[-24px]");
-                            } else {
-                                line.classList.add("left-[-24px]");
-                            }
-                            matchCard.appendChild(line);
-                        }
-                        roundColumn.appendChild(matchCard);
+                        roundRow.appendChild(matchCardWrapper);
                     });
-                    bracketWrapper.appendChild(roundColumn);
+
+                    bracketWrapper.appendChild(roundRow);
+
+                    if (roundMatches.length === 2 && roundIndex !== sortedRounds.length - 1) {
+                        const connector = document.createElement("div");
+                        connector.className =
+                            "absolute h-[2px] bg-yellow-400";
+                        connector.style.width = "calc(100% - 16rem)";
+                        connector.style.bottom = `-${32}px`;
+                        connector.style.left = "50%";
+                        connector.style.transform = "translateX(-50%)";
+                        bracketWrapper.appendChild(connector);
+                    }
                 });
+
                 container.appendChild(bracketWrapper);
+
 
                 setTimeout(() => {
                     if (data.players.includes(alias)) {

@@ -4,7 +4,7 @@ function deletePlayerFromTournament(username, tournamentId, db) {
     try {
         const query = db.prepare(`
             DELETE FROM tournament_players 
-            WHERE username = ? AND tournament_id = ?
+            WHERE display_name = ? AND tournament_id = ?
         `);
         query.run(username, tournamentId);
     } catch (e) {
