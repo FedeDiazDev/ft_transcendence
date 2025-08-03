@@ -1,5 +1,5 @@
 import { navigateTo } from "../router.js";
-import { createTournament } from "../api/game/tournamentAPI.js"
+import { createTournament } from "../api/game/tournamentAPI.js";
 import { joinSocket } from "../sockets/tournamentSocket.js";
 import { fetchUserData } from "../hooks/fetchUserData.js";
 
@@ -7,11 +7,13 @@ export const CreateTournament = () => {
 	const container = document.createElement("div");
 	container.className =
 		"flex flex-col items-center justify-center h-screen text-white gap-6";
+
 	const data = document.createElement("div");
-	data.className ="flex flex-col items-center justify-center gap-4";
+	data.className = "flex flex-col items-center justify-center gap-4";
 
 	const parentContainer = document.createElement("div");
-	parentContainer.className = "flex flex-col items-center p-16 rounded-xl bg-base-black2";
+	parentContainer.className =
+		"flex flex-col items-center p-16 rounded-xl bg-base-black2";
 
 	const createTitle = document.createElement("h2");
 	createTitle.textContent = "🏆 Create Tournament";
@@ -24,6 +26,7 @@ export const CreateTournament = () => {
 	nameInput.type = "text";
 	nameInput.placeholder = "Name";
 	nameInput.required = true;
+	nameInput.maxLength = 10; // Límite HTML
 	nameInput.className =
 		"p-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-b border-white focus:outline-none focus:border-white transition";
 
@@ -31,7 +34,6 @@ export const CreateTournament = () => {
 	selectInput.required = true;
 	selectInput.className =
 		"appearance-none bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-0 border-b-2 border-white px-2 py-2 rounded-none";
-
 
 	const fourOption = document.createElement("option");
 	fourOption.value = "4";
@@ -43,59 +45,65 @@ export const CreateTournament = () => {
 
 	selectInput.append(fourOption, eightOption);
 
+	const errorMessage = document.createElement("p");
+	errorMessage.className = "text-red-500 text-sm h-5";
+	errorMessage.textContent = "";
+
 	const submitBtn = document.createElement("button");
 	submitBtn.type = "submit";
 	submitBtn.textContent = "Create";
-	submitBtn.className = "mt-2 px-8 py-4 rounded-xl text-white bg-base-black2 self-end";
+	submitBtn.className =
+		"mt-2 px-8 py-4 rounded-xl text-white bg-base-black2 self-end";
 
 	createForm.append(nameInput, selectInput);
 	parentContainer.append(createTitle, createForm);
 	data.appendChild(parentContainer);
+	data.appendChild(errorMessage);
 	data.appendChild(submitBtn);
 	container.append(data);
 
-	// Evento submit
 	submitBtn.addEventListener("click", async (e) => {
 		e.preventDefault();
+		errorMessage.textContent = "";
 
 		const name = nameInput.value.trim();
 		const number_participants = parseInt(selectInput.value);
-		try {
 
-			const response = await createTournament(name, number_participants);
-			if (response.error) {
-				console.error(response.error);
-				return;
-			}
-			console.log(response);
-			console.log("Torneo creado correctamente");
-			fetchUserData((user) => {
-				joinSocket(user.username, "create", response.tournamentState.id, container, "" ,number_participants);
-				navigateTo("/tournament/join")
-
-			})
-		} catch (error) {
-			console.error("Error creating tournnament");
+		// Validación de longitud
+		if (name.length > 10) {
+			errorMessage.textContent = "El nombre no puede tener más de 10 caracteres.";
+			return;
 		}
-		// try {
-		// 	const res = await fetch("http://localhost:3000/tournaments", {
-		// 		method: "POST",
-		// 		headers: { "Content-Type": "application/json" },
-		// 		body: JSON.stringify({
-		// 			name,
-		// 			number_participants,
-		// 			status: "open", // o el estado que uses por defecto
-		// 		}),
-		// 	});
 
-		// 	if (!res.ok) throw new Error("Error al crear el torneo");
+		try {
+			const response = await createTournament(name, number_participants);
 
-		// 	// Redirige o muestra éxito
-		// 	navigateTo("/tournaments");
-		// } catch (err) {
-		// 	console.error(err);
-		// 	alert("No se pudo crear el torneo.");
-		// }
+			fetchUserData((user) => {
+				joinSocket(
+					user.username,
+					"create",
+					response.tournamentState.id,
+					container,
+					"",
+					number_participants
+				);
+				navigateTo("/tournament/join");
+			});
+		} catch (error: unknown) {
+			let message = "Hubo un error al crear el torneo. Inténtalo de nuevo.";
+
+			if (error instanceof Error) {
+				if (error.message.includes("409")) {
+					message = "Ya existe un torneo con ese nombre.";
+				} else if (error.message === "MAX_TOURNAMENTS_OPEN") {
+					message = "Solo puedes tener hasta 5 torneos abiertos a la vez.";
+				} else {
+					console.error("Error creando torneo:", error);
+					message = error.message;
+				}
+			}
+			errorMessage.textContent = message;
+		}
 	});
 
 	return container;

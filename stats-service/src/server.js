@@ -17,7 +17,7 @@ fastify.setErrorHandler((error, request, reply) => {
 });
 
 fastify.addHook("preHandler", async (request, reply) => {
-	if (request.raw.url.startsWith("/api")) {
+	if (request.raw.url.startsWith("/api") && !request.raw.url.startsWith("/api/stats/alias")) {
 		try {
 			await validateAuthorizationHeader(request);
 		} catch (err) {

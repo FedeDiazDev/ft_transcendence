@@ -17,6 +17,45 @@ import { Stats } from "./pages/stats.js"
 import { Navbar } from "./components/common/Navbar.js";
 import "./interceptFetch.js"
 import { getUserByUsername } from "./api/profile/profileAPI.js";
+import { gameSocketInstance } from "./sockets/gameSocket.js";
+import { NotFound } from "./pages/not_found.js";
+import fetchLogout from "./components/common/Navbar.js";
+
+function removeNotAllowedKeys(allowedKeys: string[]) {
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && !allowedKeys.includes(key)) {
+      localStorage.removeItem(key);
+    }
+  }
+}
+
+export const cleanupLocalStorage = () => {
+  const tempToken = localStorage.getItem("tempToken");
+  const authToken = localStorage.getItem("authToken");
+  const username = localStorage.getItem("username");
+  const email = localStorage.getItem("email");
+  
+  if (tempToken) {
+    const allowedKeys = ["username", "email", "QRCode", "tempToken"];
+    removeNotAllowedKeys(allowedKeys);
+    return;
+  }
+  
+  if (authToken) {
+    const allowedKeys = ["username", "email", "authToken"];
+    removeNotAllowedKeys(allowedKeys);
+    return;
+  }
+  
+  if (!authToken && !tempToken && (username || email) && window.location.pathname === "/twofalogin") {
+    const allowedKeys = ["username", "email"];
+    removeNotAllowedKeys(allowedKeys);
+    return;
+  }
+  removeNotAllowedKeys([])
+  fetchLogout();
+};
 
 const routes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
   "/loghome": LogHome,
@@ -57,13 +96,15 @@ export const render = async () => {
   const token = authToken();
 
   if (!publicRoutes.includes(path) && !twoFARoutes.includes(path) && !token) {
+    cleanupLocalStorage();
     window.history.pushState({}, "", "/loghome");
     render();
     return;
   }
 
   if (twoFARoutes.includes(path)) {
-    if (!username || token) {
+    if ((!username && !localStorage.getItem("email")) || token) {
+      cleanupLocalStorage();
       window.history.pushState({}, "", "/loghome");
       render();
       return;
@@ -73,30 +114,27 @@ export const render = async () => {
   if (pathParts[1] === "profile" && pathParts.length === 3) {
     const identifier = pathParts[2];
     const div = document.createElement("div");
-  
-    if (/^\d+$/.test(identifier)) {      
+
+    if (/^\d+$/.test(identifier)) {
       const profileComponent = FriendProfile(identifier);
       div.appendChild(profileComponent);
-    } else {      
+    } else {
       try {
         const user = await getUserByUsername(identifier);
         const profileElement = FriendProfile(user.id);
         div.appendChild(profileElement);
       } catch (error) {
-        div.innerHTML = "<h2 class='text-white'>Usuario no encontrado</h2>";
+        app.appendChild(NotFound());
       }
     }
-  
+
     app.appendChild(div);
     return;
   }
-  
 
   const component = routes[path] || (() => {
     if (path !== '/') {
-      const div = document.createElement("div");
-      div.innerHTML = "<h2>404 - Página no encontrada</h2>";
-      return div;
+      return NotFound();
     }
     return Home();
   });
@@ -113,6 +151,7 @@ export const render = async () => {
 
 window.addEventListener("popstate", render);
 document.addEventListener("DOMContentLoaded", () => {
+  cleanupLocalStorage();
   render();
   authToken();
 });
@@ -120,21 +159,27 @@ document.addEventListener("DOMContentLoaded", () => {
 export const authToken = () => {
   const token = localStorage.getItem("authToken");
   if (!token || token === "") {
+    cleanupLocalStorage();
     return false;
   } else {
     fetchUserData((user) => {
-      statusSocket(user.id, user.username, "login");
+      if (typeof user === "object" && user.username) {
+        statusSocket(user.id || null, user.username, "login");
+      } else if (typeof user === "string") {
+        statusSocket(null, user, "login");
+      }
     });
     return true;
   }
 }
 
-
 export const navigateTo = (path: string) => {
   if (window.location.pathname === path) {
     return;
   }
-
+  if (!path.endsWith("online_game")) {
+    gameSocketInstance?.close();
+  }
   window.history.pushState({}, "", path);
   render();
-};
+}

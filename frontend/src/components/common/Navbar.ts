@@ -1,6 +1,6 @@
 import { navigateTo } from "../../router.js";
 
-async function fetchLogout()
+export default async function fetchLogout()
 {
 	await fetch("https://" + window.location.hostname + ":8080/api/auth/logout", {
 	  method: "POST",
@@ -32,23 +32,25 @@ export const Navbar = () => {
   
 	links.forEach(({ text, path }) => {
 	  const a = document.createElement("a");
-	  if (token && text == "Log In")
-		a.textContent = "Log Out";
-	  else
-		a.textContent = text;
-	  a.href = path;
-	  a.className = "px-3 py-2 rounded-lg hover:bg-gray-700 transition";
-	  a.addEventListener("click", (e) => {
-		e.preventDefault();
-		if (token && text == "Log In"){
-		  localStorage.removeItem("authToken");
-		  localStorage.removeItem("username");
-		  localStorage.removeItem("email");
-		  fetchLogout();
-		}
-		navigateTo(path);
-	  });
-	  menu.appendChild(a);
+	  if (token) {
+		if (token && text == "Log In")
+			a.textContent = "Log Out";
+		else
+			a.textContent = text;
+		a.href = path;
+		a.className = "px-3 py-2 rounded-lg hover:bg-gray-700 transition";
+		a.addEventListener("click", (e) => {
+			e.preventDefault();
+			if (token && text == "Log In"){
+			localStorage.removeItem("authToken");
+			localStorage.removeItem("username");
+			localStorage.removeItem("email");
+			fetchLogout();
+			}
+			navigateTo(path);
+		});
+		menu.appendChild(a);
+	  }
 	});
   
 	nav.appendChild(logo);

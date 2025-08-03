@@ -1,7 +1,7 @@
 const originalFetch = window.fetch;
 
 window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-	let response = await originalFetch(input, addAuth(init)) //The addAuth could be not necessary
+	let response = await originalFetch(input, addAuth(init)) 
 	if (response.status == 401){
 		const refreshResponse = await originalFetch("/api/auth/refresh", { 
 			method : "POST",
@@ -13,6 +13,8 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
 			
 			response = await originalFetch(input, addAuth(init));
 		}
+		else
+			localStorage.clear();
 	}
 	return response;
 }

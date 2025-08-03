@@ -71,7 +71,7 @@ export const Friend = async () => {
             addButton.className = "p-2";
             addButton.addEventListener("click", async () => {
                 try {
-                    console.log(`Agregar a ${user.username} (id: ${user.id})`);
+                    //console.log(`Agregar a ${user.username} (id: ${user.id})`);
                     const response = await addFriend(user.id);
                     
                     if (response.error) {

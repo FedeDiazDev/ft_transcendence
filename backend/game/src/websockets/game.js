@@ -152,12 +152,16 @@ async function gameLogic(fastify, opts) {
 					startGameLoop(roomId);
 				}
 			});
-			socket.on('close', () => {
+			socket.on('close', async () => {
 				const roomEntry = [...games.entries()].find(([, room]) =>
 					room.players.some(p => p.socket === socket)
 				);
 				if (!roomEntry) return;
 				const [roomId, room] = roomEntry;
+
+				if (room.cleanedUp) return;
+				room.cleanedUp = true;
+
 				const disconnectedPlayer = room.players.find(p => p.socket === socket);
 				const remainingPlayer = room.players.find(p => p.socket !== socket);
 				console.log(`Jugador desconectado: ${disconnectedPlayer?.name}`);
@@ -169,6 +173,17 @@ async function gameLogic(fastify, opts) {
 						roomId
 					}));
 					remainingPlayer.socket.close();
+
+					try {
+						await publishGameResultEvent({
+							winner_username: remainingPlayer.name,
+							looser_username: disconnectedPlayer?.name || "Unknown",
+							looser_points: room?.game?.leftPoints ?? 0,
+							game_date: room?.game?.date ?? new Date().toISOString()
+						});
+					} catch (error) {
+						console.error('Failed to publish disconnect game result:', error)
+					}
 				}
 				if (room.tournamentInfo && remainingPlayer) {
 					room.tournamentInfo.socket?.send(JSON.stringify({
