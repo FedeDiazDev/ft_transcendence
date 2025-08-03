@@ -13,8 +13,6 @@ window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Pro
 			
 			response = await originalFetch(input, addAuth(init));
 		}
-		else
-			localStorage.clear();
 	}
 	return response;
 }
