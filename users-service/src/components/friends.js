@@ -26,7 +26,7 @@ export async function getFriends(request, reply) {
     const db = request.server.db;
     const username = getUsername(request, reply);
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Username missing" });
     }
     try {
         const query = db.prepare(`
@@ -47,7 +47,7 @@ export async function getUsers(request, reply) {
     const query = db.prepare("SELECT username FROM users");
     try {
         const users = query.all();
-        reply.status(200).send({ message: "Lista de usuarios", users });
+        reply.status(200).send({ message: "User list", users });
     } catch (err) {
         reply.status(404).send({ error: "Users not found" });
     }

@@ -9,7 +9,7 @@ export async function validateAuthorizationHeader(request) {
   //console.log(request.headers['authorization']);
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Error("Token no proporcionado");
+    throw new Error("No token");
   }
 
   const token = authHeader.split(' ')[1];
@@ -18,6 +18,6 @@ export async function validateAuthorizationHeader(request) {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     request.user = payload;
   } catch (err) {
-    throw new Error("Token inválido o expirado");
+    throw new Error("Invalid or expired token");
   }
 }
