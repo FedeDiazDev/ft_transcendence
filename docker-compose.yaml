@@ -141,7 +141,8 @@ services:
 
   elasticsearch:
     container_name: elasticsearch
-    image: elasticsearch:7.17.28
+    build:
+      context: ./monitoring/elk/elasticsearch
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data
       - ./monitoring/elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -162,6 +163,12 @@ services:
       timeout: 10s
       retries: 5
     mem_limit: 1gb
+    command: >
+      bash -c "
+        /usr/local/bin/docker-entrypoint.sh &
+        sleep 10 &&
+        /usr/share/elasticsearch/ilm-policy.sh
+        wait"
 
   logstash:
     container_name: logstash
@@ -182,7 +189,8 @@ services:
 
   kibana:
     container_name: kibana
-    image: kibana:7.17.28
+    build:
+      context: ./monitoring/elk/kibana
     volumes:
       - ./monitoring/elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
       - kibana:/usr/share/kibana/data
@@ -197,6 +205,8 @@ services:
       - NODE_OPTIONS=--max-old-space-size=768
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+    command: >
+      bash -c "/usr/share/kibana/import-dashboards.sh"
     profiles: ["elk"]
 
 volumes:
