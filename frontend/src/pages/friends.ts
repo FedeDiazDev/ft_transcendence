@@ -22,7 +22,7 @@ export const Friend = async () => {
     const div = document.createElement("div");
     div.innerHTML = "";
     div.className = "flex flex-col gap-6 items-center w-full";
-    div.innerHTML = `<h2 class="text-center font-bold text-2xl text-white">Mis amigos</h2>`;
+    div.innerHTML = `<h2 class="text-center font-bold text-2xl text-white">My Friends</h2>`;
 
     const resultsContainer = document.createElement("div");
     resultsContainer.className = "w-full";
