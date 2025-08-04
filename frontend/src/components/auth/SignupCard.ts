@@ -116,6 +116,10 @@ export const SignupCard = () => {
 	const names = ["Username", "Email", "Password", "Confirm password"];
 	const types = ["text", "email", "password", "password"];
 
+	const button = document.createElement("button");
+	button.textContent = "Sign Up";
+	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
+
 	for (let i: number = 0; i < names.length; i++) {
 		const text = document.createElement("h3");
 		text.textContent = names[i];
@@ -125,15 +129,18 @@ export const SignupCard = () => {
 		input.className = "text-white bg-transparent p-2 border-0 border-b border-white focus:outline-none focus:border-white transition";
 		input.type = types[i];
 		input.id = names[i];
+		
+		input.addEventListener("keydown", (e) => {
+			if (e.key === "Enter") {
+				button.click();
+			}
+		});
+
 		div.appendChild(input);
 	}
 
 	const errorDiv = document.createElement("div");
 	div.appendChild(errorDiv);
-
-	const button = document.createElement("button");
-	button.textContent = "Sign Up";
-	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
 
 	clickOnButtonSignup(button, names, errorDiv);
 
