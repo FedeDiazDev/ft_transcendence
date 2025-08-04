@@ -79,7 +79,7 @@ export const CreateTournament = () => {
 		const number_participants = parseInt(selectInput.value);
 
 		if (name.length > 10) {
-			errorMessage.textContent = "El nombre no puede tener más de 10 caracteres.";
+			errorMessage.textContent = "Name can't be longer than 10 characters.";
 			return;
 		}
 
@@ -98,15 +98,15 @@ export const CreateTournament = () => {
 				navigateTo("/tournament/join");
 			});
 		} catch (error: unknown) {
-			let message = "Hubo un error al crear el torneo. Inténtalo de nuevo.";
+			let message = "There was an error creating the tournament. Try again!";
 
 			if (error instanceof Error) {
 				if (error.message.includes("409")) {
-					message = "Ya existe un torneo con ese nombre.";
+					message = "There's already a tournament with that name.";
 				} else if (error.message === "MAX_TOURNAMENTS_OPEN") {
-					message = "Solo puedes tener hasta 5 torneos abiertos a la vez.";
+					message = "You can only have up to 5 tournaments running at the same time.";
 				} else {
-					console.error("Error creando torneo:", error);
+					console.error("Error creating the tournament:", error);
 					message = error.message;
 				}
 			}
