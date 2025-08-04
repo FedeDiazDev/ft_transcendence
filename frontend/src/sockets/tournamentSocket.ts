@@ -29,7 +29,6 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
 
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        //console.log("DATA: ", data);
         switch (data.action) {
             case "start_match":
                 if (!data.tournamentInfo && data.tournamentId && data.round) {
@@ -38,48 +37,136 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                         round: data.round,
                     };
                 }
-                if (data.players.includes(alias)) {
-                    container.innerHTML = "";
-                    container.className = "flex flex-col items-center justify-center h-screen text-white";
-                    const score = document.createElement("p");
-                    score.innerText = "0 - 0";
-                    score.className = "text-[#C4C4C4]"
-                    container.appendChild(score);
-                    container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo, alias));
-                }
-                break;
-            case "tournament_summary":
+
+                const matchList = data.matches || data.tournamentInfo?.matches || [];
+
                 container.innerHTML = "";
-                console.log("DATA: ",data);
-                const summaryTitle = document.createElement("h2");
-                summaryTitle.innerText = "Resumen del Torneo";
-                summaryTitle.className = "text-2xl font-bold mb-4 text-white";
-                container.appendChild(summaryTitle);
+                container.className = "p-4 text-white overflow-auto min-h-screen relative";
 
-                const list = document.createElement("ul");
-                list.className = "space-y-2 text-white";
+                const title = document.createElement("h2");
+                title.innerText = `🏆 Torneo - Ronda ${data.round || data.tournamentInfo?.round}`;
+                title.className = "text-2xl font-bold mb-6 text-center";
+                container.appendChild(title);
 
-                data.summary?.forEach((match: any, index: number) => {
-                    const item = document.createElement("li");
-                    item.innerText = `Ronda ${match.round} - ${match.player1} vs ${match.player2}`;
-                    list.appendChild(item);
+                const bracketWrapper = document.createElement("div");
+                bracketWrapper.className = "flex flex-col items-center justify-center relative";
+
+                const rounds: Record<number, { player1: string, player2: string, round: number }[]> = {};
+
+                matchList.forEach((match: { player1: string; player2: string; round: number }) => {
+                    if (!rounds[match.round]) rounds[match.round] = [];
+                    rounds[match.round].push(match);
                 });
 
-                container.appendChild(list);
+
+                const sortedRounds = Object.keys(rounds).map(Number).sort((a, b) => b - a);
+
+                sortedRounds.forEach((roundNumber, roundIndex) => {
+                    const roundMatches = rounds[roundNumber];
+                    const nextRoundMatches = rounds[sortedRounds[roundIndex + 1]] || [];
+
+                    const nextRoundPlayers = new Set<string>();
+                    nextRoundMatches.forEach(nextMatch => {
+                        nextRoundPlayers.add(nextMatch.player1);
+                        nextRoundPlayers.add(nextMatch.player2);
+                    });
+
+                    const roundRow = document.createElement("div");
+                    roundRow.className = "flex justify-center items-center gap-32 mb-32 relative";
+
+                    roundMatches.forEach((match) => {
+                        const matchCardWrapper = document.createElement("div");
+                        matchCardWrapper.className = "relative flex flex-col items-center";
+
+                        const matchCard = document.createElement("div");
+                        matchCard.className =
+                            "bg-[#1E1E1E] rounded-lg px-4 py-3 w-48 text-center border border-gray-600 shadow-md";
+
+                        const p1 = document.createElement("p");
+                        p1.innerText = match.player1;
+                        p1.className = "text-sm";
+                        if (nextRoundPlayers.has(match.player1)) {
+                            p1.className += " text-yellow-400 font-bold";
+                        }
+
+                        const vs = document.createElement("p");
+                        vs.innerText = "vs";
+                        vs.className = "text-gray-400 text-xs";
+
+                        const p2 = document.createElement("p");
+                        p2.innerText = match.player2;
+                        p2.className = "text-sm";
+                        if (nextRoundPlayers.has(match.player2)) {
+                            p2.className += " text-yellow-400 font-bold";
+                        }
+
+                        matchCard.appendChild(p1);
+                        matchCard.appendChild(vs);
+                        matchCard.appendChild(p2);
+                        matchCardWrapper.appendChild(matchCard);
+
+                        roundRow.appendChild(matchCardWrapper);
+                    });
+
+                    bracketWrapper.appendChild(roundRow);
+
+                });
+                container.appendChild(bracketWrapper);
+
+                setTimeout(() => {
+                    if (data.players.includes(alias)) {
+                        container.innerHTML = "";
+                        container.className = "flex flex-col items-center justify-center h-screen text-white";
+
+                        const score = document.createElement("p");
+                        score.innerText = "0 - 0";
+                        score.className = "text-[#C4C4C4]";
+                        container.appendChild(score);
+
+                        container.appendChild(GameCanvas(data.gameState, "online", score, data.matchId, data.tournamentInfo, alias));
+                    }
+                }, 4000);
+                break;
+
+
+
+            case "tournament_ended":
+                container.innerHTML = "";
+                container.className = "flex flex-col items-center justify-center h-screen text-white transition-opacity duration-500";
+
+                const trophy = document.createElement("div");
+                trophy.innerText = "🏆";
+                trophy.className = "text-6xl mb-4 animate-bounce";
+                container.appendChild(trophy);
+
+                const summaryTitle = document.createElement("h2");
+                summaryTitle.innerText = `${data.winner} has won the tournament!`;
+                summaryTitle.className = "text-3xl font-bold mb-2 text-yellow-400 text-center";
+                container.appendChild(summaryTitle);
+
+                const subText = document.createElement("p");
+                subText.innerText = "Returning to home in a few seconds...";
+                subText.className = "text-gray-400 text-sm mt-2";
+                container.appendChild(subText);
+
                 setTimeout(() => {
                     navigateTo("/");
                 }, 6000);
                 break;
+
+
+
+
             case "update_queue":
                 const queueList = document.getElementById("queue-list");
                 if (queueList) {
                     queueList.innerHTML = "";
 
                     const currentCount = data.players.length;
-                    const maxCount = data.numberPlayers || "?";
+                    const maxCount = data.numberPlayers || "4";
 
                     const title = document.createElement("h2");
-                    title.textContent = `Jugadores en cola (${currentCount}/${maxCount})`;
+                    title.textContent = `Players in queue (${currentCount}/${maxCount})`;
                     title.className = "text-2xl font-semibold mb-6 text-white";
                     queueList.appendChild(title);
 
@@ -104,16 +191,55 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     });
 
                     queueList.appendChild(cardContainer);
+
+                    const leaveButton = document.createElement("button");
+                    leaveButton.textContent = "Leave Tournament";
+                    leaveButton.className = "mt-6 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-semibold transition-colors duration-300";
+                    leaveButton.onclick = () => {
+                        socket.close();
+                        console.log("Leaving tournament...");
+                        setTimeout(() => {
+                            navigateTo("/tournament");
+                        }, 100);
+                    };
+                    queueList.appendChild(leaveButton);
                 }
                 break;
 
-
-            case "tournament_match_finished":
+            case "tournament_match_finished": {
                 container.innerHTML = "";
+                container.className = "flex flex-col items-center justify-center h-screen text-white transition-opacity duration-500";
+
+                const hourglass = document.createElement("div");
+                hourglass.innerText = "⏳";
+                hourglass.className = "text-5xl mb-4 animate-bounce";
+                container.appendChild(hourglass);
+
                 const waitMsg = document.createElement("p");
-                waitMsg.innerText = "Esperando siguiente ronda...";
+                waitMsg.innerText = "Waiting for the next round...";
+                waitMsg.className = "text-xl font-medium text-gray-300 text-center transition-opacity duration-500";
                 container.appendChild(waitMsg);
+
+                const messages = [
+                    "Waiting for the next round...",
+                    "Still waiting...",
+                    "Hang tight, the match is on its way...",
+                ];
+                let index = 0;
+
+                setInterval(() => {
+                    waitMsg.style.opacity = "0";
+                    setTimeout(() => {
+                        index = (index + 1) % messages.length;
+                        waitMsg.innerText = messages[index];
+                        waitMsg.style.opacity = "1";
+                    }, 300);
+                }, 3000);
+
                 break;
+            }
+
+
             // case "report_winner":
             //     const { winner, round, tournamentId } = data;
             //     console.log("WINNER: ", data);

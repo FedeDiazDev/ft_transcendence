@@ -4,15 +4,13 @@ function deletePlayerFromTournament(username, tournamentId, db) {
     try {
         const query = db.prepare(`
             DELETE FROM tournament_players 
-            WHERE username = ? AND tournament_id = ?
+            WHERE display_name = ? AND tournament_id = ?
         `);
-        const result = query.run(username, tournamentId);
-        //console.log("Borrado:", result);
+        query.run(username, tournamentId);
     } catch (e) {
         console.error("Error borrando de BDD:", e);
     }
 }
-
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -30,6 +28,7 @@ function findTournamentIdBySocket(socket) {
     }
     return null;
 }
+
 function pause(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -37,10 +36,7 @@ function pause(ms) {
 export const tournaments = new Map();
 export const tournamentSockets = new Map();
 
-
 async function tournamentLogic(fastify, opts) {
-
-
     fastify.register(async function (fastify) {
         fastify.get('/api/game/tournament_logic', { websocket: true }, (socket, req) => {
             socket.on('message', message => {
@@ -55,6 +51,7 @@ async function tournamentLogic(fastify, opts) {
                             matches: [],
                             round: 1,
                             winners: [],
+                            matchHistory: [],
                             status: "waiting",
                             organizerSocket: socket
                         };
@@ -62,19 +59,23 @@ async function tournamentLogic(fastify, opts) {
                     }
                     return;
                 }
-                if (data.action === "ping")
+
+                if (data.action === "ping") {
                     socket.send(JSON.stringify({ action: 'pong' }));
+                    return;
+                }
+
                 if (data.action === "join") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament) return;
+
                     const existingPlayer = tournament.players.find(p => p.username === data.username);
                     if (existingPlayer) {
                         existingPlayer.socket = socket;
                     } else {
                         tournament.players.push({ username: data.username, socket });
-                    }                    // console.log("Torneo:", tournamentId);
-                    // console.log("Jugadores actuales:", tournament.players.map(p => p.username));
-                    // console.log("Esperados:", tournament.number_players);
+                    }
+
                     if (tournament.players.length < tournament.number_players) {
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
@@ -87,20 +88,18 @@ async function tournamentLogic(fastify, opts) {
                         return;
                     }
 
+                    // COMIENZA EL TORNEO
                     shuffle(tournament.players);
-                    if (tournament.players.length === tournament.number_players) {
-                        //console.log("Se alcanzó el número de jugadores. Empezando torneo...");
-                    }
-
                     tournament.status = "playing";
+
+                    tournament.matchHistory.push(...tournament.matches);
                     tournament.matches = [];
+
                     for (let i = 0; i < tournament.players.length; i += 2) {
                         const player1 = tournament.players[i];
                         const player2 = tournament.players[i + 1];
-
                         const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
-                        // console.log(`  Player 1: ${player1?.username || "undefined"}`);
-                        // console.log(`  Player 2: ${player2?.username || "undefined"}`);
+
                         const gameState = {
                             roomId: matchId,
                             status: "playing",
@@ -114,7 +113,7 @@ async function tournamentLogic(fastify, opts) {
                             rightPoints: 0
                         };
 
-                        tournament.matches.push({
+                        const match = {
                             id: matchId,
                             player1: player1.username,
                             socket1: player1.socket,
@@ -122,91 +121,103 @@ async function tournamentLogic(fastify, opts) {
                             socket2: player2.socket,
                             round: tournament.round,
                             gameState
-                        });
+                        };
+                        tournament.matches.push(match);
+                    }
 
+                    const fullMatchHistory = [...tournament.matchHistory, ...tournament.matches].map(match => ({
+                        id: match.id,
+                        player1: match.player1,
+                        player2: match.player2,
+                        round: match.round
+                    }));
+
+                    for (const match of tournament.matches) {
                         const payload = {
                             action: "start_match",
-                            matchId,
-                            round: 1,
+                            matchId: match.id,
+                            round: match.round,
                             tournamentId,
-                            players: [player1.username, player2.username],
-                            gameState
+                            players: [match.player1, match.player2],
+                            gameState: match.gameState,
+                            matches: fullMatchHistory
                         };
 
-                        player1.socket.send(JSON.stringify({ ...payload, opponent: player2.username }));
-                        player2.socket.send(JSON.stringify({ ...payload, opponent: player1.username }));
+                        match.socket1.send(JSON.stringify({ ...payload, opponent: match.player2 }));
+                        match.socket2.send(JSON.stringify({ ...payload, opponent: match.player1 }));
                     }
 
                     return;
                 }
+
                 if (data.action === "report_winner" || data.action === "tournament_match_finished") {
                     const tournament = tournaments[tournamentId];
                     if (!tournament || tournament.status === "finished") return;
 
                     const winner = data.winner;
                     const reportedRound = data.round;
+
                     const match = tournament.matches.find(m =>
                         m.round === reportedRound && (m.player1 === winner || m.player2 === winner));
 
-
                     if (!match) return;
+
                     if (!tournament.winners.includes(winner)) {
                         tournament.winners.push(winner);
                     }
 
                     const loserUsername = match.player1 === winner ? match.player2 : match.player1;
                     const loserSocket = match.player1 === winner ? match.socket2 : match.socket1;
-                    //console.log("LOOOOSER", loserUsername);
+
                     loserSocket.send(JSON.stringify({
                         action: "eliminated_from_tournament",
                         message: "Has perdido esta ronda del torneo — serás redirigido al menú."
                     }), () => loserSocket.close());
+
                     tournament.players = tournament.players.filter(p => p.username !== loserUsername);
+
                     const expectedWinners = tournament.number_players / Math.pow(2, tournament.round);
                     if (tournament.winners.length < expectedWinners) {
                         const winnerSocket = match.player1 === winner ? match.socket1 : match.socket2;
                         winnerSocket.send(JSON.stringify({ action: "tournament_match_finished" }));
                         return;
                     }
+
                     if (expectedWinners === 1) {
                         tournament.status = "finished";
                         const champion = tournament.winners[0];
-                        const fullMatchHistory = tournament.matches.map(match => ({
-                            id: match.id,
-                            player1: match.player1,
-                            player2: match.player2,
-                            round: match.round
-                        }));
+
                         tournament.organizerSocket?.send(JSON.stringify({
                             action: "tournament_ended",
                             winner: champion,
-                            matches: fullMatchHistory,
                             tournamentId
                         }));
-                        //console.log("ELL GANADOR DEL TORNEO ES: ", champion);
+
                         tournament.players.forEach(p => {
                             p.socket.send(JSON.stringify({
                                 action: "tournament_ended",
                                 winner: champion,
-                                matches: fullMatchHistory,
                                 tournamentId
                             }));
                             p.socket.close();
                         });
+
                         closeTournament(fastify.db, tournamentId);
                         return;
                     }
+
                     tournament.round += 1;
                     tournament.players = tournament.players.filter(p =>
-                        tournament.winners.includes(p.username)
-                    );
+                        tournament.winners.includes(p.username));
                     tournament.winners = [];
+
                     shuffle(tournament.players);
+                    tournament.matchHistory.push(...tournament.matches);
                     tournament.matches = [];
+
                     for (let i = 0; i < tournament.players.length; i += 2) {
                         const player1 = tournament.players[i];
                         const player2 = tournament.players[i + 1];
-
                         const matchId = `match_${i / 2}_${player1.username}_vs_${player2.username}_${Date.now()}`;
 
                         const gameState = {
@@ -222,7 +233,7 @@ async function tournamentLogic(fastify, opts) {
                             rightPoints: 0
                         };
 
-                        tournament.matches.push({
+                        const match = {
                             id: matchId,
                             player1: player1.username,
                             socket1: player1.socket,
@@ -230,33 +241,38 @@ async function tournamentLogic(fastify, opts) {
                             socket2: player2.socket,
                             round: tournament.round,
                             gameState
-                        });
-                        const basePayload = {
+                        };
+                        tournament.matches.push(match);
+                    }
+
+                    const fullMatchHistory = [...tournament.matchHistory, ...tournament.matches].map(match => ({
+                        id: match.id,
+                        player1: match.player1,
+                        player2: match.player2,
+                        round: match.round
+                    }));
+
+                    for (const match of tournament.matches) {
+                        const payload = {
                             action: "start_match",
-                            matchId,
-                            players: [player1.username, player2.username],
-                            gameState,
+                            matchId: match.id,
+                            players: [match.player1, match.player2],
+                            gameState: match.gameState,
                             tournamentInfo: {
                                 tournamentId,
-                                round: tournament.round
+                                round: tournament.round,
+                                matches: fullMatchHistory
                             }
                         };
 
-                        player1.socket.send(JSON.stringify({
-                            ...basePayload,
-                            opponent: player2.username
-                        }));
-
-                        player2.socket.send(JSON.stringify({
-                            ...basePayload,
-                            opponent: player1.username
-                        }));
+                        match.socket1.send(JSON.stringify({ ...payload, opponent: match.player2 }));
+                        match.socket2.send(JSON.stringify({ ...payload, opponent: match.player1 }));
                     }
                 }
             });
+
             socket.on('close', () => {
                 const tournamentId = findTournamentIdBySocket(socket);
-
                 if (!tournamentId || !tournaments[tournamentId]) return;
 
                 const tournament = tournaments[tournamentId];
@@ -264,14 +280,12 @@ async function tournamentLogic(fastify, opts) {
                 if (!player) return;
 
                 try {
-                    console.log("PLAYER:", player);
                     deletePlayerFromTournament(player.username, tournamentId, fastify.db);
                 } catch (err) {
                     console.error("Error al eliminar jugador de BDD:", err);
                 }
 
                 tournament.players = tournament.players.filter(p => p.socket !== socket);
-                console.log("PLAYER:", player);
                 tournament.players.forEach(p => {
                     p.socket.send(JSON.stringify({
                         action: "update_queue",
@@ -280,11 +294,8 @@ async function tournamentLogic(fastify, opts) {
                     }));
                 });
             });
-
-
         });
     });
 }
 
 export default tournamentLogic;
-
