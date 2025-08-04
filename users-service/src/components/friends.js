@@ -6,18 +6,18 @@ dotenv.config();
 function getUsername(request, reply) {
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        reply.status(401).send({ error: "Token no proporcionado" })
+        reply.status(401).send({ error: "No token" })
     }
     const token = authHeader.split(' ')[1];
     let payload;
     try {
         payload = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
-        return reply.status(401).send({ error: "Token inválido o expirado" });
+        return reply.status(401).send({ error: "Expired or invalid token" });
     }
     const username = payload.username;
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "No username" });
     }
     return username;
 }
@@ -36,9 +36,9 @@ export async function getFriends(request, reply) {
             WHERE friends.user_id = (SELECT id FROM users WHERE username = ?)
         `);
         const friends = query.all(username);
-        reply.status(200).send({ message: "Lista de amigos", friends });
+        reply.status(200).send({ message: "Friend list", friends });
     } catch (err) {
-        reply.status(500).send({ error: "Error al obtener los amigos" });
+        reply.status(404).send({ error: "Friends not found" });
     }
 }
 
@@ -49,7 +49,7 @@ export async function getUsers(request, reply) {
         const users = query.all();
         reply.status(200).send({ message: "Lista de usuarios", users });
     } catch (err) {
-        reply.status(500).send({ error: "Error al obtener los usuarios" });
+        reply.status(404).send({ error: "Users not found" });
     }
 }
 
@@ -57,10 +57,9 @@ export async function addFriend(request, reply) {
     const db = request.server.db;
     const username = getUsername(request, reply);
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Missing username" });
     }
     try {
-        // First check if trying to add self as friend
         const selfCheckQuery = db.prepare("SELECT id FROM users WHERE username = ?");
         const userResult = selfCheckQuery.get(username);
         
@@ -68,7 +67,6 @@ export async function addFriend(request, reply) {
             return reply.status(400).send({ error: "No puedes agregarte a ti mismo como amigo" });
         }
 
-        // Then check if the friendship already exists
         const checkQuery = db.prepare(`
             SELECT COUNT(*) as count 
             FROM friends 
@@ -78,7 +76,7 @@ export async function addFriend(request, reply) {
         const result = checkQuery.get(username, request.body.friendId);
         
         if (result.count > 0) {
-            return reply.status(400).send({ error: "Ya tienes a este usuario como amigo" });
+            return reply.status(400).send({ error: "User is already a friend" });
         }
 
         // If all checks pass, add the friend
@@ -86,7 +84,7 @@ export async function addFriend(request, reply) {
         query.run(username, request.body.friendId);
         reply.status(200).send({ message: "Friend added" });
     } catch (error) {
-        reply.status(500).send({ error: "Error al agregar el amigo." });
+        reply.status(400).send({ error: "Can't add friend" });
     }
 }
 
@@ -95,11 +93,11 @@ export async function deleteFiend(request, reply) {
     const db = request.server.db;
     const username = getUsername(request, reply);
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Missing username" });
     }
     const { friendId } = request.params;
     if (!friendId) {
-        return reply.status(400).send({ error: "Falta el friendId" });
+        return reply.status(400).send({ error: "Missing friendId" });
     }
     try {
         const query = db.prepare(`
@@ -109,9 +107,9 @@ export async function deleteFiend(request, reply) {
             `);
         query.run(username, friendId);
 
-        reply.status(200).send({ message: "Amigo eliminado correctamente" });
+        reply.status(200).send({ message: "Friend deleted" });
     } catch (error) {
-        reply.status(500).send({ error: "Error al borrar amigo" });
+        reply.status(400).send({ error: "Error while deleting friend" });
     }
 }
 
@@ -120,13 +118,13 @@ export async function searchUsersByName(request, reply) {
     const db = request.server.db;    
     const searchText = request.params.text;
     if (!searchText || searchText.trim() === "") {
-        return reply.status(400).send({ error: "Texto de búsqueda vacío" });
+        return reply.status(400).send({ error: "Empty search text" });
     }
 
     // Get the logged-in username
     const username = getUsername(request, reply);
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Missing username" });
     }
 
     try {
@@ -140,7 +138,7 @@ export async function searchUsersByName(request, reply) {
         const results = query.all(`%${searchText}%`, username);
         reply.status(200).send({ results })
     } catch (error) {
-        reply.status(500).send({ error: "Error en la búsqueda" });
+        reply.status(404).send({ error: "Can't find while searching" });
     }
 }
 

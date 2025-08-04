@@ -1,6 +1,10 @@
 const originalFetch = window.fetch;
 
 window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+	const token = localStorage.getItem("authToken");
+	if (!token) {
+		return originalFetch(input, init);
+	}
 	let response = await originalFetch(input, addAuth(init)) 
 	if (response.status == 401){
 		const refreshResponse = await originalFetch("/api/auth/refresh", { 

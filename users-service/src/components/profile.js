@@ -8,7 +8,7 @@ dotenv.config();
 function validateAuthorizationHeader(request) {
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        const error = new Error("Token no proporcionado");
+        const error = new Error("No token");
         error.statusCode = 401;
         throw error;
     }    
@@ -17,7 +17,7 @@ function validateAuthorizationHeader(request) {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         return payload;
     } catch (err) {
-        const error = new Error("Token inválido o expirado");
+        const error = new Error("Expired or invalid token");
         error.statusCode = 401;
         throw error;
     }
@@ -50,13 +50,13 @@ export async function getUser(request, reply) {
     try {
         response = query.get(username);
     } catch (error) {
-        const dbError = new Error("Error al consultar la base de datos");
-        dbError.statusCode = 500;
+        const dbError = new Error("Error checking the database");
+        dbError.statusCode = 400;
         throw dbError;
     }
 
     // if (!response) {
-    //     const error = new Error("Usuario no existe");
+    //     const error = new Error("User not found");
     //     error.statusCode = 404;
     //     throw error;
     // }
@@ -71,17 +71,17 @@ export async function getUserById(request, reply) {
     try {
         response = query.get(id);
     } catch (error) {
-        const dbError = new Error("Error al consultar la base de datos");
-        dbError.statusCode = 500;
+        const dbError = new Error("Error checking the database");
+        dbError.statusCode = 400;
         throw dbError;
     }
 
     if (!response) {
-        const error = new Error("Usuario no existe");
+        const error = new Error("User not found");
         error.statusCode = 400;
         throw error;
     }
-    reply.status(200).send({ message: "Usuario encontrado", user: response });
+    reply.status(200).send({ message: "User found", user: response });
 }
 
 export async function updateProfileText(request, reply) {
@@ -98,17 +98,17 @@ export async function updateProfileText(request, reply) {
     try {
         response = query.run(request.body.presentacion, username);
     } catch (error) {
-        const dbError = new Error("Error al consultar la base de datos");
-        dbError.statusCode = 500;
+        const dbError = new Error("Error checking the database");
+        dbError.statusCode = 400;
         throw dbError;
     }
 
     if (!response) {
-        const error = new Error("Usuario no existe");
-        error.statusCode = 400;
+        const error = new Error("User not found");
+        error.statusCode = 404;
         throw error;
     }
-    reply.status(200).send({ message: "Texto de perfil actualizado" });
+    reply.status(200).send({ message: "About me updated" });
 }
 
 export async function updateAvatar(request, reply) {
@@ -184,7 +184,7 @@ export async function updateAvatar(request, reply) {
             response = query.run(buffer, username);
         } catch (error) {
             console.error("Database error:", error);
-            return reply.code(500).send({ message: "Database error" });
+            return reply.code(400).send({ message: "Database error" });
         }
         
         // Clean up temp file
@@ -200,7 +200,7 @@ export async function updateAvatar(request, reply) {
             stack: error.stack,
             name: error.name
         });
-        return reply.code(500).send({ 
+        return reply.code(400).send({ 
             message: 'Error processing file upload', 
             error: error.message  // Add the actual error message
         });
@@ -230,7 +230,7 @@ export async function getUserByUsername(request, reply) {
         response = query.get(username);
     } catch (error) {
         console.error("Error querying the database:", error);
-        return reply.status(500).send({
+        return reply.status(400).send({
             error: "Error querying the database for username"
         });
     }
