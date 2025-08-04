@@ -166,7 +166,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     const maxCount = data.numberPlayers || "4";
 
                     const title = document.createElement("h2");
-                    title.textContent = `Jugadores en cola (${currentCount}/${maxCount})`;
+                    title.textContent = `Players in queue (${currentCount}/${maxCount})`;
                     title.className = "text-2xl font-semibold mb-6 text-white";
                     queueList.appendChild(title);
 
@@ -191,9 +191,20 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     });
 
                     queueList.appendChild(cardContainer);
+
+                    const leaveButton = document.createElement("button");
+                    leaveButton.textContent = "Leave Tournament";
+                    leaveButton.className = "mt-6 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-semibold transition-colors duration-300";
+                    leaveButton.onclick = () => {
+                        socket.close();
+                        console.log("Leaving tournament...");
+                        setTimeout(() => {
+                            navigateTo("/tournament");
+                        }, 100);
+                    };
+                    queueList.appendChild(leaveButton);
                 }
                 break;
-
 
             case "tournament_match_finished": {
                 container.innerHTML = "";
