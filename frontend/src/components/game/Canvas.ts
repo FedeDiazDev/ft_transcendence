@@ -92,10 +92,10 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {
             const paddle = gameState.paddles[player];
             if (!paddle) return;
-            console.log("Speed: " ,paddle.speed);
+            //console.log("Speed: " ,paddle.speed);
             const speed = paddle.speed ?? 10;
-            const newY = direction === "up" ? paddle.y - speed : paddle.y + speed;
-
+            const newYRaw = direction === "up" ? paddle.y - speed : paddle.y + speed;
+            const newY = Math.max(0, Math.min(newYRaw, canvas.height - paddle.height));
             gameState = {
                 ...gameState,
                 paddles: {
