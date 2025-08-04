@@ -114,6 +114,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                 draw();
                 requestAnimationFrame(loop);
             };
+
             loop();
         };
         const updateGameState = (newState: any) => {
