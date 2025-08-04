@@ -2,6 +2,49 @@ import { getUserData, getFriendData } from "../../api/profile/profileAPI.js";
 // import { Input } from "./Input.js";
 import { getUserStats, getFriendStats } from "../../api/stats/statsAPI.js";
 
+function showError(msg: string) {
+  const existing = document.getElementById("error-overlay");
+  if (existing) existing.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "error-overlay";
+  overlay.className = `
+    fixed inset-0 z-50 flex items-center justify-center
+    bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0
+  `;
+
+  const card = document.createElement("div");
+  card.setAttribute("role", "alert");
+  card.className = `
+    transform scale-90 opacity-0 transition-all duration-300
+    flex flex-col items-center gap-4 px-12 py-10 rounded-3xl
+    bg-gradient-to-br from-[#0B0C0E] to-[#141519]
+    shadow-[0_0_15px_#000_inset,0_0_10px_#000]
+    w-[360px] md:w-[440px] text-center
+  `;
+
+  const title = document.createElement("p");
+  title.className = "text-white text-xl font-semibold";
+  title.textContent = msg;
+
+  card.append(title);
+  overlay.append(card);
+  document.body.append(overlay);
+
+  requestAnimationFrame(() => {
+    overlay.classList.remove("opacity-0");
+    card.classList.remove("opacity-0", "scale-90");
+    card.classList.add("opacity-100", "scale-100");
+  });
+
+  setTimeout(() => {
+    overlay.classList.add("opacity-0");
+    card.classList.add("opacity-0", "scale-90");
+    setTimeout(() => overlay.remove(), 300);
+  }, 3000);
+}
+
+
 async function fetchStats(container: HTMLDivElement) {
     try {
         const stats = await getUserStats();
@@ -184,7 +227,7 @@ async function fetchProfile(container: HTMLDivElement) {
             container.appendChild(editAboutBtn);
           } catch (err) {
             console.error("Failed to update presentation", err);
-            alert("Failed to update About Me.");
+            showError("Failed to update About Me.");
           }
         });
       });
@@ -222,20 +265,20 @@ async function fetchProfile(container: HTMLDivElement) {
             const file = target.files[0];
   
             if (file.type !== "image/png") {
-              alert("Please select a PNG image file.");
+              showError("Please select a PNG image file.");
               document.body.removeChild(fileInput);
               return;
             }
   
             const isValidPNG = await isPNG(file);
             if (!isValidPNG) {
-              alert("Invalid PNG file. Please select a valid PNG image.");
+              showError("Invalid PNG file. Please select a valid PNG image.");
               document.body.removeChild(fileInput);
               return;
             }
   
             if (file.size > 5 * 1024 * 1024) {
-              alert("File is too large. Maximum size is 5MB.");
+              showError("File is too large. Maximum size is 5MB.");
               document.body.removeChild(fileInput);
               return;
             }
@@ -265,7 +308,7 @@ async function fetchProfile(container: HTMLDivElement) {
               };
               reader.readAsDataURL(file);
             } catch (error) {
-              alert("Failed to upload avatar. Please try again.");
+              showError("Failed to upload avatar. Please try again.");
               console.error(error);
             } finally {
               editAvatarButton.textContent = "Edit Avatar";

@@ -41,6 +41,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         ctx.fill();
 
         Object.values(gameState.paddles).forEach((paddle: Paddle) => {
+            console.log(`Dibujando paddle ${player} en y=${paddle.y}`);
             ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         });
     };
@@ -72,7 +73,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             if (scoreElement != null) {
                 scoreElement.innerHTML = `${gameState.leftPoints} - ${gameState.rightPoints}`;
             }
-
+            //console.log("Posición Y paddle left:", gameState.paddles.left.y);
+            //console.log("Posición Y paddle right:", gameState.paddles.right.y);
             if (gameState.status === "game_over") {
                 const winner = gameState.rightPoints == 10 ? "right" : "left";
                 alert(`The winner is the ${winner} player`);

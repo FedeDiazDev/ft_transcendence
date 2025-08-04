@@ -77,14 +77,7 @@ export class Game {
 
     movePaddle(player, direction) {
         const paddle = this.paddles[player];
-        const speed = paddle.speed;
-        const maxY = 600 - paddle.height;
-
-        if (direction === "up") {
-            paddle.y = Math.max(0, paddle.y - speed);
-        } else if (direction === "down") {
-            paddle.y = Math.min(maxY, paddle.y + speed);
-        }
+        paddle.move(direction);
     }
 
     update() {
