@@ -14,7 +14,6 @@ export class Paddle {
 			this.y = Math.max(0, this.y - this.speed);
 		} else if (direction === "down") {
 			this.y = Math.min(600 - this.height, this.y + this.speed);
-		}
-		console.log(`Paddle: ${this.player} moved ${direction}, new y: ${this.y}`);
+		}		
 	}
 }
