@@ -114,9 +114,6 @@ export const JoinTournament = () => {
 					submitBtn.disabled = true;
 					submitBtn.textContent = "Comprobando...";
 
-					submitBtn.disabled = true;
-					submitBtn.textContent = "Comprobando...";
-
 					try {
 						const nicknameExists = await checkNickname(tournament.id, alias);
 						if (nicknameExists.exists) {

@@ -132,15 +132,28 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
 
             case "tournament_ended":
                 container.innerHTML = "";
+                container.className = "flex flex-col items-center justify-center h-screen text-white transition-opacity duration-500";
+
+                const trophy = document.createElement("div");
+                trophy.innerText = "🏆";
+                trophy.className = "text-6xl mb-4 animate-bounce";
+                container.appendChild(trophy);
+
                 const summaryTitle = document.createElement("h2");
-                summaryTitle.innerText = `🏆 Ganador del Torneo: ${data.winner}`;
-                summaryTitle.className = "text-2xl font-bold mb-4 text-white";
+                summaryTitle.innerText = `${data.winner} has won the tournament!`;
+                summaryTitle.className = "text-3xl font-bold mb-2 text-yellow-400 text-center";
                 container.appendChild(summaryTitle);
+
+                const subText = document.createElement("p");
+                subText.innerText = "Returning to home in a few seconds...";
+                subText.className = "text-gray-400 text-sm mt-2";
+                container.appendChild(subText);
 
                 setTimeout(() => {
                     navigateTo("/");
                 }, 6000);
                 break;
+
 
 
 
@@ -150,7 +163,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     queueList.innerHTML = "";
 
                     const currentCount = data.players.length;
-                    const maxCount = data.numberPlayers || "?";
+                    const maxCount = data.numberPlayers || "4";
 
                     const title = document.createElement("h2");
                     title.textContent = `Jugadores en cola (${currentCount}/${maxCount})`;
@@ -182,12 +195,40 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 break;
 
 
-            case "tournament_match_finished":
+            case "tournament_match_finished": {
                 container.innerHTML = "";
+                container.className = "flex flex-col items-center justify-center h-screen text-white transition-opacity duration-500";
+
+                const hourglass = document.createElement("div");
+                hourglass.innerText = "⏳";
+                hourglass.className = "text-5xl mb-4 animate-bounce";
+                container.appendChild(hourglass);
+
                 const waitMsg = document.createElement("p");
-                waitMsg.innerText = "Esperando siguiente ronda...";
+                waitMsg.innerText = "Waiting for the next round...";
+                waitMsg.className = "text-xl font-medium text-gray-300 text-center transition-opacity duration-500";
                 container.appendChild(waitMsg);
+
+                const messages = [
+                    "Waiting for the next round...",
+                    "Still waiting...",
+                    "Hang tight, the match is on its way...",
+                ];
+                let index = 0;
+
+                setInterval(() => {
+                    waitMsg.style.opacity = "0";
+                    setTimeout(() => {
+                        index = (index + 1) % messages.length;
+                        waitMsg.innerText = messages[index];
+                        waitMsg.style.opacity = "1";
+                    }, 300);
+                }, 3000);
+
                 break;
+            }
+
+
             // case "report_winner":
             //     const { winner, round, tournamentId } = data;
             //     console.log("WINNER: ", data);

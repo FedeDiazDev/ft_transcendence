@@ -26,7 +26,7 @@ export const CreateTournament = () => {
 	nameInput.type = "text";
 	nameInput.placeholder = "Name";
 	nameInput.required = true;
-	nameInput.maxLength = 10; // Límite HTML
+	nameInput.maxLength = 10;
 	nameInput.className =
 		"p-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-b border-white focus:outline-none focus:border-white transition";
 
@@ -69,7 +69,6 @@ export const CreateTournament = () => {
 		const name = nameInput.value.trim();
 		const number_participants = parseInt(selectInput.value);
 
-		// Validación de longitud
 		if (name.length > 10) {
 			errorMessage.textContent = "El nombre no puede tener más de 10 caracteres.";
 			return;
