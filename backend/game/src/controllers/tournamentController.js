@@ -93,7 +93,7 @@ export async function createTournament(request, reply) {
         });
 
     } catch (error) {
-        return reply.status(500).send({ error: "Error al crear el torneo" });
+        return reply.status(400).send({ error: "Error creating tournament" });
     }
 
 }
@@ -112,7 +112,7 @@ export async function listOpenTournaments(request, reply) {
         const tournaments = query.all("open");
         reply.status(200).send({ message: "Lista de torneos", tournaments });
     } catch (error) {
-        return reply.status(500).send({ error: "Error al mostrar listado de torneos abiertos" });
+        return reply.status(400).send({ error: "Error listing open tournaments" });
     }
 }
 
@@ -203,7 +203,7 @@ export async function addPlayerToTournament(request, reply) {
         } else if (error.message === "Torneo no encontrado") {
             return reply.status(404).send({ error: error.message });
         }
-        return reply.status(500).send({ error: "Error al añadir jugador al torneo" });
+        return reply.status(400).send({ error: "Error adding tournament" });
     }
 }
 
@@ -220,10 +220,10 @@ export async function checkPlayerTournament(request, reply) {
 		WHERE tp.username = ? AND t.status IN ('open')
 		LIMIT 1`);
         const result = query.get(username);
-        reply.status(200).send({ message: "Checkeo Player", result });
+        reply.status(200).send({ message: "Player checked", result });
 
     } catch (error) {
-        return reply.status(500).send({ error: "Error al checkear el jugador" });
+        return reply.status(400).send({ error: "Error checking player" });
 
     }
 }
@@ -231,11 +231,11 @@ export async function checkPlayerTournament(request, reply) {
 export async function checkNickname(request, reply) {
     const username = getUsername(request, reply);
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Username missing" });
     }
     const { tournamentId, alias } = request.query;
     if (!tournamentId || !alias) {
-        return reply.status(400).send({ error: "Faltan datos en la query" });
+        return reply.status(400).send({ error: "Missing query data" });
     }
     const db = request.server.db;
     try {
@@ -250,6 +250,6 @@ export async function checkNickname(request, reply) {
         });
     } catch (error) {
         console.error("Error al verificar alias:", error);
-        return reply.status(500).send({ error: "Error al verificar alias" });
+        return reply.status(400).send({ error: "Error verifying alias" });
     }
 }
