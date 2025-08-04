@@ -28,7 +28,7 @@ export async function storeAlias(req, reply) {
     return reply.status(200).send({ message: "Alias saved successfully" });
   } catch (error) {
     //console.error("Error saving alias:", error);
-    return reply.status(500).send({ error: "Internal server error" });
+    return reply.status(400).send({ error: "Issues storing alias" });
   }
 }
 

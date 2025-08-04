@@ -22,7 +22,7 @@ async function matchmakingSockets(fastify, opts) {
 					const [player2] = queue.splice(player2Index, 1);
 					const matchInfo = {
 						status: "ready",
-						message: "Preparaos para la partida",
+						message: "Get ready for the game",
 						players: [player1.id, player2.id],
 						roomId: `room-${Date.now()}`
 					};

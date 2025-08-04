@@ -2,8 +2,6 @@ import amqp from 'amqplib';
 import fs from 'fs';
 
 function registerUserInDatabase(username, db){
-
-	// Read the avatar file as a binary blob
 	const avatarBlob = fs.readFileSync("/data/pics/defaultAvatar.png");
 
 	const query = db.prepare("INSERT INTO users (username, avatar_blob, presentacion) VALUES (?, ?, ?)");
