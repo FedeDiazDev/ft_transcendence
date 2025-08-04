@@ -81,6 +81,13 @@ export const JoinTournament = () => {
 				submitBtn.textContent = "Unirse";
 				submitBtn.className = "px-4 py-2 bg-green-600 rounded hover:bg-green-700";
 
+				input.addEventListener("keydown", (e) => {
+					if (e.key === "Enter") {
+						e.preventDefault();
+						submitBtn.click();
+					}
+				});
+
 				buttonsContainer.appendChild(cancelBtn);
 				buttonsContainer.appendChild(submitBtn);
 

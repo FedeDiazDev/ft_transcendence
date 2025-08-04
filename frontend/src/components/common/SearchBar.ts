@@ -9,6 +9,16 @@ export const SearchBar = (onSearch: (searchText: string) => void) => {
 	input.className =
 		"w-full px-3 py-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-b border-white70 placeholder-white70 focus:outline-none focus:border-white transition";
 
+	input.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			const searchText = input.value.trim();
+			if (searchText !== "") {
+				onSearch(searchText);
+			}
+		}
+	});
+
 	const button = document.createElement("button");
 	button.innerHTML = "🔍";
 	button.className =

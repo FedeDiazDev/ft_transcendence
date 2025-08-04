@@ -19,6 +19,14 @@ function formatCard(div : HTMLDivElement)
 	button.textContent = "Verify";
 	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
 	clickVerify(button, input, div);
+	
+	input.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			button.click();
+		}
+	});
+	
 	div.appendChild(button);
 	return (div);
 }

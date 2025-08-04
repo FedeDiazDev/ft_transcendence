@@ -62,6 +62,15 @@ export const CreateTournament = () => {
 	data.appendChild(submitBtn);
 	container.append(data);
 
+	[nameInput, selectInput].forEach(input => {
+		input.addEventListener("keydown", (e) => {
+			if ((e as KeyboardEvent).key === "Enter") {
+				e.preventDefault();
+				submitBtn.click();
+			}
+		});
+	});
+
 	submitBtn.addEventListener("click", async (e) => {
 		e.preventDefault();
 		errorMessage.textContent = "";
