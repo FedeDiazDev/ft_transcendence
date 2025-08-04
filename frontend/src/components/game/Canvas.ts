@@ -41,7 +41,6 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         ctx.fill();
 
         Object.values(gameState.paddles).forEach((paddle: Paddle) => {
-            console.log(`Dibujando paddle ${player} en y=${paddle.y}`);
             ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         });
     };
@@ -81,9 +80,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                 playAgainBtn!.classList.remove("hidden");
                 return;
             }
-
             await updateGameState();
-
             if (window.location.pathname.endsWith("/local_game")) {
                 requestAnimationFrame(loop);
             }
@@ -97,14 +94,13 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                 if (!response || !response.gameState) return;
         
                 gameState = response.gameState;
+                //console.log("Game State: ", gameState);
                 draw();
             } catch (error) {
                 console.error("Error moving the paddle:", error);
             }
         };
         
-        
-        //*ONLINE
     } else if (mode === "online") {
         const pressedKeys = useKeyPress();
         const onlineLoop = (socket: any, userId: number) => {

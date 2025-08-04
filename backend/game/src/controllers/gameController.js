@@ -21,11 +21,14 @@ export async function movePaddle(request, reply) {
   const paddles = game.paddles;
   const paddleSpeed = game.paddles.left.speed;
   const paddleHeight = game.paddles.left.height;
-  if ((player === "left" && direction === "up" && paddles.left.y - paddleSpeed <= 0) ||
-    (player === "left" && direction === "down" && paddles.left.y + paddleHeight + paddleSpeed >= 600) ||
-    (player === "right" && direction === "up" && paddles.right.y - paddleSpeed <= 0) ||
-    (player === "right" && direction === "down" && paddles.right.y + paddleHeight + paddleSpeed >= 600))
+  if (
+    (player === "left" && direction === "up" && paddles.left.y <= 0) ||
+    (player === "left" && direction === "down" && paddles.left.y + paddleHeight >= 600) ||
+    (player === "right" && direction === "up" && paddles.right.y <= 0) ||
+    (player === "right" && direction === "down" && paddles.right.y + paddleHeight >= 600)
+  )
     return reply.status(204).send({ error: "Movement not allowed", message: "The paddle cannot move further in this direction" });
+
 
   game.movePaddle(player, direction);
   return reply.status(200).send({ gameState: game });
