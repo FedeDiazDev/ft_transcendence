@@ -92,6 +92,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {
             const paddle = gameState.paddles[player];
             if (!paddle) return;
+            console.log("Speed: " ,paddle.speed);
             const speed = paddle.speed ?? 10;
             const newY = direction === "up" ? paddle.y - speed : paddle.y + speed;
 
@@ -142,7 +143,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         });
         const renderGame = (player1Name: string, player2Name: string) => {
             draw();
-            scoreElement.innerHTML = `<span>Jugador 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span>: Jugador 2 ${player2Name}</span>`;
+            scoreElement.innerHTML = `<span>Jugador 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span> Jugador 2: ${player2Name}</span>`;
         };
 
     }
