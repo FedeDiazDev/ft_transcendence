@@ -105,7 +105,7 @@ async function fetchSignup(sendData: { username: string, email: string, password
 		localStorage.setItem("tempToken", data.tempToken);
 		navigateTo("/qrcode");
 	} catch (error) {
-		console.error("Fetch error:", error);
+		//console.error("Fetch error:", error);
 	}
 }
 

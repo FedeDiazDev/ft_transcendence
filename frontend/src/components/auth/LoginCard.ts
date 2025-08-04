@@ -44,7 +44,7 @@ async function fetchLogin(sendData: { user: string, password: string }, errorDiv
 		}
 
 	} catch (error) {
-		console.error("Fetch error:", error);
+		//console.error("Fetch error:", error);
 	}
 }
 

@@ -40,7 +40,7 @@ export const WaitingRoom = () => {
                 const res = await getUserById(opponentId);
                 opponentUsername = res.username;
             } catch (err) {
-                console.error("Could not fetch opponent username", err);
+                //console.error("Could not fetch opponent username", err);
             }
 
             container.innerHTML = "";

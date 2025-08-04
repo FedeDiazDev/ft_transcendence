@@ -16,7 +16,7 @@ export const createGame = async (leftPlayerId: number, rightPlayerId: number): P
         }
         return data;
     } catch (error) {
-        console.error("Error en /create: ", error);
+        //console.error("Error en /create: ", error);
         throw error;
     }
 }
@@ -30,7 +30,7 @@ export const getGameState = async (): Promise<any> => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error obteniendo el estado del juego:", error);
+        //console.error("Error obteniendo el estado del juego:", error);
         return null;
     }
 };
@@ -52,7 +52,7 @@ export const updateBall = async (): Promise<any> => {
         }
         return data.gameState;
     } catch (error) {
-        console.error("Error en /moveBall:", error);
+        //console.error("Error en /moveBall:", error);
         return null;
     }
 };
@@ -71,7 +71,7 @@ export const startGame = async (): Promise<any> => {
         }
         return data;
     } catch (error) {
-        console.error("Error en /startGame:", error);
+        //console.error("Error en /startGame:", error);
         return null;
     }
 

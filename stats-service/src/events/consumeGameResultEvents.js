@@ -18,14 +18,14 @@ export default async function consumeGameResultEvents(server) {
     if (msg !== null) {
       try {
         const gameResult = JSON.parse(msg.content.toString());
-        console.log(" [x] Received game result:", gameResult);
+        //console.log(" [x] Received game result:", gameResult);
 
         // Save game result and update ELO with real usernames
         await saveGameAndUpdateElo(db, gameResult);
 
         channel.ack(msg);
       } catch (error) {
-        console.error("Error processing game result event:", error);
+        //console.error("Error processing game result event:", error);
       }
     }
   });

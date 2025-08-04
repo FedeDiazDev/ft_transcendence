@@ -22,7 +22,7 @@ export async function getUserStats() {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error fetching user stats:", error);
+        //console.error("Error fetching user stats:", error);
         return null;
     }
 }
@@ -51,7 +51,7 @@ export async function getFriendStats(id: number) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error fetching friend stats:", error);
+        //console.error("Error fetching friend stats:", error);
         return null;
     }
 }
@@ -75,7 +75,7 @@ export async function getAllPlayers() {
 
         return await response.json();
     } catch (error) {
-        console.error("Error fetching players:", error);
+        //console.error("Error fetching players:", error);
         return [];
     }
 }
@@ -97,7 +97,7 @@ export async function getAllGames() {
 
         return await response.json();
     } catch (error) {
-        console.error("Error fetching games:", error);
+        //console.error("Error fetching games:", error);
         return [];
     }
 }

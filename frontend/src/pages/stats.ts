@@ -238,7 +238,7 @@ export const Stats = async (): Promise<HTMLElement> => {
     return wrapper;
 
   } catch (error) {
-    console.error("Error loading stats page:", error);
+    //console.error("Error loading stats page:", error);
     const errDiv: HTMLDivElement = document.createElement("div");
     errDiv.textContent = "Error while loading stats!";
     return errDiv;

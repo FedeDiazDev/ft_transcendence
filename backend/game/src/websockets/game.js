@@ -39,9 +39,9 @@ function startGameLoop(roomId) {
 				  game_date: game.date
 				});
 
-				console.log('Game result published to RabbitMQ');
+				//console.log('Game result published to RabbitMQ');
 			} catch (error) {
-				console.error('Failed to publish game result to RabbitMQ:', error);
+				//console.error('Failed to publish game result to RabbitMQ:', error);
 			}
 			// const response = await fetch("http://stats-service:3000/api/stats/game", {
 			// 	method: 'POST',
@@ -164,7 +164,7 @@ async function gameLogic(fastify, opts) {
 
 				const disconnectedPlayer = room.players.find(p => p.socket === socket);
 				const remainingPlayer = room.players.find(p => p.socket !== socket);
-				console.log(`Jugador desconectado: ${disconnectedPlayer?.name}`);
+				//console.log(`Jugador desconectado: ${disconnectedPlayer?.name}`);
 				if (remainingPlayer) {
 					remainingPlayer.socket.send(JSON.stringify({
 						type: "game_over",
@@ -182,7 +182,7 @@ async function gameLogic(fastify, opts) {
 							game_date: room?.game?.date ?? new Date().toISOString()
 						});
 					} catch (error) {
-						console.error('Failed to publish disconnect game result:', error)
+						//console.error('Failed to publish disconnect game result:', error)
 					}
 				}
 				if (room.tournamentInfo && remainingPlayer) {

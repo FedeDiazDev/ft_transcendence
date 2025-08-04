@@ -132,7 +132,7 @@ export async function closeTournament(db, tournamentId) {
 
         return { message: "Torneo cerrado correctamente" };
     } catch (error) {
-        console.error("Error al cerrar el torneo:", error);
+        //console.error("Error al cerrar el torneo:", error);
         throw new Error("Error al cerrar el torneo");
     }
 }
@@ -185,9 +185,9 @@ export async function addPlayerToTournament(request, reply) {
                         throw new Error(`Failed to save alias: ${response.statusText}`);
                     }
 
-                    console.log("Alias saved successfully to stats service");
+                    //console.log("Alias saved successfully to stats service");
                 } catch (error) {
-                    console.error("Error calling saveAlias endpoint:", error);
+                    //console.error("Error calling saveAlias endpoint:", error);
                 }
             }
 
@@ -249,7 +249,7 @@ export async function checkNickname(request, reply) {
             exists: !!result,
         });
     } catch (error) {
-        console.error("Error al verificar alias:", error);
+        //console.error("Error al verificar alias:", error);
         return reply.status(400).send({ error: "Error verifying alias" });
     }
 }

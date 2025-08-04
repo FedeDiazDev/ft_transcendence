@@ -62,7 +62,7 @@ async function fetchVerify(verifyInput : string)
 	});
 
 	const data = await response.json();
-	console.log("Verification response:", data);
+	//console.log("Verification response:", data);
 	if (data.message === "Verified OTP Code")
 	{
 		localStorage.setItem("authToken", data.token);

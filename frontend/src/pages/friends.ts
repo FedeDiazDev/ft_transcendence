@@ -75,7 +75,7 @@ export const Friend = async () => {
                     showMessage(document.body, `${user.username} has been added as a friend!`);
                     await refreshFriendsList();
                 } catch (error) {
-                    console.error("Error adding friend:", error);
+                    //console.error("Error adding friend:", error);
                     showMessage(document.body, "Error adding friend", true);
                 }
             });

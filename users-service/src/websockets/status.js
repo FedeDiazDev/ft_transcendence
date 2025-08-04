@@ -16,7 +16,7 @@ export async function friendsStatus(fastify, opts) {
                     if (!queue.some(player => player.id === playerId)) {
                         queue.push({ id: playerId, username: playerName, socket });
                         const onlineUsers = queue.map(({ id, username }) => ({ id, username }));
-                        console.log("LOGIN: ", onlineUsers);
+                        //console.log("LOGIN: ", onlineUsers);
                         queue.forEach(player => {
                             player.socket.send(JSON.stringify({
                                 action: 'onlineUsers',
