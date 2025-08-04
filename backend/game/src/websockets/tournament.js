@@ -171,7 +171,7 @@ async function tournamentLogic(fastify, opts) {
 
                     loserSocket.send(JSON.stringify({
                         action: "eliminated_from_tournament",
-                        message: "Has perdido esta ronda del torneo — serás redirigido al menú."
+                        message: "You lost this round... Redirecting you to main menu."
                     }), () => loserSocket.close());
 
                     tournament.players = tournament.players.filter(p => p.username !== loserUsername);

@@ -21,8 +21,8 @@ function startGameLoop(roomId) {
 
 			const winnerId = game.leftPoints === 10 ? game.paddles.left.playerId : game.paddles.right.playerId;
 			const looserPoints = game.leftPoints === 10 ? game.rightPoints : game.leftPoints;
-			const winnerName = players.find(p => p.id === winnerId)?.name || "Desconocido";
-			const looserName = players.find(p => p.id !== winnerId)?.name || "Desconocido";
+			const winnerName = players.find(p => p.id === winnerId)?.name || "Unknown";
+			const looserName = players.find(p => p.id !== winnerId)?.name || "Unknown";
 
 			//POST result to stats-service
 			// console.log("game over game is: ", game);//game.date
