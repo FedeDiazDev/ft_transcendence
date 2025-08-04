@@ -31,7 +31,6 @@ export async function movePaddle(request, reply) {
   return reply.status(200).send({ gameState: game });
 }
 
-//TODO: pasar ID
 export async function startGame(request, reply) {
   if (!game) {
     return reply.status(500).send({ message: "Error: gameState no inicializado" });

@@ -6,9 +6,9 @@ import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 import { navigateTo } from "../../router.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any, alias ?: string) => {
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any, alias?: string) => {
 
-    // Llamamos a la función para obtener los datos
+    
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
     canvas.height = 600;
@@ -89,31 +89,19 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
 
         loop();
 
-        const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {
-            const paddle = gameState.paddles[player];
-            if (!paddle) return;
-            //console.log("Speed: " ,paddle.speed);
-            const speed = paddle.speed ?? 10;
-            const newYRaw = direction === "up" ? paddle.y - speed : paddle.y + speed;
-            const newY = Math.max(0, Math.min(newYRaw, canvas.height - paddle.height));
-            gameState = {
-                ...gameState,
-                paddles: {
-                    ...gameState.paddles,
-                    [player]: { ...paddle, y: newY }
-                }
-            };
-        };
         const moveAndUpdate = async (player: "left" | "right", direction: "up" | "down") => {
             try {
                 const response = await movePaddle(player, direction);
-                if (!response || response.status == 204) return;
-                updatePaddlePosition(player, direction);
+                if (!response || !response.gameState) return;
+        
+                gameState = response.gameState;
                 draw();
             } catch (error) {
                 console.error("Error al mover la pala:", error);
             }
         };
+        
+        
         //*ONLINE
     } else if (mode === "online") {
         const pressedKeys = useKeyPress();
@@ -131,8 +119,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             loop();
         };
         const updateGameState = (newState: any) => {
-            const { gameState: receivedGameState, player1Name, player2Name } = newState;            
-            gameState = { ...gameState, ...receivedGameState };            
+            const { gameState: receivedGameState, player1Name, player2Name } = newState;
+            gameState = { ...gameState, ...receivedGameState };
             renderGame(player1Name, player2Name);
         };
 

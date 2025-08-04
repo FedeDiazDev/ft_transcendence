@@ -24,13 +24,6 @@ function startGameLoop(roomId) {
 			const winnerName = players.find(p => p.id === winnerId)?.name || "Desconocido";
 			const looserName = players.find(p => p.id !== winnerId)?.name || "Desconocido";
 
-			//POST result to stats-service
-			// console.log("game over game is: ", game);//game.date
-			// console.log("game over game.date is: ", game.date);
-			// console.log("game over winnerId is: ", winnerId);
-			// console.log("game over winnername is: ", winnerName);
-			// console.log("game over looserName is: ", looserName);
-			// console.log("game over looserPoints is: ", looserPoints);
 			try {
 				await publishGameResultEvent({
 				  winner_username: winnerName,
@@ -43,24 +36,7 @@ function startGameLoop(roomId) {
 			} catch (error) {
 				console.error('Failed to publish game result to RabbitMQ:', error);
 			}
-			// const response = await fetch("http://stats-service:3000/api/stats/game", {
-			// 	method: 'POST',
-			// 	headers: {
-			// 	  'Content-Type': 'application/json'
-			// 	},
-			// 	body: JSON.stringify({
-			// 	  winner_username: winnerName,
-			// 	  looser_username: looserName,
-			// 	  looser_points: looserPoints,
-			// 	  game_date: game.date
-			// 	})
-			//   });
 
-			// if (!response.ok) {
-			// 	console.error('Error sending game data to stats-service:', response.statusText);
-			// }
-			// console.log("response from stats container is : ", response);
-			//console.log('Game data sent to stats-service successfully');
 			players.forEach(player => {
 				player.socket.send(JSON.stringify({
 					type: "game_over",

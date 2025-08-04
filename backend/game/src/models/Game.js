@@ -11,7 +11,7 @@ export class Game {
             left: new Paddle("left", 0, 225, player1Id),
             right: new Paddle("right", 1185, 225, player2Id),
         };
-        
+
         this.targetFps = 60;
         this.targetFrameTime = 1000 / this.targetFps;
         this.fixedDeltaTime = 1 / this.targetFps;
@@ -21,9 +21,9 @@ export class Game {
         this.points = 10;
         this.leftPoints = 0;
         this.rightPoints = 0;
-        
+
         this.ballStartDelay = 0;
-        
+
         this.isRunning = false;
         this.gameLoopInterval = null;
     }
@@ -34,26 +34,26 @@ export class Game {
         this.ball.y = 300;
         this.ball.vx = 0;
         this.ball.vy = 0;
-        
+
         this.ballStartDelay = this.delayTime;
-        
+
         this.startGameLoop();
     }
 
     startGameLoop() {
         if (this.isRunning) return;
-        
+
         this.isRunning = true;
-        
+
         const gameLoop = async () => {
             while (this.isRunning && this.status !== GameStatus.TERMINATED) {
                 const frameStart = performance.now();
-                
+
                 this.update();
-                
+
                 const frameEnd = performance.now();
                 const frameDuration = frameEnd - frameStart;
-                
+
                 if (frameDuration < this.targetFrameTime) {
                     const sleepTime = this.targetFrameTime - frameDuration;
                     await this.sleep(sleepTime);
@@ -76,13 +76,19 @@ export class Game {
     }
 
     movePaddle(player, direction) {
-        if (this.paddles[player]) {
-            this.paddles[player].move(direction);
+        const paddle = this.paddles[player];
+        const speed = paddle.speed;
+        const maxY = 600 - paddle.height;
+
+        if (direction === "up") {
+            paddle.y = Math.max(0, paddle.y - speed);
+        } else if (direction === "down") {
+            paddle.y = Math.min(maxY, paddle.y + speed);
         }
     }
 
     update() {
-        const deltaTime = this.fixedDeltaTime; 
+        const deltaTime = this.fixedDeltaTime;
 
         if (this.status === GameStatus.PLAYING) {
             if (this.ballStartDelay > 0) {
@@ -96,7 +102,7 @@ export class Game {
                 this.paddleColision();
             }
         }
-        
+
         if (this.ball.x <= 0) {
             this.resetBall();
             this.checkScore("right");
@@ -105,7 +111,7 @@ export class Game {
             this.resetBall();
             this.checkScore("left");
         }
-        
+
         if (this.ball.y <= 0) {
             this.ball.y = 0;
             this.ball.vy = Math.abs(this.ball.vy);
@@ -121,7 +127,7 @@ export class Game {
         this.ball.y = 300;
         this.ball.vx = 0;
         this.ball.vy = 0;
-        
+
         if (this.status === GameStatus.PLAYING) {
             this.ballStartDelay = this.delayTime;
         }
@@ -132,7 +138,7 @@ export class Game {
             this.leftPoints++;
         else if (player === "right")
             this.rightPoints++;
-        
+
         if (this.leftPoints >= this.points || this.rightPoints >= this.points) {
             this.status = GameStatus.GAME_OVER;
             this.stop();
@@ -143,26 +149,26 @@ export class Game {
         const paddleLeft = this.paddles.left;
         const paddleRight = this.paddles.right;
 
-        if (this.ball.x <= paddleLeft.x + paddleLeft.width && 
-            this.ball.y + this.ball.height > paddleLeft.y && 
+        if (this.ball.x <= paddleLeft.x + paddleLeft.width &&
+            this.ball.y + this.ball.height > paddleLeft.y &&
             this.ball.y < paddleLeft.y + paddleLeft.height &&
-            this.ball.vx < 0) { 
-            
-           	let hitZone = (this.ball.y - paddleLeft.y) / (paddleLeft.height / 8);
-           	this.ball.vx = Math.abs(this.ball.vx); 
-           	this.ball.vy = (hitZone - 0.5) * this.ballSpeed * 0.5;
-            
-           	this.ball.x = paddleLeft.x + paddleLeft.width + 1;
+            this.ball.vx < 0) {
+
+            let hitZone = (this.ball.y - paddleLeft.y) / (paddleLeft.height / 8);
+            this.ball.vx = Math.abs(this.ball.vx);
+            this.ball.vy = (hitZone - 0.5) * this.ballSpeed * 0.5;
+
+            this.ball.x = paddleLeft.x + paddleLeft.width + 1;
         }
-        else if (this.ball.x + this.ball.width >= paddleRight.x && 
-                 this.ball.y + this.ball.height > paddleRight.y && 
-                 this.ball.y < paddleRight.y + paddleRight.height &&
-                 this.ball.vx > 0) {
-            
+        else if (this.ball.x + this.ball.width >= paddleRight.x &&
+            this.ball.y + this.ball.height > paddleRight.y &&
+            this.ball.y < paddleRight.y + paddleRight.height &&
+            this.ball.vx > 0) {
+
             let hitZone = (this.ball.y - paddleRight.y) / (paddleRight.height / 8);
-            this.ball.vx = -Math.abs(this.ball.vx); 
-            this.ball.vy = (hitZone - 0.5) * this.ballSpeed * 0.5; 
-            
+            this.ball.vx = -Math.abs(this.ball.vx);
+            this.ball.vy = (hitZone - 0.5) * this.ballSpeed * 0.5;
+
             this.ball.x = paddleRight.x - this.ball.width - 1;
         }
     }
