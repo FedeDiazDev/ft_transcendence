@@ -17,7 +17,6 @@ services:
       - rabbitmq
     networks:
       - transcendence-network
-    profiles: ["app"]
     logging:
       driver: gelf
       options:
@@ -33,7 +32,6 @@ services:
       - front-spa:/usr/src/app/
     networks:
       - transcendence-network
-    profiles: ["app"]
 
   auth-service:
     container_name: auth-service
@@ -49,7 +47,6 @@ services:
         condition: service_healthy
     networks:
       - transcendence-network
-    profiles: ["app"]
 
   stats-service:
     container_name: stats-service
@@ -65,7 +62,6 @@ services:
         condition: service_healthy
     networks:
       - transcendence-network
-    profiles: ["app"]
     logging:
       driver: gelf
       options:
@@ -86,7 +82,6 @@ services:
         condition: service_healthy
     networks:
       - transcendence-network
-    profiles: ["app"]
     logging:
       driver: gelf
       options:
@@ -107,7 +102,6 @@ services:
       - transcendence-network
     env_file:
       - .env
-    profiles: ["app"]
     logging:
       driver: gelf
       options:
@@ -126,7 +120,6 @@ services:
       - transcendence-network
     env_file:
       - .env
-    profiles: ["app"]
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"] 
       interval: 10s 
@@ -153,16 +146,13 @@ services:
       - xpack.ml.enabled=false
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     networks:
       - transcendence-network
-    profiles: ["elk"]
     healthcheck:
       test: ["CMD", "curl", "-u", "elastic:$ELASTIC_PASSWORD", "-f", "http://localhost:9200"]
       interval: 15s
       timeout: 10s
       retries: 5
-    mem_limit: 1gb
     command: >
       bash -c "
         /usr/local/bin/docker-entrypoint.sh &
@@ -185,7 +175,6 @@ services:
       - transcendence-network
     environment:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-    profiles: ["elk"]
 
   kibana:
     container_name: kibana
@@ -202,12 +191,10 @@ services:
     networks:
       - transcendence-network
     environment:
-      - NODE_OPTIONS=--max-old-space-size=768
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
     command: >
       bash -c "/usr/share/kibana/import-dashboards.sh"
-    profiles: ["elk"]
 
 volumes:
   front-spa:
