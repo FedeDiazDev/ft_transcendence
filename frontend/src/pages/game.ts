@@ -43,14 +43,14 @@ export const Game = (mode: string) => {
         createGame(1, 2)
             .then(gameData => {
                 if (!gameData?.gameState) {
-                    console.error("Error: gameState no tiene el formato correcto", gameData);
+                    console.error("Error: gameState doesn't have the correct format", gameData);
                     return;
                 }
                 return startGame();
             })
             .then(gameData => {
                 if (!gameData?.gameState) {
-                    console.error("Error: gameState no tiene el formato correcto", gameData);
+                    console.error("Error: gameState doesn't have the correct format", gameData);
                     return;
                 }
                 gameState = gameData.gameState as GameState;
@@ -65,7 +65,7 @@ export const Game = (mode: string) => {
                     }
                 }
             })
-            .catch(err => console.error("Error al crear el juego:", err));
+            .catch(err => console.error("Error creating the game", err));
     } else if (mode === "online") {
         const canvas = GameCanvas(gameState, "online", score, Date.now.toString());
         aux.appendChild(canvas);

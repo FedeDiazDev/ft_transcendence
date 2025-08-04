@@ -52,6 +52,10 @@ export const LoginCard = () => {
 	const div = document.createElement("div");
 	div.className = "flex flex-col items-center gap-2 p-6 bg-gradient-to-r from-[#0D1013] to-[#101115] shadow-xl rounded-lg w-64 min-h-64 mx-auto text-white justify-evenly";
 
+	const button = document.createElement("button");
+	button.textContent = "Login";
+	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
+
 	const names = ["Username", "Password"];
 	for (let i: number = 0; i < names.length; i++) {
 		const text = document.createElement("h3");
@@ -65,15 +69,19 @@ export const LoginCard = () => {
 			input.type = "text";
 		input.className = "text-white bg-transparent p-2 border-0 border-b border-white focus:outline-none focus:border-white transition";
 		input.id = names[i];
+		
+		input.addEventListener("keydown", (e) => {
+			if (e.key === "Enter") {
+				button.click();
+			}
+		});
+
 		div.appendChild(input);
 	}
 
 	const errorDiv = document.createElement("div");
 	div.appendChild(errorDiv);
 
-	const button = document.createElement("button");
-	button.textContent = "Login";
-	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
 
 	clickOnButtonLogin(button, names, errorDiv);
 

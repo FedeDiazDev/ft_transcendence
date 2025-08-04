@@ -95,11 +95,11 @@ export const gameSocket = (updateGameState: any, id: number, name: string, roomI
 		}
 	};
 
-	socket.onclose = (event) => {
-		console.log(event.wasClean
-			? `[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`
-			: '[close] La conexión se cayó en gameSocket');
-	};
+	// socket.onclose = (event) => {
+	// 	console.log(event.wasClean
+	// 			? `[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`
+	// 			: '[close] The connection dropped in gameSocket');
+	// };
 
 	socket.onerror = () => {
 		alert(`[error]`);

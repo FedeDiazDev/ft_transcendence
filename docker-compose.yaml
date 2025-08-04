@@ -146,8 +146,10 @@ services:
       - xpack.ml.enabled=false
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - NODE_OPTIONS=--max-old-space-size=768
     networks:
       - transcendence-network
+    mem_limit: 1gb
     healthcheck:
       test: ["CMD", "curl", "-u", "elastic:$ELASTIC_PASSWORD", "-f", "http://localhost:9200"]
       interval: 15s
@@ -193,6 +195,7 @@ services:
     environment:
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      - NODE_OPTIONS=--max-old-space-size=768
     command: >
       bash -c "/usr/share/kibana/import-dashboards.sh"
 
