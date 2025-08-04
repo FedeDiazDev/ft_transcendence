@@ -55,12 +55,12 @@ export async function getUser(request, reply) {
         throw dbError;
     }
 
-    if (!response) {
-        const error = new Error("Usuario no existe");
-        error.statusCode = 400;
-        throw error;
-    }
-    reply.status(200).send({ message: "Usuario encontrado", user: response });
+    // if (!response) {
+    //     const error = new Error("Usuario no existe");
+    //     error.statusCode = 404;
+    //     throw error;
+    // }
+    reply.status(200).send({ message: "User found", user: response });
 }
 
 export async function getUserById(request, reply) {
