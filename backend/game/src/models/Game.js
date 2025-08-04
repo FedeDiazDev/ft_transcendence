@@ -16,7 +16,7 @@ export class Game {
         this.targetFrameTime = 1000 / this.targetFps;
         this.fixedDeltaTime = 1 / this.targetFps;
 
-        this.ballSpeed = 100;
+        this.ballSpeed = 200;
         this.delayTime = 1000;
         this.points = 10;
         this.leftPoints = 0;
@@ -148,6 +148,7 @@ export class Game {
             this.ball.vx < 0) {
 
             let hitZone = (this.ball.y - paddleLeft.y) / (paddleLeft.height / 8);
+            hitZone = Math.min(0.8, Math.max(0.2, hitZone));
             this.ball.vx = Math.abs(this.ball.vx);
             this.ball.vy = (hitZone - 0.5) * this.ballSpeed * 0.5;
 
@@ -159,6 +160,7 @@ export class Game {
             this.ball.vx > 0) {
 
             let hitZone = (this.ball.y - paddleRight.y) / (paddleRight.height / 8);
+            //hitZone = Math.min(0.9, Math.max(0.1, hitZone));
             this.ball.vx = -Math.abs(this.ball.vx);
             this.ball.vy = (hitZone - 0.5) * this.ballSpeed * 0.5;
 
