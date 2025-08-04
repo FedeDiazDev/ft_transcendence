@@ -62,7 +62,6 @@ export const Navbar = () => {
 	  
 		let helpVisible = false;
 	  
-		// ✅ Declare handler once
 		function handleOutsideClick(e: any) {
 		  const card = document.getElementById("help-card");
 		  if (card && !card.contains(e.target)) {

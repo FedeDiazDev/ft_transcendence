@@ -18,16 +18,23 @@ function formatCorrectCard(div : HTMLDivElement, qr : HTMLImageElement, qrImg : 
 
 	const info = document.createElement("h3");
 	info.className = "text-lg font-semibold text-white-400";
-	info.textContent = "Introduce Verification Code";
+	info.textContent = "Input Verification Code";
 	div.appendChild(info);
-
-	const input = document.createElement("input");
-    input.className = "text-black p-2 border rounded focus:outline-none transition";
-	div.appendChild(input);
 
 	const button = document.createElement("button");
 	button.textContent = "Verify";
 	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
+
+	const input = document.createElement("input");
+    input.className = "text-black p-2 border rounded focus:outline-none transition";
+	
+	input.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") {
+			button.click();
+		}
+	});
+	div.appendChild(input);
+
 	clickVerify(button, input, div);
 	div.appendChild(button);
 	return (div);
@@ -45,7 +52,7 @@ function clickVerify(button : HTMLButtonElement, input : HTMLInputElement, div :
 		{
 			errorText = document.createElement("p");
 			errorText.className = "text-sm text-red-400";
-			errorText.textContent = "Incorrect OTP Code. Please, try again."
+			errorText.textContent = "Incorrect OTP Code. Please, try again..."
 			div.appendChild(errorText);
 		}
 	})

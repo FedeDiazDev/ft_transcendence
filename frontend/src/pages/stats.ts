@@ -140,7 +140,6 @@ export const Stats = async (): Promise<HTMLElement> => {
       },
     });
 
-    // ELO Bar Chart
     const eloDiv: HTMLDivElement = document.createElement("div");
     eloDiv.className = "w-full md:w-1/2 bg-base-black2 p-4 rounded-lg shadow-md";
 
@@ -196,7 +195,6 @@ export const Stats = async (): Promise<HTMLElement> => {
       },
     });
 
-    // Add chart container to DOM
     wrapper.appendChild(chartContainer);
 
     // Game History

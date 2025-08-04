@@ -35,7 +35,6 @@ export const WaitingRoom = () => {
             clearInterval(intervalId);
             matchmakingSocket.close();
 
-            // Fetch opponent username before proceeding
             let opponentUsername = "Unknown";
             try {
                 const res = await getUserById(opponentId);
@@ -44,7 +43,6 @@ export const WaitingRoom = () => {
                 console.error("Could not fetch opponent username", err);
             }
 
-            // Show banner with opponent's name
             container.innerHTML = "";
             container.className = "flex flex-col items-center justify-center text-white";
 
@@ -54,7 +52,6 @@ export const WaitingRoom = () => {
 
             container.appendChild(banner);
 
-            // After delay, start game
             setTimeout(() => {
                 container.innerHTML = "";
 

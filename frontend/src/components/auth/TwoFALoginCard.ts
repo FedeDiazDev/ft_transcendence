@@ -8,7 +8,7 @@ function formatCard(div : HTMLDivElement)
 
 	const header = document.createElement("h3");
 	header.className = "text-lg font-semibold text-white-400";
-	header.textContent = "Introduce Verification Code";
+	header.textContent = "Input Verification Code";
 	div.appendChild(header);
 
 	const input = document.createElement("input");
@@ -19,6 +19,14 @@ function formatCard(div : HTMLDivElement)
 	button.textContent = "Verify";
 	button.className = "w-full py-2 border border-white rounded-lg active:bg-gray-700 mt-2";
 	clickVerify(button, input, div);
+	
+	input.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			button.click();
+		}
+	});
+	
 	div.appendChild(button);
 	return (div);
 }

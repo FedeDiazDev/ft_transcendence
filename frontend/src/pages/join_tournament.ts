@@ -19,7 +19,7 @@ export const JoinTournament = () => {
 	tournamentsContainer.className = "flex flex-row items-center justify-center flex-wrap gap-12"
 
 	const createTitle = document.createElement("h2");
-	createTitle.textContent = "Torneos disponibles";
+	createTitle.textContent = "Available tournaments";
 	createTitle.className = "text-2xl font-semibold mb-4";
 	parentContainer.appendChild(createTitle);
 
@@ -42,13 +42,13 @@ export const JoinTournament = () => {
 			name.className = "text-xl font-bold mb-2";
 
 			const players = document.createElement("p");
-			players.textContent = `Jugadores: ${tournament.number_players}`;
+			players.textContent = `Players: ${tournament.number_players}`;
 
 			const status = document.createElement("p");
-			status.textContent = `Estado: ${tournament.status}`;
+			status.textContent = `Status: ${tournament.status}`;
 
 			const joinButton = document.createElement("button");
-			joinButton.textContent = "Unirse";
+			joinButton.textContent = "Join";
 			joinButton.className = "mt-4 px-4 py-2 bg-green-600 rounded hover:bg-green-700";
 
 			joinButton.addEventListener("click", () => {
@@ -59,12 +59,12 @@ export const JoinTournament = () => {
 				modal.className = "bg-[#0D1013] p-6 rounded-lg shadow-lg max-w-sm w-full text-white flex flex-col gap-4";
 
 				const title = document.createElement("h3");
-				title.textContent = `Pon tu nick para "${tournament.name}"`;
+				title.textContent = `Enter your nickname for "${tournament.name}"`;
 				title.className = "text-xl font-semibold";
 
 				const input = document.createElement("input");
 				input.type = "text";
-				input.placeholder = "Tu nickname";
+				input.placeholder = "Your nickname";
 				input.className = "p-2 rounded bg-[#1f2226] text-white outline-none";
 
 				const errorMsg = document.createElement("p");
@@ -74,12 +74,19 @@ export const JoinTournament = () => {
 				buttonsContainer.className = "flex justify-end gap-4";
 
 				const cancelBtn = document.createElement("button");
-				cancelBtn.textContent = "Cancelar";
+				cancelBtn.textContent = "Cancel";
 				cancelBtn.className = "px-4 py-2 bg-gray-700 rounded hover:bg-gray-600";
 
 				const submitBtn = document.createElement("button");
-				submitBtn.textContent = "Unirse";
+				submitBtn.textContent = "Join";
 				submitBtn.className = "px-4 py-2 bg-green-600 rounded hover:bg-green-700";
+
+				input.addEventListener("keydown", (e) => {
+					if (e.key === "Enter") {
+						e.preventDefault();
+						submitBtn.click();
+					}
+				});
 
 				buttonsContainer.appendChild(cancelBtn);
 				buttonsContainer.appendChild(submitBtn);
@@ -94,30 +101,30 @@ export const JoinTournament = () => {
 				cancelBtn.addEventListener("click", () => {
 					document.body.removeChild(overlay);
 					joinButton.disabled = false;
-					joinButton.textContent = "Unirse";
+					joinButton.textContent = "Join";
 				});
 
 				submitBtn.addEventListener("click", async () => {
 					const alias = input.value.trim();
 					if (!alias) {
-						errorMsg.textContent = "El nickname no puede estar vacío";
+						errorMsg.textContent = "Nickname cannot be empty";
 						errorMsg.classList.remove("hidden");
 						return;
 					}
 
 					if (alias.length > 20) {
-						errorMsg.textContent = "El nickname no puede tener más de 20 caracteres";
+						errorMsg.textContent = "Nickname cannot be longer than 20 characters";
 						errorMsg.classList.remove("hidden");
 						return;
 					}
 
 					submitBtn.disabled = true;
-					submitBtn.textContent = "Comprobando...";
+					submitBtn.textContent = "Checking...";
 
 					try {
 						const nicknameExists = await checkNickname(tournament.id, alias);
 						if (nicknameExists.exists) {
-							errorMsg.textContent = `El nick "${alias}" ya está en uso en este torneo.`;
+							errorMsg.textContent = `The nickname "${alias}" is already in use for this tournament.`;
 							errorMsg.classList.remove("hidden");
 							submitBtn.disabled = false;
 							submitBtn.textContent = "Unirse";
@@ -129,7 +136,7 @@ export const JoinTournament = () => {
 							errorMsg.textContent = response.error;
 							errorMsg.classList.remove("hidden");
 							submitBtn.disabled = false;
-							submitBtn.textContent = "Unirse";
+							submitBtn.textContent = "Join";
 							return;
 						}
 
@@ -157,14 +164,14 @@ export const JoinTournament = () => {
 						});
 
 					} catch (error) {
-						errorMsg.textContent = "Error al unirse al torneo";
+						errorMsg.textContent = "Error while joining a tournament";
 						errorMsg.classList.remove("hidden");
 						submitBtn.disabled = false;
-						submitBtn.textContent = "Unirse";
+						submitBtn.textContent = "Join";
 					}
 				});
 				joinButton.disabled = true;
-				joinButton.textContent = "Uniendo...";
+				joinButton.textContent = "Joining...";
 			});
 
 			tournamentCard.appendChild(name);
@@ -185,7 +192,7 @@ export const JoinTournament = () => {
 			tournamentsContainer.innerHTML = "";
 			renderTournaments(response.tournaments);
 		} catch (error) {
-			showError("Error al obtener torneos");
+			showError("Error fetching tournaments");
 		}
 	})();
 
@@ -225,7 +232,7 @@ export const JoinTournament = () => {
 			tournamentsContainer.innerHTML = "";
 			renderTournaments(response.tournaments);
 		} catch (error) {
-			showError("Error al obtener torneos");
+			showError("Error fetching tournaments");
 		}
 	})();
 	return container;

@@ -2,15 +2,11 @@ import { GameCanvas } from "../components/game/Canvas.js";
 import { fetchUserData } from "../hooks/fetchUserData.js";
 import { navigateTo } from "../router.js";
 
-//TODO: checkear si estas en un torneo al darle a jugar torneo.
-//TODO: borrar usuario del torneo al salir de la Base de datos
-//TODO: Botón para salir
-
 let interval: number | null = null;
 export const joinSocket = (username: string, action: string, tournamentId: number, container: any, alias?: string, nb_players?: number) => {
     let socket = new WebSocket("wss://" + window.location.hostname + ":8080/api/game/tournament_logic");
     socket.onopen = function () {
-        // console.log("✅ WebSocket conectado");
+        // console.log("WebSocket conectado");
         interval = setInterval(() => {
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({ action: "ping" }));
@@ -44,7 +40,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                 container.className = "p-4 text-white overflow-auto min-h-screen relative";
 
                 const title = document.createElement("h2");
-                title.innerText = `🏆 Torneo - Ronda ${data.round || data.tournamentInfo?.round}`;
+                title.innerText = `🏆 Tournament - Round ${data.round || data.tournamentInfo?.round}`;
                 title.className = "text-2xl font-bold mb-6 text-center";
                 container.appendChild(title);
 
