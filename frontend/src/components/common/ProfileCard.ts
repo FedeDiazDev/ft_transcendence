@@ -1,5 +1,5 @@
 import { getUserData, getFriendData } from "../../api/profile/profileAPI.js";
-import { Input } from "./Input.js";
+// import { Input } from "./Input.js";
 import { getUserStats, getFriendStats } from "../../api/stats/statsAPI.js";
 
 async function fetchStats(container: HTMLDivElement) {
@@ -10,7 +10,6 @@ async function fetchStats(container: HTMLDivElement) {
             return;
         }
 
-        // Create stats section
         const statsSection = document.createElement("div");
         statsSection.className = "mt-6 border-t pt-4";
 
@@ -19,7 +18,6 @@ async function fetchStats(container: HTMLDivElement) {
         statsTitle.className = "text-gray-300 text-lg text-center w-full mb-4";
         statsSection.appendChild(statsTitle);
 
-        // Create stats display
         const statsGrid = document.createElement("div");
         statsGrid.className = "grid grid-cols-2 gap-4";
 
@@ -32,7 +30,6 @@ async function fetchStats(container: HTMLDivElement) {
         statsGrid.appendChild(lossesCard);
         statsSection.appendChild(statsGrid);
 
-        // games history section
         if (stats.recentGames && stats.recentGames.length > 0) {
             const recentGamesSection = document.createElement("div");
             recentGamesSection.className = "mt-4";
@@ -67,7 +64,6 @@ async function fetchStats(container: HTMLDivElement) {
     } catch (error) {
         console.error("Error fetching stats:", error);
 
-        // Show error message in the container
         const errorMsg = document.createElement("div");
         errorMsg.className = "mt-4 p-3 bg-red-100 text-red-700 rounded";
         errorMsg.textContent = "Unable to load game statistics.";
@@ -75,7 +71,6 @@ async function fetchStats(container: HTMLDivElement) {
     }
 }
 
-// Helper function to create stat cards
 function createStatCard(label: string, value: number | string, valueColorClass: string) {
     const card = document.createElement("div");
     card.className = "bg-gray-50 p-3 rounded shadow-sm";
@@ -102,11 +97,9 @@ export function convertBlobToBase64(data: any, avatarImage: HTMLImageElement) {
         binaryString += String.fromCharCode(byte);
     });
     const base64String = btoa(binaryString);
-    // Set as image source with data URL
     avatarImage.src = `data:image/png;base64,${base64String}`;
 }
 
-// Function to validate PNG file signature
 async function isPNG(file: File): Promise<boolean> {
     const PNG_SIGNATURE = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
     const bytes = await file.slice(0, 8).arrayBuffer();
@@ -121,13 +114,9 @@ async function fetchProfile(container: HTMLDivElement) {
         console.error("No data received");
         return;
       }
-  
-      // Clear container before populating
+
       container.innerHTML = "";
-  
-      // Profile header div for avatar is outside, so no avatar here!
-  
-      // Username label + value (no white box behind)
+
       const usernameLabel = document.createElement("p");
       usernameLabel.className = "text-sm font-bold text-white mb-1";
       usernameLabel.textContent = "Username:";
@@ -139,7 +128,6 @@ async function fetchProfile(container: HTMLDivElement) {
       container.appendChild(usernameLabel);
       container.appendChild(usernameValue);
   
-      // About Me label + text
       const aboutMeLabel = document.createElement("p");
       aboutMeLabel.className = "text-sm font-bold text-white mb-1";
       aboutMeLabel.textContent = "About Me:";
@@ -156,14 +144,12 @@ async function fetchProfile(container: HTMLDivElement) {
       container.appendChild(aboutMeLabel);
       container.appendChild(aboutMeValue);
   
-      // Edit About Me button below text
       const editAboutBtn = document.createElement("button");
       editAboutBtn.textContent = "Edit About Me";
       editAboutBtn.className = "mt-3 px-4 py-2 bg-white text-black rounded shadow";
       container.appendChild(editAboutBtn);
   
       editAboutBtn.addEventListener("click", () => {
-        // Replace aboutMeValue with textarea for editing
         container.removeChild(aboutMeValue);
         editAboutBtn.remove();
   
@@ -190,7 +176,6 @@ async function fetchProfile(container: HTMLDivElement) {
               }
             );
   
-            // Update UI
             textarea.remove();
             saveBtn.remove();
   
@@ -204,11 +189,9 @@ async function fetchProfile(container: HTMLDivElement) {
         });
       });
   
-      // === Avatar + Edit Avatar logic moved to 'profile-header' outside this container ===
-      // Append avatar and edit button to #profile-header outside this container
       const profileHeader = document.getElementById("profile-header");
       if (profileHeader) {
-        profileHeader.innerHTML = ""; // Clear previous
+        profileHeader.innerHTML = "";
   
         const avatarImage = document.createElement("img");
         avatarImage.alt = "Avatar";
@@ -223,7 +206,6 @@ async function fetchProfile(container: HTMLDivElement) {
         editAvatarButton.className = "mt-2 px-4 py-2 bg-white text-black rounded shadow";
   
         editAvatarButton.addEventListener("click", () => {
-          // File input logic here (same as your existing)
           const fileInput = document.createElement("input");
           fileInput.type = "file";
           fileInput.accept = "image/png";
@@ -305,7 +287,6 @@ export const ProfileView = (): HTMLElement => {
     const container = document.createElement("div");
     container.className = "bg-[#1c1c1c] p-6 rounded-xl shadow-md w-full max-w-xl mx-auto";
   
-    // Immediately invoke async fetch to populate container
     (async () => {
       await fetchProfile(container);
     })();
@@ -345,7 +326,6 @@ async function fetchFriendProfile(container: HTMLDivElement, id: string) {
       container.appendChild(aboutMeLabel);
       container.appendChild(aboutMeValue);
   
-      // Avatar goes to left panel
       const profileHeader = document.getElementById("profile-header");
       if (profileHeader) {
         profileHeader.innerHTML = "";
@@ -369,11 +349,8 @@ async function fetchFriendProfile(container: HTMLDivElement, id: string) {
 export const FriendProfileView = (id: string): HTMLElement => {
     const container = document.createElement("div");
     container.className = "bg-[#1c1c1c] p-6 rounded-xl shadow-md w-full max-w-xl mx-auto";
-  
-    // Fetch and populate immediately
     (async () => {
       await fetchFriendProfile(container, id);
     })();
-  
     return container;
 };

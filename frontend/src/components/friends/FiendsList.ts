@@ -12,12 +12,11 @@ export const FriendList = async () => {
 
 	try {
 		const response = await getFriendsList();
-		//console.log("Friends: ", response);
 
 		if (!response || response.length === 0) {
 			const noFriendsMessage = document.createElement("p");
 			noFriendsMessage.className = "text-white";
-			noFriendsMessage.textContent = "No tienes amigos aún.";
+			noFriendsMessage.textContent = "You don't have friends yet.";
 			container.appendChild(noFriendsMessage);
 			return container;
 		}
@@ -48,7 +47,7 @@ export const FriendList = async () => {
 		});
 
 	} catch (error) {
-		console.error("Error al obtener la lista de amigos:", error);
+		console.error("Error fetching friends list:", error);
 	}
 	return container;
 };

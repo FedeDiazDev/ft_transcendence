@@ -4,7 +4,6 @@ import { deleteFriend } from "../../api/profile/profileAPI.js";
 import { FriendList } from "./FiendsList.js";
 import { convertBlobToBase64 } from "../common/ProfileCard.js";
 
-// Function to show temporary message
 function showMessage(message: string, isError: boolean = false) {
     const messageDiv = document.createElement("div");
     messageDiv.className = `fixed top-4 right-4 px-4 py-2 rounded shadow-lg transition-opacity duration-500 ${
@@ -13,7 +12,6 @@ function showMessage(message: string, isError: boolean = false) {
     messageDiv.textContent = message;
     document.body.appendChild(messageDiv);
 
-    // Fade out and remove after 3 seconds
     setTimeout(() => {
         messageDiv.style.opacity = "0";
         setTimeout(() => {
@@ -36,7 +34,6 @@ export const Friend = (
     text-gray-300 shadow-inner shadow-black w-[400px] h-[120px] mb-4
   `;
 
-  // 📍 Columna izquierda (Avatar + login + estado)
   const leftSection = document.createElement("div");
   leftSection.className = "flex flex-col items-center justify-center w-1/3 gap-2";
 
@@ -58,7 +55,7 @@ export const Friend = (
   const login = document.createElement("p");
   login.textContent = username;
   login.className = "text-white text-sm font-medium cursor-pointer hover:text-blue-400";
-  login.title = "Ver perfil";
+  login.title = "Show profile";
   container.addEventListener("click", () => {
     navigateTo(`/profile/${username}`);
   });
@@ -71,7 +68,6 @@ export const Friend = (
   leftSection.appendChild(avatarWrapper);
   leftSection.appendChild(usernameLine);
 
-  // 📝 Columna derecha (nombre completo y posible descripción)
   const rightSection = document.createElement("div");
   rightSection.className = "flex flex-row items-center justify-between w-2/3 pl-4";
 
@@ -81,17 +77,16 @@ export const Friend = (
 
   rightSection.appendChild(descriptionEl);
 
-  // Botón de eliminar
   const deleteBut = document.createElement("button");
   deleteBut.textContent = "❌";
   deleteBut.className = "text-xl cursor-pointer hover:text-red-400 transition self-end";
-  deleteBut.title = "Eliminar amigo";
+  deleteBut.title = "Delete friend";
 
   deleteBut.addEventListener("click", async (e) => {
     e.stopPropagation();
     try {
       await deleteFriend(userId);
-      showMessage(`${username} ha sido eliminado de tu lista de amigos`);
+      showMessage(`${username} has been deleted from your friend list`);
 
       const friendsListContainer = container.closest(".w-full");
       if (friendsListContainer) {
@@ -101,13 +96,12 @@ export const Friend = (
       }
     } catch (error) {
       console.error("Error deleting friend:", error);
-      showMessage("Error al eliminar amigo", true);
+      showMessage("Error deleting friend", true);
     }
   });
 
   rightSection.appendChild(deleteBut);
 
-  // Ensamblar todo
   container.appendChild(leftSection);
   container.appendChild(rightSection);
 

@@ -49,7 +49,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
 
         const updateGameState = async () => {
             if (gameState.status !== "playing") {
-                console.warn(" Estado no es PLAYING:", gameState.status);
+                console.warn("Status isn't PLAYING:", gameState.status);
                 return;
             }
             if (pressedKeys.w) moveAndUpdate("left", "up");
@@ -64,7 +64,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                     draw();
                 }
             } catch (error) {
-                console.error("Error al actualizar la bola:", error);
+                console.error("Error updating the ball:", error);
             }
         };
 
@@ -74,8 +74,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             }
 
             if (gameState.status === "game_over") {
-                const winner = gameState.rightPoints == 10 ? "derecha" : "izquierda";
-                alert(`El ganador es el jugador de la ${winner}`);
+                const winner = gameState.rightPoints == 10 ? "right" : "left";
+                alert(`The winner is the ${winner} player`);
                 playAgainBtn!.classList.remove("hidden");
                 return;
             }
@@ -110,7 +110,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                 updatePaddlePosition(player, direction);
                 draw();
             } catch (error) {
-                console.error("Error al mover la pala:", error);
+                console.error("Error moving the paddle:", error);
             }
         };
         //*ONLINE
@@ -142,7 +142,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         });
         const renderGame = (player1Name: string, player2Name: string) => {
             draw();
-            scoreElement.innerHTML = `<span>Jugador 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span>: Jugador 2 ${player2Name}</span>`;
+            scoreElement.innerHTML = `<span>Player 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span>: Player 2 ${player2Name}</span>`;
         };
 
     }

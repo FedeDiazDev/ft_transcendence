@@ -8,7 +8,7 @@ function formatCard(div : HTMLDivElement)
 
 	const header = document.createElement("h3");
 	header.className = "text-lg font-semibold text-white-400";
-	header.textContent = "Introduce Verification Code";
+	header.textContent = "Input Verification Code";
 	div.appendChild(header);
 
 	const input = document.createElement("input");

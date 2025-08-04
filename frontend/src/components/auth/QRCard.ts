@@ -18,7 +18,7 @@ function formatCorrectCard(div : HTMLDivElement, qr : HTMLImageElement, qrImg : 
 
 	const info = document.createElement("h3");
 	info.className = "text-lg font-semibold text-white-400";
-	info.textContent = "Introduce Verification Code";
+	info.textContent = "Input Verification Code";
 	div.appendChild(info);
 
 	const button = document.createElement("button");
@@ -52,7 +52,7 @@ function clickVerify(button : HTMLButtonElement, input : HTMLInputElement, div :
 		{
 			errorText = document.createElement("p");
 			errorText.className = "text-sm text-red-400";
-			errorText.textContent = "Incorrect OTP Code. Please, try again."
+			errorText.textContent = "Incorrect OTP Code. Please, try again..."
 			div.appendChild(errorText);
 		}
 	})
