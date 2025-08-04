@@ -15,7 +15,7 @@ export default async function publishGameResultEvent(gameResult) {
 
   channel.sendToQueue(queue, Buffer.from(JSON.stringify(gameResult)), { persistent: true });
 
-  console.log(" [x] Sent game result:", gameResult);
+  //console.log(" [x] Sent game result:", gameResult);
 
   setTimeout(() => {
     channel.close();

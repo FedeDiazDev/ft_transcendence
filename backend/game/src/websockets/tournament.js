@@ -8,7 +8,7 @@ function deletePlayerFromTournament(username, tournamentId, db) {
         `);
         query.run(username, tournamentId);
     } catch (e) {
-        console.error("Error borrando de BDD:", e);
+        //console.error("Error borrando de BDD:", e);
     }
 }
 
@@ -282,7 +282,7 @@ async function tournamentLogic(fastify, opts) {
                 try {
                     deletePlayerFromTournament(player.username, tournamentId, fastify.db);
                 } catch (err) {
-                    console.error("Error al eliminar jugador de BDD:", err);
+                    //console.error("Error al eliminar jugador de BDD:", err);
                 }
 
                 tournament.players = tournament.players.filter(p => p.socket !== socket);

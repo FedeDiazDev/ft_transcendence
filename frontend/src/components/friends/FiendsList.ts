@@ -47,7 +47,7 @@ export const FriendList = async () => {
 		});
 
 	} catch (error) {
-		console.error("Error fetching friends list:", error);
+		//console.error("Error fetching friends list:", error);
 	}
 	return container;
 };

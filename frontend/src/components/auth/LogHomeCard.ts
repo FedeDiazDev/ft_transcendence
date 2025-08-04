@@ -19,7 +19,7 @@ async function googleCallback(response : any)
 		navigateTo("/");
 	}
 	catch(error){
-		console.error("Fetch error: ", error);
+		//console.error("Fetch error: ", error);
 	}
 }
 

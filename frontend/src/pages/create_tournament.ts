@@ -106,7 +106,7 @@ export const CreateTournament = () => {
 				} else if (error.message === "MAX_TOURNAMENTS_OPEN") {
 					message = "You can only have up to 5 tournaments running at the same time.";
 				} else {
-					console.error("Error creating the tournament:", error);
+					//console.error("Error creating the tournament:", error);
 					message = error.message;
 				}
 			}

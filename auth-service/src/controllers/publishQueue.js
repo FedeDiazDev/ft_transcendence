@@ -19,7 +19,7 @@ export default async function publishUserRegisteredEvent(username) {
 
   channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), { persistent: true });
 
-  console.log(" [x] Sent %s", JSON.stringify(message));
+  //console.log(" [x] Sent %s", JSON.stringify(message));
 
   setTimeout(() => {
     channel.close();

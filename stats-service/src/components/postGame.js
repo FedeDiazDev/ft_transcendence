@@ -5,8 +5,8 @@ export async function storeAlias(req, reply) {
   const { alias, real_username } = req.body;
   const db = req.server.db;
   
-  console.log("Received Alias:", alias);
-  console.log("Received Real Username:", real_username);
+  //console.log("Received Alias:", alias);
+  //console.log("Received Real Username:", real_username);
 
   if (!alias || !real_username) {
     return reply.status(400).send({ error: "Alias and real username are required" });
@@ -24,10 +24,10 @@ export async function storeAlias(req, reply) {
     const updateQuery = db.prepare("INSERT OR REPLACE INTO alias_to_user (alias, real_username) VALUES (?, ?)");
     await updateQuery.run(alias, real_username);
 
-    console.log(`Alias ${alias} saved for username ${real_username}`);
+    //console.log(`Alias ${alias} saved for username ${real_username}`);
     return reply.status(200).send({ message: "Alias saved successfully" });
   } catch (error) {
-    console.error("Error saving alias:", error);
+    //console.error("Error saving alias:", error);
     return reply.status(500).send({ error: "Internal server error" });
   }
 }
@@ -64,5 +64,5 @@ export async function saveGameAndUpdateElo(db, {
     ) VALUES (?, ?, ?, ?, ?)
   `).run(winnerRealUsername, 10, looserRealUsername, looser_points, formattedDate);
 
-  console.log("✅ Game result saved and ELO updated");
+  //console.log("✅ Game result saved and ELO updated");
 }

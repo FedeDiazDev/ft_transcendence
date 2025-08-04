@@ -5,8 +5,8 @@ dotenv.config();
 export async function validateAuthorizationHeader(request) {
   const authHeader = request.headers['authorization'];
 
-  console.log("Logging auth header: ")
-  console.log(request.headers['authorization']);
+  //console.log("Logging auth header: ")
+  //console.log(request.headers['authorization']);
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw new Error("Token no proporcionado");
