@@ -6,7 +6,7 @@ import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 import { navigateTo } from "../../router.js";
 
-export function showWinnerModal(winner: "left" | "right", onClose?: () => void) {
+export function showWinnerModal(winner: "left" | "right") {
 	const overlay = document.createElement("div");
 	overlay.className = `
     fixed inset-0 z-50 flex items-center justify-center
@@ -41,7 +41,6 @@ export function showWinnerModal(winner: "left" | "right", onClose?: () => void) 
 	button.textContent = "OK";
 	button.onclick = () => {
 		document.body.removeChild(overlay);
-		if (onClose) onClose();
 	};
 
 	card.append(icon, title, button);
@@ -119,9 +118,12 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             //console.log("Posición Y paddle right:", gameState.paddles.right.y);
             if (gameState.status === "game_over") {
                 const winner = gameState.rightPoints == 10 ? "right" : "left";
-                showWinnerModal(winner, () => {
-                    playAgainBtn!.classList.remove("hidden");
-                });
+                showWinnerModal(winner);
+                playAgainBtn!.classList.remove("hidden");
+
+                // showWinnerModal(winner, () => {
+                //     playAgainBtn!.classList.remove("hidden");
+                // });
                 return;
             }
             await updateGameState();

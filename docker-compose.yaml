@@ -132,72 +132,72 @@ services:
         gelf-address: "udp://localhost:12201"
         tag: "transcendence"
 
-  # elasticsearch:
-  #   container_name: elasticsearch
-  #   build:
-  #     context: ./monitoring/elk/elasticsearch
-  #   volumes:
-  #     - elasticsearch:/usr/share/elasticsearch/data
-  #     - ./monitoring/elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-  #   environment:
-  #     - discovery.type=single-node
-  #     - http.host=0.0.0.0
-  #     - transport.host=0.0.0.0
-  #     - xpack.ml.enabled=false
-  #     - xpack.security.enabled=true
-  #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-  #     - NODE_OPTIONS=--max-old-space-size=768
-  #   networks:
-  #     - transcendence-network
-  #   mem_limit: 1gb
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-u", "elastic:$ELASTIC_PASSWORD", "-f", "http://localhost:9200"]
-  #     interval: 15s
-  #     timeout: 10s
-  #     retries: 5
-  #   command: >
-  #     bash -c "
-  #       /usr/local/bin/docker-entrypoint.sh &
-  #       sleep 10 &&
-  #       /usr/share/elasticsearch/ilm-policy.sh
-  #       wait"
+  elasticsearch:
+    container_name: elasticsearch
+    build:
+      context: ./monitoring/elk/elasticsearch
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+      - ./monitoring/elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    environment:
+      - discovery.type=single-node
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - xpack.ml.enabled=false
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - NODE_OPTIONS=--max-old-space-size=768
+    networks:
+      - transcendence-network
+    mem_limit: 1gb
+    healthcheck:
+      test: ["CMD", "curl", "-u", "elastic:$ELASTIC_PASSWORD", "-f", "http://localhost:9200"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    command: >
+      bash -c "
+        /usr/local/bin/docker-entrypoint.sh &
+        sleep 10 &&
+        /usr/share/elasticsearch/ilm-policy.sh
+        wait"
 
-  # logstash:
-  #   container_name: logstash
-  #   image: logstash:7.17.28
-  #   volumes:
-  #     - ./monitoring/elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-  #     - ./monitoring/elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
-  #   depends_on:
-  #     elasticsearch:
-  #       condition: service_healthy
-  #   ports:
-  #     - 12201:12201/udp
-  #   networks:
-  #     - transcendence-network
-  #   environment:
-  #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+  logstash:
+    container_name: logstash
+    image: logstash:7.17.28
+    volumes:
+      - ./monitoring/elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./monitoring/elk/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - 12201:12201/udp
+    networks:
+      - transcendence-network
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
 
-  # kibana:
-  #   container_name: kibana
-  #   build:
-  #     context: ./monitoring/elk/kibana
-  #   volumes:
-  #     - ./monitoring/elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
-  #     - kibana:/usr/share/kibana/data
-  #   depends_on:
-  #     elasticsearch:
-  #       condition: service_healthy
-  #   ports:
-  #     - "5601:5601"
-  #   networks:
-  #     - transcendence-network
-  #   environment:
-  #     - ELASTICSEARCH_USERNAME=elastic
-  #     - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
-  #     - NODE_OPTIONS=--max-old-space-size=768
-  #   command: >
-  #     bash -c "/usr/share/kibana/import-dashboards.sh"
+  kibana:
+    container_name: kibana
+    build:
+      context: ./monitoring/elk/kibana
+    volumes:
+      - ./monitoring/elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - kibana:/usr/share/kibana/data
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "5601:5601"
+    networks:
+      - transcendence-network
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      - NODE_OPTIONS=--max-old-space-size=768
+    command: >
+      bash -c "/usr/share/kibana/import-dashboards.sh"
 
 volumes:
   front-spa:

@@ -62,11 +62,11 @@ export async function createGame(request, reply) {
 
 export async function moveBall(request, reply) {
   const body = request.body || {};
-  if (game.status !== GameStatus.PLAYING) {
-    return reply.send({ status: 'error', message: 'El juego no está en curso' });
-  }
   if (game.status === GameStatus.GAME_OVER)
     return reply.status(200).send({ message: "Juego finalizado", gameState: game })
+  if (game.status !== GameStatus.PLAYING) {
+    return reply.send({ status: 'error', message: 'El juego no está en curso' });
+  }  
   game.update();
   return reply.send({ status: 'success', gameState: game });
 }

@@ -18,7 +18,7 @@ export const createTournament = async (name: string, players: number) => {
             throw new Error("409");
         }
         if (response.status === 400) {
-            if (data?.error?.includes("No se pueden crear más de 5 torneos abiertos")) {
+            if (data?.error?.includes("Not more than 5 tournaments at a time allowed. Wait for one to finish!")) {
                 throw new Error("MAX_TOURNAMENTS_OPEN");
             } else {
                 throw new Error(`Error 400: ${data.error}`);

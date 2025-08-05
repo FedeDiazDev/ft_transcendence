@@ -133,8 +133,7 @@ export class Game {
             this.rightPoints++;
 
         if (this.leftPoints >= this.points || this.rightPoints >= this.points) {
-            this.status = GameStatus.GAME_OVER;
-            this.stop();
+            this.status = GameStatus.GAME_OVER;            
         }
     }
 
