@@ -159,7 +159,7 @@ export const joinSocket = (username: string, action: string, tournamentId: numbe
                     queueList.innerHTML = "";
 
                     const currentCount = data.players.length;
-                    const maxCount = data.numberPlayers || "4";
+                    const maxCount = data.numberPlayers;
 
                     const title = document.createElement("h2");
                     title.textContent = `Players in queue (${currentCount}/${maxCount})`;
