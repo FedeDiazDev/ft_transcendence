@@ -6,9 +6,52 @@ import { gameSocket } from "../../sockets/gameSocket.js";
 import { fetchUserData } from "../../hooks/fetchUserData.js";
 import { navigateTo } from "../../router.js";
 
-export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any, alias ?: string) => {
+export function showWinnerModal(winner: "left" | "right", onClose?: () => void) {
+	const overlay = document.createElement("div");
+	overlay.className = `
+    fixed inset-0 z-50 flex items-center justify-center
+    bg-black/40 backdrop-blur-sm
+  `;
 
-    // Llamamos a la función para obtener los datos
+	const card = document.createElement("div");
+	card.className = `
+    flex flex-col items-center gap-4 px-10 py-8 rounded-3xl
+    bg-gradient-to-br from-[#0B0C0E] to-[#141519]
+    shadow-[0_0_15px_#000_inset,0_0_10px_#000]
+    w-[320px] md:w-[380px] text-center
+    ring-2 ring-white/10
+  `;
+
+	const icon = document.createElement("div");
+	icon.className = `
+    w-16 h-16 rounded-full flex items-center justify-center text-3xl
+    bg-white/5
+  `;
+	icon.textContent = "🏆";
+
+	const title = document.createElement("p");
+	title.className = "text-white text-lg font-semibold";
+	title.textContent = `The winner is the ${winner} player!`;
+
+	const button = document.createElement("button");
+	button.className = `
+    mt-2 px-4 py-2 rounded-md bg-white/10 text-white text-sm
+    hover:bg-white/20 transition
+  `;
+	button.textContent = "OK";
+	button.onclick = () => {
+		document.body.removeChild(overlay);
+		if (onClose) onClose();
+	};
+
+	card.append(icon, title, button);
+	overlay.append(card);
+	document.body.append(overlay);
+}
+
+
+export const GameCanvas = (state: GameState, mode: string, scoreElement: any, roomId: string, tournamentInfo?: any, alias?: string) => {
+
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
     canvas.height = 600;
@@ -75,10 +118,12 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
 
             if (gameState.status === "game_over") {
                 const winner = gameState.rightPoints == 10 ? "right" : "left";
-                alert(`The winner is the ${winner} player`);
-                playAgainBtn!.classList.remove("hidden");
+                showWinnerModal(winner, () => {
+                    playAgainBtn!.classList.remove("hidden");
+                });
                 return;
             }
+
 
             await updateGameState();
 
@@ -130,8 +175,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             loop();
         };
         const updateGameState = (newState: any) => {
-            const { gameState: receivedGameState, player1Name, player2Name } = newState;            
-            gameState = { ...gameState, ...receivedGameState };            
+            const { gameState: receivedGameState, player1Name, player2Name } = newState;
+            gameState = { ...gameState, ...receivedGameState };
             renderGame(player1Name, player2Name);
         };
 
