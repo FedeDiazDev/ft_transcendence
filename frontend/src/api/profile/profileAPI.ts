@@ -2,7 +2,6 @@ import { API_URLS } from "../apiConfig.js"
 
 export const getUserData = async (): Promise<any> => {
     try {
-        const token = localStorage.getItem("authToken");
         const response = await fetch(`${API_URLS.profile}/getUser`, {
             method: 'GET',
         });

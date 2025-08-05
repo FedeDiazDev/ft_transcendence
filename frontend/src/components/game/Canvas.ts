@@ -115,7 +115,8 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
             if (scoreElement != null) {
                 scoreElement.innerHTML = `${gameState.leftPoints} - ${gameState.rightPoints}`;
             }
-
+            //console.log("Posición Y paddle left:", gameState.paddles.left.y);
+            //console.log("Posición Y paddle right:", gameState.paddles.right.y);
             if (gameState.status === "game_over") {
                 const winner = gameState.rightPoints == 10 ? "right" : "left";
                 showWinnerModal(winner, () => {
@@ -123,10 +124,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                 });
                 return;
             }
-
-
             await updateGameState();
-
             if (window.location.pathname.endsWith("/local_game")) {
                 requestAnimationFrame(loop);
             }
@@ -134,31 +132,19 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
 
         loop();
 
-        const updatePaddlePosition = (player: "left" | "right", direction: "up" | "down") => {
-            const paddle = gameState.paddles[player];
-            if (!paddle) return;
-            const speed = paddle.speed ?? 10;
-            const newY = direction === "up" ? paddle.y - speed : paddle.y + speed;
-
-            gameState = {
-                ...gameState,
-                paddles: {
-                    ...gameState.paddles,
-                    [player]: { ...paddle, y: newY }
-                }
-            };
-        };
         const moveAndUpdate = async (player: "left" | "right", direction: "up" | "down") => {
             try {
                 const response = await movePaddle(player, direction);
-                if (!response || response.status == 204) return;
-                updatePaddlePosition(player, direction);
+                if (!response || !response.gameState) return;
+        
+                gameState = response.gameState;
+                //console.log("Game State: ", gameState);
                 draw();
             } catch (error) {
                 //console.error("Error moving the paddle:", error);
             }
         };
-        //*ONLINE
+        
     } else if (mode === "online") {
         const pressedKeys = useKeyPress();
         const onlineLoop = (socket: any, userId: number) => {
@@ -172,6 +158,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                 draw();
                 requestAnimationFrame(loop);
             };
+
             loop();
         };
         const updateGameState = (newState: any) => {
@@ -187,7 +174,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
         });
         const renderGame = (player1Name: string, player2Name: string) => {
             draw();
-            scoreElement.innerHTML = `<span>Player 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span>: Player 2 ${player2Name}</span>`;
+            scoreElement.innerHTML = `<span>Jugador 1: ${player1Name}</span> ${gameState.leftPoints} - ${gameState.rightPoints} <span> Jugador 2: ${player2Name}</span>`;
         };
 
     }

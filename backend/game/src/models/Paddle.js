@@ -9,14 +9,11 @@ export class Paddle {
 		this.speed = 15;
 	}
 
-	move(direction) {		
-		if (direction === "up" && this.y - this.speed >= 0) {
-			this.y -= this.speed;
+	move(direction) {
+		if (direction === "up") {
+			this.y = Math.max(0, this.y - this.speed);
+		} else if (direction === "down") {
+			this.y = Math.min(600 - this.height, this.y + this.speed);
 		}		
-		else if (direction === "down" && this.y + this.height + this.speed <= 600) {
-			this.y += this.speed;
-		}
 	}
-	
 }
-

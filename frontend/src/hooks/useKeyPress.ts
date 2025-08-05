@@ -10,26 +10,20 @@ export const useKeyPress = (): PressedKeys => {
     s: false,
   };
   
-  const handleKeyDown = (event: KeyboardEvent): void => {
-    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+
+  function handleKeyDown(event : KeyboardEvent) {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "w" || event.key === "s") {
       event.preventDefault();
-    }
-    
-    if (pressedKeys.hasOwnProperty(event.key)) {
       pressedKeys[event.key] = true;
     }
-  };
-
-  const handleKeyUp = (event: KeyboardEvent): void => {
-    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+  }
+  
+  function handleKeyUp(event : KeyboardEvent) {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "w" || event.key === "s") {
       event.preventDefault();
-    }
-    
-    if (pressedKeys.hasOwnProperty(event.key)) {
       pressedKeys[event.key] = false;
     }
-  };
- 
+  }
   document.addEventListener("keydown", handleKeyDown);
   document.addEventListener("keyup", handleKeyUp);
 

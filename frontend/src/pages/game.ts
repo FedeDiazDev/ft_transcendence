@@ -4,7 +4,7 @@ import { GameState } from "../types/types.js";
 
 export const Game = (mode: string) => {
     const container = document.createElement("div");
-    container.className = "flex flex-col justify-center items-center bg-gradient-to-r from-[#0D1013] to-[#101115] mt-10 border-[#262626] p-6 rounded-md";
+    container.className = "flex flex-col justify-center items-center mt-10 border-[#262626] p-6 rounded-md";
     const aux = document.createElement("div");
     aux.className = "flex flex-col justify-center items-center";
     let gameState: GameState = {
@@ -18,8 +18,8 @@ export const Game = (mode: string) => {
                 x: 50,
                 y: 200,
                 width: 10,
-                height: 50,
-                speed: 5
+                height: 150,
+                speed: 15
             },
             right: {
                 player: "right",
@@ -27,8 +27,8 @@ export const Game = (mode: string) => {
                 x: 440,
                 y: 200,
                 width: 10,
-                height: 50,
-                speed: 5
+                height: 150,
+                speed: 15
             }
         },
         points: 0,

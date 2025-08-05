@@ -26,7 +26,7 @@ export const CreateTournament = () => {
 	nameInput.type = "text";
 	nameInput.placeholder = "Name";
 	nameInput.required = true;
-	nameInput.maxLength = 10;
+	nameInput.maxLength = 10;	
 	nameInput.className =
 		"p-2 bg-gradient-to-r from-[#0D1013] to-[#101115] text-white border-b border-white focus:outline-none focus:border-white transition";
 

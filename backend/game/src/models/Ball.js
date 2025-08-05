@@ -4,11 +4,11 @@ export class Ball {
 		this.y = y;
 		this.width = 15;
 		this.height = 15;
-		this.vx = 10;
-		this.vy = 10;
+		this.vx = 0;
+		this.vy = 0;
 	}
-	move() {
-		this.x += this.vx;
-		this.y += this.vy;
+	move(deltaTime) {
+		this.x += this.vx * deltaTime;
+		this.y += this.vy * deltaTime;
 	}
 }

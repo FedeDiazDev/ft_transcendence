@@ -11,80 +11,70 @@ function startGameLoop(roomId) {
 	room.gameLoopRunning = true;
 	let gameResultSent = false;
 
-	const interval = setInterval(async () => {
-		const { game, players } = room;
-		game.update();
+	const game = room.game;
+	let lastFrameTime = performance.now();
 
-		if (game.leftPoints === 10 || game.rightPoints === 10) {
-			if (gameResultSent) return;
-			gameResultSent = true;
+	const loop = async () => {
+		while (room.gameLoopRunning && game.status !== "GAME_OVER") {
+			const now = performance.now();
+			//const deltaTime = (now - lastFrameTime) / 1000;
+			lastFrameTime = now;
 
-			const winnerId = game.leftPoints === 10 ? game.paddles.left.playerId : game.paddles.right.playerId;
-			const looserPoints = game.leftPoints === 10 ? game.rightPoints : game.leftPoints;
-			const winnerName = players.find(p => p.id === winnerId)?.name || "Unknown";
-			const looserName = players.find(p => p.id !== winnerId)?.name || "Unknown";
+			game.update();
 
-			//POST result to stats-service
-			// console.log("game over game is: ", game);//game.date
-			// console.log("game over game.date is: ", game.date);
-			// console.log("game over winnerId is: ", winnerId);
-			// console.log("game over winnername is: ", winnerName);
-			// console.log("game over looserName is: ", looserName);
-			// console.log("game over looserPoints is: ", looserPoints);
-			try {
-				await publishGameResultEvent({
-				  winner_username: winnerName,
-				  looser_username: looserName,
-				  looser_points: looserPoints,
-				  game_date: game.date
-				});
+			if (game.leftPoints === 10 || game.rightPoints === 10) {
+				if (!gameResultSent) {
+					gameResultSent = true;
 
-				//console.log('Game result published to RabbitMQ');
-			} catch (error) {
-				//console.error('Failed to publish game result to RabbitMQ:', error);
+					const winnerId = game.leftPoints === 10 ? game.paddles.left.playerId : game.paddles.right.playerId;
+					const looserPoints = game.leftPoints === 10 ? game.rightPoints : game.leftPoints;
+					const winnerName = room.players.find(p => p.id === winnerId)?.name || "Desconocido";
+					const looserName = room.players.find(p => p.id !== winnerId)?.name || "Desconocido";
+
+					try {
+						await publishGameResultEvent({
+							winner_username: winnerName,
+							looser_username: looserName,
+							looser_points: looserPoints,
+							game_date: game.date,
+						});
+					} catch (error) {
+						console.error('Failed to publish game result:', error);
+					}
+
+					room.players.forEach(player => {
+						player.socket.send(JSON.stringify({
+							type: "game_over",
+							gameState: game,
+							winner: winnerName,
+							roomId
+						}));
+						player.socket.close();
+					});
+				}
+				room.gameLoopRunning = false;
+				games.delete(roomId);
+				break;
 			}
-			// const response = await fetch("http://stats-service:3000/api/stats/game", {
-			// 	method: 'POST',
-			// 	headers: {
-			// 	  'Content-Type': 'application/json'
-			// 	},
-			// 	body: JSON.stringify({
-			// 	  winner_username: winnerName,
-			// 	  looser_username: looserName,
-			// 	  looser_points: looserPoints,
-			// 	  game_date: game.date
-			// 	})
-			//   });
 
-			// if (!response.ok) {
-			// 	console.error('Error sending game data to stats-service:', response.statusText);
-			// }
-			// console.log("response from stats container is : ", response);
-			//console.log('Game data sent to stats-service successfully');
-			players.forEach(player => {
+			room.players.forEach(player => {
 				player.socket.send(JSON.stringify({
-					type: "game_over",
 					gameState: game,
-					winner: winnerName,
+					player1Name: room.players[0].name,
+					player2Name: room.players[1].name,
 					roomId
 				}));
-				player.socket.close();
 			});
 
-			clearInterval(interval);
-			games.delete(roomId);
-			return;
+			const frameDuration = performance.now() - now;
+			const sleepTime = Math.max(0, (1000 / 60) - frameDuration);
+			await new Promise(res => setTimeout(res, sleepTime));
 		}
-		players.forEach(player => {
-			player.socket.send(JSON.stringify({
-				gameState: game,
-				player1Name: players[0].name,
-				player2Name: players[1].name,
-				roomId
-			}));
-		});
-	}, 1000 / 60);
+	};
+
+	loop();
 }
+
 
 async function gameLogic(fastify, opts) {
 	fastify.register(async function (fastify) {
