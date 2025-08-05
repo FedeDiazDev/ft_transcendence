@@ -82,7 +82,7 @@ export const CreateTournament = () => {
 			errorMessage.textContent = "Name can't be longer than 10 characters.";
 			return;
 		} else if (name.length <= 0) {
-			errorMessage.textContent = "Name is empty";
+			errorMessage.textContent = "Name cannot be empty.";
 			return;
 		}
 

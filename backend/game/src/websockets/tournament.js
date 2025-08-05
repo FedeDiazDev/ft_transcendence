@@ -290,7 +290,8 @@ async function tournamentLogic(fastify, opts) {
                     p.socket.send(JSON.stringify({
                         action: "update_queue",
                         players: tournament.players.map(pl => pl.username),
-                        tournamentId
+                        tournamentId,
+                        numberPlayers : tournament.number_players
                     }));
                 });
             });
