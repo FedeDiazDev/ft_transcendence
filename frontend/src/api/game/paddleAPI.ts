@@ -24,6 +24,6 @@ export const movePaddle = async (player: Player, direction: Direction): Promise<
             return data;
         }
     } catch (error) {
-        console.error("Error en /movePaddle:", error);
+        //console.error("Error en /movePaddle:", error);
     }
 };

@@ -95,7 +95,7 @@ export const Friend = (
         friendsListContainer.appendChild(newFriendsComponent);
       }
     } catch (error) {
-      console.error("Error deleting friend:", error);
+      //console.error("Error deleting friend:", error);
       showMessage("Error deleting friend", true);
     }
   });

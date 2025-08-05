@@ -8,7 +8,7 @@ dotenv.config();
 function validateAuthorizationHeader(request) {
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        const error = new Error("Token no proporcionado");
+        const error = new Error("No token");
         error.statusCode = 401;
         throw error;
     }    
@@ -17,7 +17,7 @@ function validateAuthorizationHeader(request) {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         return payload;
     } catch (err) {
-        const error = new Error("Token inválido o expirado");
+        const error = new Error("Expired or invalid token");
         error.statusCode = 401;
         throw error;
     }
@@ -30,7 +30,7 @@ async function validatePNGSignature(filePath) {
         const pngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
         return pngSignature.every((byte, i) => buffer[i] === byte);
     } catch (error) {
-        console.error("Error validating PNG signature:", error);
+        //console.error("Error validating PNG signature:", error);
         return false;
     }
 }
@@ -50,13 +50,13 @@ export async function getUser(request, reply) {
     try {
         response = query.get(username);
     } catch (error) {
-        const dbError = new Error("Error al consultar la base de datos");
-        dbError.statusCode = 500;
+        const dbError = new Error("Error checking the database");
+        dbError.statusCode = 400;
         throw dbError;
     }
 
     // if (!response) {
-    //     const error = new Error("Usuario no existe");
+    //     const error = new Error("User not found");
     //     error.statusCode = 404;
     //     throw error;
     // }
@@ -71,17 +71,17 @@ export async function getUserById(request, reply) {
     try {
         response = query.get(id);
     } catch (error) {
-        const dbError = new Error("Error al consultar la base de datos");
-        dbError.statusCode = 500;
+        const dbError = new Error("Error checking the database");
+        dbError.statusCode = 400;
         throw dbError;
     }
 
     if (!response) {
-        const error = new Error("Usuario no existe");
+        const error = new Error("User not found");
         error.statusCode = 400;
         throw error;
     }
-    reply.status(200).send({ message: "Usuario encontrado", user: response });
+    reply.status(200).send({ message: "User found", user: response });
 }
 
 export async function updateProfileText(request, reply) {
@@ -98,17 +98,17 @@ export async function updateProfileText(request, reply) {
     try {
         response = query.run(request.body.presentacion, username);
     } catch (error) {
-        const dbError = new Error("Error al consultar la base de datos");
-        dbError.statusCode = 500;
+        const dbError = new Error("Error checking the database");
+        dbError.statusCode = 400;
         throw dbError;
     }
 
     if (!response) {
-        const error = new Error("Usuario no existe");
-        error.statusCode = 400;
+        const error = new Error("User not found");
+        error.statusCode = 404;
         throw error;
     }
-    reply.status(200).send({ message: "Texto de perfil actualizado" });
+    reply.status(200).send({ message: "About me updated" });
 }
 
 export async function updateAvatar(request, reply) {
@@ -137,7 +137,7 @@ export async function updateAvatar(request, reply) {
         const [fields, files] = await new Promise((resolve, reject) => {
             form.parse(request.raw, (err, fields, files) => {
                 if (err) {
-                    console.error("Parse error:", err);
+                    //console.error("Parse error:", err);
                     return reject(err);
                 }
                 //console.log("Parsed fields:", fields);
@@ -151,7 +151,7 @@ export async function updateAvatar(request, reply) {
         
         // Check if avatar file was uploaded (with better error handling)
         if (!files || !files.avatar) {
-            console.error("No avatar file found in:", files);
+            //console.error("No avatar file found in:", files);
             return reply.code(400).send({ message: 'No avatar file received' });
         }
         
@@ -161,7 +161,7 @@ export async function updateAvatar(request, reply) {
                 (avatarFile[0] && (avatarFile[0].filepath || avatarFile[0].path));
         
         if (!filePath) {
-            console.error("File path is undefined!", avatarFile);
+            //console.error("File path is undefined!", avatarFile);
             return reply.code(400).send({ message: "Invalid file upload - no file path" });
         }
 
@@ -183,8 +183,8 @@ export async function updateAvatar(request, reply) {
         try {
             response = query.run(buffer, username);
         } catch (error) {
-            console.error("Database error:", error);
-            return reply.code(500).send({ message: "Database error" });
+            //console.error("Database error:", error);
+            return reply.code(400).send({ message: "Database error" });
         }
         
         // Clean up temp file
@@ -195,12 +195,12 @@ export async function updateAvatar(request, reply) {
         return reply.code(200).send({ message: "Avatar updated successfully" });
         
     } catch (error) {
-        console.error("File upload error details:", {
-            message: error.message,
-            stack: error.stack,
-            name: error.name
-        });
-        return reply.code(500).send({ 
+        // console.error("File upload error details:", {
+        //     message: error.message,
+        //     stack: error.stack,
+        //     name: error.name
+        // });
+        return reply.code(400).send({ 
             message: 'Error processing file upload', 
             error: error.message  // Add the actual error message
         });
@@ -229,14 +229,14 @@ export async function getUserByUsername(request, reply) {
     try {
         response = query.get(username);
     } catch (error) {
-        console.error("Error querying the database:", error);
-        return reply.status(500).send({
+        //console.error("Error querying the database:", error);
+        return reply.status(400).send({
             error: "Error querying the database for username"
         });
     }
 
     if (!response) {
-        console.error("Username not found");
+        //console.error("Username not found");
         return reply.status(404).send({
             error: "Username not found in database"
         });

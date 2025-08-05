@@ -5,7 +5,7 @@ let game = null;
 
 export async function getGameInfo(request, reply) {
   if (game === null)
-    reply.send({ message: "No hay ningun juego creado" })
+    reply.send({ message: "No game created" })
   reply.send({ gameState: game.gameState });
 }
 
@@ -13,10 +13,10 @@ export async function movePaddle(request, reply) {
   const { player, direction } = request.body;
 
   if (!player || !direction) {
-    return reply.status(400).send({ error: "Faltan datos" });
+    return reply.status(400).send({ error: "Missing data" });
   }
   if (!["left", "right"].includes(player) || !["up", "down"].includes(direction)) {
-    return reply.status(400).send({ error: "Valores no validos" });
+    return reply.status(400).send({ error: "Values not valid" });
   }
   const paddles = game.paddles;
   const paddleSpeed = game.paddles.left.speed;
@@ -36,14 +36,14 @@ export async function movePaddle(request, reply) {
 
 export async function startGame(request, reply) {
   if (!game) {
-    return reply.status(500).send({ message: "Error: gameState no inicializado" });
+    return reply.status(400).send({ message: "Error: gameState not initialised" });
   }
 
   game.start();
   game.gameStatus = GameStatus.PLAYING;
 
   return reply.status(200).send({
-    message: "Juego iniciado",
+    message: "Game started",
     gameState: game,
   });
 }

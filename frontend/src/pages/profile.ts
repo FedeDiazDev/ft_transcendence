@@ -62,7 +62,7 @@ export const Profile = (): HTMLElement => {
         `;
       } catch (error) {
         statsContainer.textContent = "Error loading statistics.";
-        console.error("Error fetching user stats:", error);
+        //console.error("Error fetching user stats:", error);
       }
     }
   });
@@ -135,7 +135,7 @@ export const FriendProfile = (id: string): HTMLElement => {
         `;
       } catch (error) {
         statsContainer.textContent = "Error loading statistics.";
-        console.error("Error fetching friend stats:", error);
+        //console.error("Error fetching friend stats:", error);
       }
     }
   });

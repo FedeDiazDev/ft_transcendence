@@ -7,18 +7,18 @@ dotenv.config();
 function getUsername(request, reply) {
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return reply.status(401).send({ error: "Token no proporcionado" })
+        return reply.status(401).send({ error: "No token" })
     }
     const token = authHeader.split(' ')[1];
     let payload;
     try {
         payload = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
-        return reply.status(401).send({ error: "Token inválido o expirado" });
+        return reply.status(401).send({ error: "Invalid or expired token" });
     }
     const username = payload.username;
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Username missing" });
     }
     return username;
 }
@@ -26,7 +26,7 @@ function getUsername(request, reply) {
 function validateAuthorizationHeader(request) {
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        const error = new Error("Token no proporcionado");
+        const error = new Error("No token");
         error.statusCode = 401;
         throw error;
     }
@@ -35,7 +35,7 @@ function validateAuthorizationHeader(request) {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         return payload;
     } catch (err) {
-        const error = new Error("Token inválido o expirado");
+        const error = new Error("Invalid or expired token");
         error.statusCode = 401;
         throw error;
     }
@@ -45,7 +45,7 @@ function validateAuthorizationHeader(request) {
 export async function createTournament(request, reply) {
     const { name, players } = request.body;
     if (!name || !players) {
-        return reply.status(400).send({ error: "Faltan datos" });
+        return reply.status(400).send({ error: "Missing data" });
     }
     let payload;
     try {
@@ -62,7 +62,7 @@ export async function createTournament(request, reply) {
 
         if (existing) {
             return reply.status(409).send({
-                message: "El torneo ya existe",
+                message: "Tournament already exists",
                 tournamentId: existing.id,
                 status: existing.status,
             });
@@ -72,7 +72,7 @@ export async function createTournament(request, reply) {
         const { count } = countOpenQuery.get();
         if (count >= 5) {
             return reply.status(400).send({
-                error: "No se pueden crear más de 5 torneos abiertos. Espera a que uno termine.",
+                error: "Not more than 5 tournaments at a time allowed. Wait for one to finish!",
             });
         }
 
@@ -88,12 +88,12 @@ export async function createTournament(request, reply) {
         };
 
         return reply.status(200).send({
-            message: "Torneo creado",
+            message: "Created tournament",
             tournamentState: tournament,
         });
 
     } catch (error) {
-        return reply.status(500).send({ error: "Error al crear el torneo" });
+        return reply.status(400).send({ error: "Error creating tournament" });
     }
 
 }
@@ -110,16 +110,16 @@ export async function listOpenTournaments(request, reply) {
     try {
         const query = db.prepare("SELECT * FROM tournaments WHERE status= ?");
         const tournaments = query.all("open");
-        reply.status(200).send({ message: "Lista de torneos", tournaments });
+        reply.status(200).send({ message: "Tournament list", tournaments });
     } catch (error) {
-        return reply.status(500).send({ error: "Error al mostrar listado de torneos abiertos" });
+        return reply.status(400).send({ error: "Error listing open tournaments" });
     }
 }
 
 
 export async function closeTournament(db, tournamentId) {
     if (!tournamentId) {
-        throw new Error("ID de torneo no proporcionado");
+        throw new Error("Tournament id not given");
     }
 
     try {
@@ -127,13 +127,13 @@ export async function closeTournament(db, tournamentId) {
         const result = query.run(tournamentId);
 
         if (result.changes === 0) {
-            throw new Error("Torneo no encontrado");
+            throw new Error("Tournament not found");
         }
 
-        return { message: "Torneo cerrado correctamente" };
+        return { message: "Tournament correctly closed" };
     } catch (error) {
-        console.error("Error al cerrar el torneo:", error);
-        throw new Error("Error al cerrar el torneo");
+        //console.error("Error al cerrar el torneo:", error);
+        throw new Error("Error closing the tournament");
     }
 }
 
@@ -142,11 +142,11 @@ export async function addPlayerToTournament(request, reply) {
     const db = request.server.db;
     const username = getUsername(request, reply);
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Missing username" });
     }
     const { tournamentId, alias } = request.body;
     if (!tournamentId || !alias) {
-        return reply.status(400).send({ error: "Faltan datos" });
+        return reply.status(400).send({ error: "Missing data" });
     }
 
     try {
@@ -158,11 +158,11 @@ export async function addPlayerToTournament(request, reply) {
             const result = totalQuery.get(tournamentId);
 
             if (!result) {
-                throw new Error("Torneo no encontrado");
+                throw new Error("Tournament not found");
             }
 
             if (count >= result.number_players) {
-                throw new Error("El torneo está lleno");
+                throw new Error("Tournament is full");
             }
 
             const insertQuery = db.prepare("INSERT INTO tournament_players (tournament_id, username, display_name) VALUES (?, ?, ?)");
@@ -185,9 +185,9 @@ export async function addPlayerToTournament(request, reply) {
                         throw new Error(`Failed to save alias: ${response.statusText}`);
                     }
 
-                    console.log("Alias saved successfully to stats service");
+                    //console.log("Alias saved successfully to stats service");
                 } catch (error) {
-                    console.error("Error calling saveAlias endpoint:", error);
+                    //console.error("Error calling saveAlias endpoint:", error);
                 }
             }
 
@@ -196,21 +196,21 @@ export async function addPlayerToTournament(request, reply) {
 
         insertTransaction();
 
-        return reply.status(200).send({ message: "Jugador añadido al torneo" });
+        return reply.status(200).send({ message: "Player added to tournament" });
     } catch (error) {
-        if (error.message === "El torneo está lleno") {
+        if (error.message === "Tournament is full") {
             return reply.status(409).send({ error: error.message });
-        } else if (error.message === "Torneo no encontrado") {
+        } else if (error.message === "Tournament not found") {
             return reply.status(404).send({ error: error.message });
         }
-        return reply.status(500).send({ error: "Error al añadir jugador al torneo" });
+        return reply.status(400).send({ error: "Error adding tournament" });
     }
 }
 
 export async function checkPlayerTournament(request, reply) {
     const username = getUsername(request, reply);
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Username missing" });
     }
     const db = request.server.db;
     try {
@@ -220,10 +220,10 @@ export async function checkPlayerTournament(request, reply) {
 		WHERE tp.username = ? AND t.status IN ('open')
 		LIMIT 1`);
         const result = query.get(username);
-        reply.status(200).send({ message: "Checkeo Player", result });
+        reply.status(200).send({ message: "Player checked", result });
 
     } catch (error) {
-        return reply.status(500).send({ error: "Error al checkear el jugador" });
+        return reply.status(400).send({ error: "Error checking player" });
 
     }
 }
@@ -231,11 +231,11 @@ export async function checkPlayerTournament(request, reply) {
 export async function checkNickname(request, reply) {
     const username = getUsername(request, reply);
     if (!username) {
-        return reply.status(400).send({ error: "Falta el username" });
+        return reply.status(400).send({ error: "Username missing" });
     }
     const { tournamentId, alias } = request.query;
     if (!tournamentId || !alias) {
-        return reply.status(400).send({ error: "Faltan datos en la query" });
+        return reply.status(400).send({ error: "Missing query data" });
     }
     const db = request.server.db;
     try {
@@ -249,7 +249,7 @@ export async function checkNickname(request, reply) {
             exists: !!result,
         });
     } catch (error) {
-        console.error("Error al verificar alias:", error);
-        return reply.status(500).send({ error: "Error al verificar alias" });
+        //console.error("Error al verificar alias:", error);
+        return reply.status(400).send({ error: "Error verifying alias" });
     }
 }

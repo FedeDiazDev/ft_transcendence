@@ -8,7 +8,7 @@ export const getUserData = async (): Promise<any> => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Fetch error:", error);
+        //console.error("Fetch error:", error);
     }
 }
 
@@ -20,7 +20,7 @@ export const getFriendData = async (id: number): Promise<any> => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Fetch error:", error);
+        //console.error("Fetch error:", error);
     }
 }
 
@@ -37,7 +37,7 @@ export const addFriend = async (friendId: number): Promise<any> => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Fetch error: ", error);
+        //console.error("Fetch error: ", error);
     }
 }
 
@@ -50,7 +50,7 @@ export const deleteFriend = async (friendId : number) : Promise <any> => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Fetch error: ", error);
+        //console.error("Fetch error: ", error);
     }
 }
 
@@ -68,7 +68,7 @@ export const getUserByUsername = async (username: string) => {
 
         return data.user;
     } catch(error) {
-        console.error('Error fetching user by username');
+        //console.error('Error fetching user by username');
         throw error;
     }
 }

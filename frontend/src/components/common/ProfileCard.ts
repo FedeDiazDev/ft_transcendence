@@ -49,7 +49,7 @@ async function fetchStats(container: HTMLDivElement) {
     try {
         const stats = await getUserStats();
         if (!stats) {
-            console.error("No stats data received");
+            //console.error("No stats data received");
             return;
         }
 
@@ -105,7 +105,7 @@ async function fetchStats(container: HTMLDivElement) {
         container.appendChild(statsSection);
 
     } catch (error) {
-        console.error("Error fetching stats:", error);
+        //console.error("Error fetching stats:", error);
 
         const errorMsg = document.createElement("div");
         errorMsg.className = "mt-4 p-3 bg-red-100 text-red-700 rounded";
@@ -154,7 +154,7 @@ async function fetchProfile(container: HTMLDivElement) {
     try {
       const data = await getUserData();
       if (!data) {
-        console.error("No data received");
+        //console.error("No data received");
         return;
       }
 
@@ -226,7 +226,6 @@ async function fetchProfile(container: HTMLDivElement) {
             container.appendChild(aboutMeValue);
             container.appendChild(editAboutBtn);
           } catch (err) {
-            console.error("Failed to update presentation", err);
             showError("Failed to update About Me.");
           }
         });
@@ -309,7 +308,6 @@ async function fetchProfile(container: HTMLDivElement) {
               reader.readAsDataURL(file);
             } catch (error) {
               showError("Failed to upload avatar. Please try again.");
-              console.error(error);
             } finally {
               editAvatarButton.textContent = "Edit Avatar";
               editAvatarButton.disabled = false;
@@ -322,7 +320,7 @@ async function fetchProfile(container: HTMLDivElement) {
         profileHeader.appendChild(editAvatarButton);
       }
     } catch (error) {
-      console.error("Fetch error:", error);
+      //console.error("Fetch error:", error);
     }
 }
 
@@ -341,7 +339,7 @@ async function fetchFriendProfile(container: HTMLDivElement, id: string) {
     try {
       const data = await getFriendData(Number(id));
       if (!data) {
-        console.error("No friend data received");
+        //console.error("No friend data received");
         return;
       }
   
@@ -384,7 +382,7 @@ async function fetchFriendProfile(container: HTMLDivElement, id: string) {
         profileHeader.appendChild(avatarImage);
       }
     } catch (error) {
-      console.error("Fetch error:", error);
+      //console.error("Fetch error:", error);
     }
 }
 

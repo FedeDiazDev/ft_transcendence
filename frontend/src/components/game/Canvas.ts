@@ -49,7 +49,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
 
         const updateGameState = async () => {
             if (gameState.status !== "playing") {
-                console.warn("Status isn't PLAYING:", gameState.status);
+                //console.warn("Status isn't PLAYING:", gameState.status);
                 return;
             }
             if (pressedKeys.w) moveAndUpdate("left", "up");
@@ -64,7 +64,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                     draw();
                 }
             } catch (error) {
-                console.error("Error updating the ball:", error);
+                //console.error("Error updating the ball:", error);
             }
         };
 
@@ -97,7 +97,7 @@ export const GameCanvas = (state: GameState, mode: string, scoreElement: any, ro
                 //console.log("Game State: ", gameState);
                 draw();
             } catch (error) {
-                console.error("Error moving the paddle:", error);
+                //console.error("Error moving the paddle:", error);
             }
         };
         

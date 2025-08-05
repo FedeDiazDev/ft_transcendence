@@ -39,7 +39,7 @@ export const createTournament = async (name: string, players: number) => {
         };
 
     } catch (error) {
-        console.error("Error en /tournament/create: ", error);
+        //console.error("Error en /tournament/create: ", error);
         throw error;
     }
 };
@@ -65,7 +65,7 @@ export const registerPlayer = async (tournamentId: number, alias: string) => {
         }
         return data;
     } catch (error) {
-        console.error("Error en /tournament/addPlayer", error);
+        //console.error("Error en /tournament/addPlayer", error);
         throw error;
     }
 }
@@ -85,7 +85,7 @@ export const openTournaments = async () => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error en /tournament/open:", error)
+        //console.error("Error en /tournament/open:", error)
     }
 }
 
@@ -113,7 +113,7 @@ export const closeTournament = async (tournamentId: number): Promise<any> => {
 
         return data;
     } catch (error) {
-        console.error("Error en /tournament/close:", error);
+        //console.error("Error en /tournament/close:", error);
         throw error;
     }
 };
@@ -134,7 +134,7 @@ export const checkPlayer = async () => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error en /tournament/open:", error)
+        //console.error("Error en /tournament/open:", error)
     }
 }
 
@@ -165,7 +165,7 @@ export const checkNickname = async (tournamentId: number, alias: string) => {
         return data;
 
     } catch (error) {
-        console.error("Error en /tournament/checkNickname:", error);
+        //console.error("Error en /tournament/checkNickname:", error);
         throw error;
     }
 };

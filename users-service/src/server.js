@@ -26,7 +26,6 @@ const connectOptions = {
     port: 3000
 }
 
-//Exit process if the init fails
 function serverError(err) {
     if (err) {
         fastify.log.error(err);

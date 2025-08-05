@@ -45,7 +45,7 @@ export function getUserStats(request, reply) {
     };
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: "Failed to get user statistics" });
+    return reply.code(400).send({ error: "Failed to get user statistics" });
   }
 }
 
@@ -83,6 +83,6 @@ export function getFriendStats(request, reply) {
     };
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Failed to get friend statistics' });
+    return reply.code(400).send({ error: 'Failed to get friend statistics' });
   }
 }

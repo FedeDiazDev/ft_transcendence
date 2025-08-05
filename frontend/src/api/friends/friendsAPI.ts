@@ -9,7 +9,7 @@ export const getFriendsList = async (): Promise<any> => {
         const data = await response.json();
         return data.friends;
     } catch (error) {
-        console.error("Fetch error: ", error);
+        //console.error("Fetch error: ", error);
     }
 }
 
@@ -25,6 +25,6 @@ export const getUserByName = async (text: string): Promise<any> => {
         const data = await response.json();
         return data.results;
     } catch (error) {
-        console.error("Fetch error: ", error);
+        //console.error("Fetch error: ", error);
     }
 };

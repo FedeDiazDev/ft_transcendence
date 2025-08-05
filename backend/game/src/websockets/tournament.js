@@ -8,7 +8,7 @@ function deletePlayerFromTournament(username, tournamentId, db) {
         `);
         query.run(username, tournamentId);
     } catch (e) {
-        console.error("Error borrando de BDD:", e);
+        //console.error("Error borrando de BDD:", e);
     }
 }
 
@@ -171,7 +171,7 @@ async function tournamentLogic(fastify, opts) {
 
                     loserSocket.send(JSON.stringify({
                         action: "eliminated_from_tournament",
-                        message: "Has perdido esta ronda del torneo — serás redirigido al menú."
+                        message: "You lost this round... Redirecting you to main menu."
                     }), () => loserSocket.close());
 
                     tournament.players = tournament.players.filter(p => p.username !== loserUsername);
@@ -282,7 +282,7 @@ async function tournamentLogic(fastify, opts) {
                 try {
                     deletePlayerFromTournament(player.username, tournamentId, fastify.db);
                 } catch (err) {
-                    console.error("Error al eliminar jugador de BDD:", err);
+                    //console.error("Error al eliminar jugador de BDD:", err);
                 }
 
                 tournament.players = tournament.players.filter(p => p.socket !== socket);
