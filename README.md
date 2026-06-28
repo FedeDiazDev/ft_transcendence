@@ -22,6 +22,24 @@ A high-performance, containerized **Microservices Platform** featuring a real-ti
 
 ---
 
+## 🕹️ Core Features & User Experience
+
+This platform replicates a classic competitive gaming hub, focusing on seamless real-time interactions and robust user security:
+
+*   **⚡ Real-Time Multiplayer Pong:** Fast-paced, responsive Pong matches synced over WebSockets. Features accurate collision detection, smooth paddle movements, and multiple game modes (including Classic and custom rulesets).
+*   **🤖 Local & AI Match Play:** Play offline locally by sharing a keyboard with a friend (1v1 local), or practice your skills against an intelligent AI bot.
+*   **🤝 Matchmaking & Queues:** Join the global matchmaking queue to automatically find players of similar skill levels, or directly invite online friends to competitive custom game lobbies.
+*   **💬 Integrated Chat System:** 
+    *   **Direct Messages (DMs):** Chat privately with other users in real time.
+    *   **Chat Rooms / Channels:** Create public, private, or password-protected group channels.
+    *   **Moderation Controls:** Channel owners can appoint administrators, mute, or ban users.
+    *   **User Blocking:** Instantly block other users to prevent them from sending direct messages or appearing in your active chats.
+*   **👥 Social Network & Friends list:** Follow other players, track their real-time status (Online, Offline, In-Game), view their profile metrics, and invite them directly to matches.
+*   **👤 Custom User Profiles & Stats:** Detail-rich player profiles displaying global rank, match histories (wins, losses, dates, scores), customizable avatars, and customizable game themes (paddle colors, ball skins).
+*   **🔒 Secure Auth & Two-Factor Authentication (2FA):** Protected user registration and login endpoints utilizing secure JSON Web Tokens (JWT). Includes optional, production-grade **2FA** integration (using TOTP via Authenticator apps like Google Authenticator) for enhanced profile security.
+
+---
+
 ## 🏗️ System Architecture
 
 This project is built using a decentralized **Microservices Architecture** with a **Database-per-Service** pattern, asynchronous message brokers, and centralized logging. 
