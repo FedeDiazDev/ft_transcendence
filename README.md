@@ -11,13 +11,12 @@
    |  |   |  |\\  \\   |  | |  ||  | \\   |  \\       /(_'  '--'\\  |  `---.|  | \\   |   |  '--'  / |  `---.|  | \\   |(_'  '--'\\  |  `---. 
    `--'   `--' '--'  `--' `--' `--'  `--'   `-----'    `-----'  `------'`--'  `--'   `-------'  `------'`--'  `--'   `-----'  `------' 
 ```
-
-[![Docker Compose](https://img.shields.io/badge/Docker_Compose-v2.0+-blue?logo=docker&logoColor=white&style=flat-square)](#)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Vanilla_SPA-blue?logo=typescript&logoColor=white&style=flat-square)](#)
-[![Fastify Backend](https://img.shields.io/badge/Fastify-Backend_Services-000000?logo=fastify&logoColor=white&style=flat-square)](#)
-[![RabbitMQ Broker](https://img.shields.io/badge/RabbitMQ-Event_Driven-FF6600?logo=rabbitmq&logoColor=white&style=flat-square)](#)
-[![ELK Stack](https://img.shields.io/badge/ELK_Stack-Monitoring-005571?logo=elastic-stack&logoColor=white&style=flat-square)](#)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Modern_UI-38B2AC?logo=tailwind-css&logoColor=white&style=flat-square)](#)
+<img src="https://img.shields.io/badge/Docker_Compose-v2.0+-blue?logo=docker&logoColor=white&style=flat-square" alt="Docker Compose">
+<img src="https://img.shields.io/badge/TypeScript-Vanilla_SPA-blue?logo=typescript&logoColor=white&style=flat-square" alt="TypeScript">
+<img src="https://img.shields.io/badge/Fastify-Backend_Services-000000?logo=fastify&logoColor=white&style=flat-square" alt="Fastify">
+<img src="https://img.shields.io/badge/RabbitMQ-Event_Driven-FF6600?logo=rabbitmq&logoColor=white&style=flat-square" alt="RabbitMQ">
+<img src="https://img.shields.io/badge/ELK_Stack-Monitoring-005571?logo=elastic-stack&logoColor=white&style=flat-square" alt="ELK Stack">
+<img src="https://img.shields.io/badge/Tailwind_CSS-Modern_UI-38B2AC?logo=tailwind-css&logoColor=white&style=flat-square" alt="Tailwind CSS">
 
 A high-performance, containerized **Microservices Platform** featuring a real-time multiplayer Pong game, secure authentication, centralized logging, and a custom Single Page Application (SPA) built entirely from scratch with **Vanilla TypeScript**.
 
@@ -30,67 +29,71 @@ This project is built using a decentralized **Microservices Architecture** with 
 ```mermaid
 flowchart TD
     %% Clients
-    User([User / Browser])
+    User(["User / Browser"])
     
     %% Gateway
-    subgraph Gateway [Reverse Proxy & Gateway]
-        Nginx[Nginx Load Balancer / SSL Gateway]
+    subgraph Gateway ["Reverse Proxy & Gateway"]
+        Nginx["Nginx Load Balancer / SSL Gateway"]
     end
 
     %% Frontend
-    subgraph FrontendSPA [Client-Side App]
-        SPA[Vanilla TS Single Page Application]
-        Tailwind[Tailwind CSS Styling]
+    subgraph FrontendSPA ["Client-Side App"]
+        SPA["Vanilla TS Single Page Application"]
+        Tailwind["Tailwind CSS Styling"]
     end
 
     %% Microservices
-    subgraph Services [Backend Microservices (Node.js / Fastify)]
-        Auth[Auth Service]
-        Users[Users & Social Service]
-        Stats[Stats Service]
-        Game[Multiplayer Game Service]
+    subgraph Services ["Backend Microservices (Node.js / Fastify)"]
+        Auth["Auth Service"]
+        Users["Users & Social Service"]
+        Stats["Stats Service"]
+        Game["Multiplayer Game Service"]
     end
 
     %% Databases
-    subgraph Databases [Isolated Storage]
-        DB_Auth[(SQLite Auth DB)]
-        DB_Users[(SQLite Users DB)]
-        DB_Stats[(SQLite Stats DB)]
+    subgraph Databases ["Isolated Storage"]
+        DB_Auth[("SQLite Auth DB")]
+        DB_Users[("SQLite Users DB")]
+        DB_Stats[("SQLite Stats DB")]
     end
 
     %% Message Broker
-    RabbitMQ{RabbitMQ Event Bus}
+    RabbitMQ{"RabbitMQ Event Bus"}
 
     %% Monitoring
-    subgraph Monitoring [Observability & Analytics]
-        Logstash[Logstash Collector]
-        Elasticsearch[(Elasticsearch Storage)]
-        Kibana[Kibana Dashboards]
+    subgraph Monitoring ["Observability & Analytics"]
+        Logstash["Logstash Collector"]
+        Elasticsearch[("Elasticsearch Storage")]
+        Kibana["Kibana Dashboards"]
     end
 
     %% Connections
-    User <-->|HTTPS / SSL| Nginx
-    Nginx -->|Serves Static Files| SPA
-    Nginx <-->|API Routing / WS| Auth
-    Nginx <-->|API Routing / WS| Users
-    Nginx <-->|API Routing / WS| Stats
-    Nginx <-->|WebSocket Matchmaking| Game
+    User <--> Nginx
+    Nginx --> SPA
+    Nginx <--> Auth
+    Nginx <--> Users
+    Nginx <--> Stats
+    Nginx <--> Game
 
     %% DB Connections
-    Auth <---> DB_Auth
-    Users <---> DB_Users
-    Stats <---> DB_Stats
+    Auth <--> DB_Auth
+    Users <--> DB_Users
+    Stats <--> DB_Stats
 
     %% Event Bus Connections
-    Auth -.->|Publish events| RabbitMQ
-    Users -.->|Publish/Subscribe| RabbitMQ
-    Stats -.->|Subscribe events| RabbitMQ
-    Game -.->|Publish Match Results| RabbitMQ
+    Auth -.-> RabbitMQ
+    Users -.-> RabbitMQ
+    Stats -.-> RabbitMQ
+    Game -.-> RabbitMQ
 
     %% Logs Flow
-    Nginx & Auth & Users & Stats & Game ===>|GELF Logging Driver| Logstash
-    Logstash ===> Elasticsearch
-    Elasticsearch ===> Kibana
+    Nginx ==> Logstash
+    Auth ==> Logstash
+    Users ==> Logstash
+    Stats ==> Logstash
+    Game ==> Logstash
+    Logstash ==> Elasticsearch
+    Elasticsearch ==> Kibana
 ```
 
 ---
